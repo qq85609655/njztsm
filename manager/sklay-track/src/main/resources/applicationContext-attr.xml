@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean id="ipAttrExtractor" class="com.sklay.track.attr.extractor.IpAttrExtractor"/>
+    <bean id="userAgentExtractor" class="com.sklay.track.attr.extractor.UserAgentExtractor"/>
+    <bean id="customsAttrExtractor" class="com.sklay.track.attr.extractor.CustomsAttrExtractor" p:customsKey="cs"/>
+    <bean id="singleExtractor" abstract="true" class="com.sklay.track.attr.extractor.SingleAttrExtractor"/>
+    <bean id="attrConfig" abstract="true" class="com.sklay.track.attr.AttrConfig"/>
+
+    <bean id="trackDataExtractor" class="com.sklay.track.service.impl.TrackDataExtractorImpl">
+        <property name="mapping">
+            <map>
+                <entry key="BROWSER">
+                    <map>
+                        <entry key="CLIENT">
+                            <list>
+                                <ref bean="ipAttrExtractor"/>
+                                <ref bean="userAgentExtractor"/>
+                                <bean class="com.sklay.track.attr.extractor.MultiAttrExtractor">
+                                    <property name="simpleMapping">
+                                        <map>
+                                            <entry key="colorDepth" value="DICT"/>
+                                            <entry key="screen" value="DICT"/>
+                                            <entry key="lang" value="DICT"/>
+                                        </map>
+                                    </property>
+                                </bean>
+                                <ref bean="customsAttrExtractor"/>
+                            </list>
+                        </entry>
+                        <entry key="SESSION">
+                            <list>
+                                <ref bean="ipAttrExtractor"/>
+                                <ref bean="customsAttrExtractor"/>
+                            </list>
+                        </entry>
+                        <entry key="EVENT">
+                            <list>
+                                <bean class="com.sklay.track.attr.extractor.UserAttrExtractor">
+                                   <!--  <property name="userProvider" ref="userProvider"/> -->
+                                    <property name="userService" ref="userService"/>
+                                </bean>
+                                <bean class="com.sklay.track.attr.extractor.MultiAttrExtractor">
+                                    <property name="simpleMapping">
+                                        <map>
+                                            <entry key="lt" value="INTEGER"/>
+                                            <entry key="clt" value="INTEGER"/>
+                                            <entry key="slt" value="INTEGER"/>
+                                            <entry key="mem" value="INTEGER"/>
+                                            <entry key="title" value="STRING"/>
+                                        </map>
+                                    </property>
+                                </bean>
+                                <bean class="com.sklay.track.attr.extractor.UrlAttrExtractor"/>
+                                <bean class="com.sklay.track.attr.extractor.RefererAttrExtractor"/>
+                                <ref bean="customsAttrExtractor"/>
+                            </list>
+                        </entry>
+                        <entry key="ACTION">
+                            <list>
+                                <bean class="com.sklay.track.attr.extractor.MultiAttrExtractor">
+                                    <property name="simpleMapping">
+                                        <map>
+                                            <entry key="tid" value="STRING"/>
+                                            <entry key="pos" value="STRING"/>
+                                            <entry key="lt" value="INTEGER"/>
+                                            <entry key="ok" value="BOOLEAN"/>
+                                        </map>
+                                    </property>
+                                </bean>
+                                <bean parent="singleExtractor" p:key="v" p:targetKey="value"/>
+                                <bean class="com.sklay.track.attr.extractor.UrlAttrExtractor"/>
+                                <bean class="com.sklay.track.attr.extractor.CustomsAttrExtractor">
+                                    <property name="excludes" value="type,name,happenAt"/>
+                                </bean>
+                                <ref bean="customsAttrExtractor"/>
+                            </list>
+                        </entry>
+                        <entry key="ERROR_LOG">
+                            <list>
+                                <ref bean="customsAttrExtractor"/>
+                            </list>
+                        </entry>
+                    </map>
+                </entry>
+            </map>
+        </property>
+    </bean>
+</beans>

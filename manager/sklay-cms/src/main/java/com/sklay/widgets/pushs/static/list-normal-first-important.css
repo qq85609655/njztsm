@@ -1,0 +1,28 @@
+.post_wrapper{
+	margin: 0px;
+}
+.post_wrapper li{
+	height:20px;
+	overflow:hidden;
+	padding: 3px 0px;
+}
+
+.post_wrapper li.first{
+	text-align: center;
+	margin-bottom: 0px;
+	height: auto;
+}
+
+.post_wrapper li.first h4{
+	margin-bottom: 0px;
+	
+}
+
+.post_wrapper li.first p{
+	
+}
+
+.post_wrapper .img-holder{
+	padding-right: 10px;
+	padding-bottom: 10px;
+}

@@ -1,0 +1,15 @@
+.list-images{
+    margin:0px;
+}
+
+.list-images li{
+	margin-bottom: 20px;
+}
+
+.list-images h6{
+	margin-bottom:0px;
+	height:20px;
+	text-align: center;
+	word-break: break-all;
+	overflow: hidden;
+}

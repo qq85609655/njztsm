@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+       http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<!-- <import resource="applicationContext-profile.xml"/> -->
+	
+	 <context:property-placeholder ignore-resource-not-found="true" location="classpath:application.properties" />
+
+	<context:annotation-config />
+	<context:component-scan base-package="com.sklay.track">
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+
+	<!-- messagesource -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:message/messages</value>
+				<value>classpath:message/errors</value>
+			</list>
+		</property>
+	</bean>
+	<bean class="com.sklay.core.message.NLS">
+		<property name="messageSource" ref="messageSource" />
+	</bean>
+
+	<mongo:db-factory id="mongoDbFactory" uri="${mongodb.url}" />
+
+	<bean id="mongoConverter" class="com.sklay.support.mongo.EntityMongoConverter">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+		<constructor-arg name="mappingContext">
+			<bean class="org.springframework.data.mongodb.core.mapping.MongoMappingContext" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactory" />
+		<constructor-arg name="mongoConverter" ref="mongoConverter" />
+	</bean>
+
+	<!-- task <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor"> 
+		<property name="corePoolSize" value="20"/> <property name="maxPoolSize" value="200"/> 
+		<property name="queueCapacity" value="10000"/> </bean> <bean class="com.sklay.framework.scheduling.config.ScheduledTaskRegistrarBeanPostProcessor"/> 
+		<task:scheduler id="taskScheduler" pool-size="5"/> <task:scheduled-tasks 
+		scheduler="taskScheduler"> <task:scheduled ref="sessionScheduler" method="sessionTimeoutJob" 
+		fixed-delay="600000"/> <task:scheduled ref="tempCollectionScheduler" method="mapreduceLatestUserAction" 
+		fixed-delay="600000"/> <task:scheduled ref="tempCollectionScheduler" method="mapreduceLatestUserActionOwner" 
+		fixed-delay="600000"/> </task:scheduled-tasks> -->
+	<bean id="sessionScheduler" class="com.sklay.track.scheduler.SessionScheduler" />
+
+	<bean id="tempCollectionScheduler" class="com.sklay.track.scheduler.TempCollectionScheduler" />
+
+	<bean id="appService" class="com.sklay.track.service.impl.AppServiceImpl">
+		<property name="incrementer">
+			<bean class="com.sklay.support.mongo.MongoDataFieldMaxValueIncrementer">
+				<property name="incrementerName" value="app" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="dictService" class="com.sklay.track.service.impl.DictServiceImpl">
+		<property name="dictIncrementer">
+			<bean class="com.sklay.support.mongo.MongoDataFieldMaxValueIncrementer">
+				<property name="incrementerName" value="dict" />
+			</bean>
+		</property>
+		<property name="itemIncrementer">
+			<bean class="com.sklay.support.mongo.MongoDataFieldMaxValueIncrementer">
+				<property name="incrementerName" value="dictItem" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="onlineListener" class="com.sklay.track.listener.impl.OnlineListener" />
+
+	<bean id="trackService" class="com.sklay.track.service.impl.TrackDataServiceImpl">
+		<property name="sessionListeners">
+			<list>
+				<ref bean="onlineListener" />
+			</list>
+		</property>
+		<property name="eventListeners">
+			<list>
+				<ref bean="onlineListener" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="userService" class="com.sklay.track.service.impl.UserServiceImpl" />
+
+	<bean id="jsApiService" class="com.sklay.track.service.impl.TrackServiceImpl">
+		<property name="debug" value="${track.debug}" />
+		<property name="cookieDomain" value="${track.sessionDomain}" />
+		<property name="configs">
+			<map>
+				<entry key="url" value="${track.url}" />
+				<entry key="sDomain" value="${track.sessionDomain}" />
+				<!--<entry key="uidKey" value="a3_uid"/> -->
+			</map>
+		</property>
+	</bean>
+
+	<bean id="locationService" class="com.sklay.track.service.impl.QQWryLocationServiceImpl">
+		<property name="ipFile" value="/WEB-INF/data/qqwry.dat" />
+	</bean>
+
+	<import resource="applicationContext-attr.xml" />
+</beans>

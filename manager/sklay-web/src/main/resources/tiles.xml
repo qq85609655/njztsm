@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+	<definition name="mainTemplate" template="/WEB-INF/views/layout.jsp">
+		<put-attribute name="footer" value="/WEB-INF/views/footer.jsp"/>
+		<put-attribute name="header" value="/WEB-INF/views/header.jsp"/>
+		<put-attribute name="subheader" value="/WEB-INF/views/subheader.jsp"/>
+	</definition>
+	
+	<definition name="cmsTemplate" template="/WEB-INF/views/core/main.jsp">
+		<put-attribute name="content" value="/WEB-INF/views/global.jsp"/>
+	</definition>
+	
+	<definition name="mobileTemplate" template="/WEB-INF/views/mobile/layout.jsp">
+		<put-attribute name="footer" value="/WEB-INF/views/mobile/footer.jsp"/>
+		<put-attribute name="header" value="/WEB-INF/views/mobile/header.jsp"/>
+	</definition>
+	
+	<!-- 最大的匹配放在最下面 -->
+	<definition name="manager:*" extends="mainTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/manager/layout.jsp"/>
+		<put-attribute name="subheader" value="/WEB-INF/views/manager/subheader.jsp" cascade="true"/>
+		<put-attribute name="right" value="/WEB-INF/views/manager/{1}.jsp" cascade="true"/>
+	</definition>
+	
+	<!-- 最大的匹配放在最下面 -->
+	<definition name="manager.*.*" extends="mainTemplate">
+		<put-attribute name="content" value="/WEB-INF/views/manager/layout.jsp"/>
+		<put-attribute name="subheader" value="/WEB-INF/views/manager/subheader.jsp" cascade="true"/>
+		<put-attribute name="right" value="/WEB-INF/views/manager/{1}/{2}.jsp" cascade="true"/>
+	</definition>
+	
+	<!-- 最大的匹配放在最下面 -->
+	<definition name="mobile.*.*" extends="mobileTemplate">
+		<put-attribute name="content" expression="/WEB-INF/views/mobile/{1}/{2}.jsp" cascade="true"/>
+	</definition>
+	<definition name="mobile:*.*" templateExpression="/WEB-INF/views/mobile/{1}/{2}.jsp"/>
+	
+	
+	<definition name="modal:*.*" templateExpression="/WEB-INF/views/manager/{1}/{2}.jsp"/>
+	
+	<definition name="alone:*.*" templateExpression="/WEB-INF/views/{1}/{2}.jsp"/>
+	<definition name="*.*" extends="mainTemplate">
+		<put-attribute name="content" expression="/WEB-INF/views/{1}/{2}.jsp"/>
+	</definition>
+	
+	<!-- 最大的匹配放在最下面 -->
+	<definition name="cms:*.*.*" templateExpression="/WEB-INF/views/{1}/{2}/{3}.jsp"/>
+	
+	<definition name="*.*.*" extends="cmsTemplate">
+		<put-attribute name="content" expression="/WEB-INF/views/{1}/{2}/{3}.jsp" cascade="true"/>
+	</definition>
+	
+	<definition name="cms:*.*" templateExpression="/WEB-INF/views/{1}/{2}.jsp"/>
+	<definition name="*.*" extends="cmsTemplate">
+		<put-attribute name="content" expression="/WEB-INF/views/{1}/{2}.jsp" cascade="true"/>
+	</definition>
+	
+</tiles-definitions>

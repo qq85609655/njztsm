@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Project:  any
+  ~ Module:   any-track
+  ~ File:     logback.xml
+  ~ Modifier: xyang
+  ~ Modified: 2012-12-16 22:11
+  ~
+  ~ Copyright (c) 2012 Sanyuan Ltd. All Rights Reserved.
+  ~
+  ~ Copying of this document or code and giving it to others and the
+  ~ use or communication of the contents thereof, are forbidden without
+  ~ expressed authority. Offenders are liable to the payment of damages.
+  ~ All rights reserved in the event of the grant of a invention patent or the
+  ~ registration of a utility model, design or code.
+  -->
+<configuration>
+    <property name="fileName" value="track" />
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <charset>utf-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} |-%-5level [%thread] %logger{50}:%L - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <if condition='isDefined("filelog.enable")'>
+        <then>
+            <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>../logs/${fileName}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                    <FileNamePattern>../logs/${fileName}.%d{yyyy-MM-dd}.%i.log.gz</FileNamePattern>
+                    <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                        <maxFileSize>10MB</maxFileSize>
+                    </timeBasedFileNamingAndTriggeringPolicy>
+                    <maxHistory>30</maxHistory>
+                </rollingPolicy>
+                <encoder>
+            <charset>utf-8</charset>
+                    <charset>utf-8</charset>
+                    <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} |-%-5level [%thread] %logger{50}:%L - %msg%n</pattern>
+                </encoder>
+            </appender>
+            <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+                <appender-ref ref="FILE"/>
+            </appender>
+        </then>
+    </if>
+
+    <if condition='isDefined("filelog.enable")'>
+        <then>
+            <logger name="com.sklay" level="info"/>
+            <root level="warn">
+                <appender-ref ref="CONSOLE"/>
+                <appender-ref ref="ASYNC"/>
+            </root>
+        </then>
+        <else>
+            <logger name="com.sklay" level="info"/>
+            <root level="info">
+                <appender-ref ref="CONSOLE"/>
+            </root>
+        </else>
+    </if>
+</configuration>

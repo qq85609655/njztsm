@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>test</title>
+    <script type="text/javascript" src="jquery-1.9.1.js"></script>
+</head>
+<body>
+<script type='text/javascript'>
+    var _atk = _atk || [];
+
+    _atk.push(['start', new Date()]);
+    _atk.push(['slt', 200]);
+    _atk.push(['cfs', {debug: true}]);
+    _atk.push(['tags', 'aa', 111]);
+    _atk.push(['customs', {'age': 12}]);
+    _atk.push(['action', {'name': 'aa', start: new Date()}, {'aa': 'ss'}]);
+    _atk.push(['ajax', {url: 'test2.html', ok: true, lt: 123}]);
+    _atk.push(['actionCallback', function (action, type) {
+        if (type == 4 && action.url == 'xxxx') {
+            return false;
+        }
+    }]);
+    try {
+        var tt = aaa;
+    } catch (e) {
+        _atk.push(['ex', e]);
+    }
+
+    (function () {
+        var c = document.createElement('script');
+        c.type = 'text/javascript';
+        c.async = true;
+        c.src = '/atk/boot/1';
+        var h = document.getElementsByTagName('script')[0];
+        h.parentNode.insertBefore(c, h);
+    })();
+</script>
+<div style="width:200px;height: 200px;background: #aaa;padding: 20px;">
+    <a href="test1.html" id="test-link">Inner link test</a>&nbsp;
+    <a href="http://www.baidu.com" id="test-link">Outer link test</a>&nbsp;
+    <br/>
+    <input name="test-input"/>
+    <br/>
+    <textarea id="test-textarea">vvvv</textarea>
+</div>
+<div class="trigger">Trigger</div>
+<div class="result"></div>
+<div class="log"></div>
+<div class="log1"></div>
+<script type="text/javascript">
+    $('.trigger').click(function () {
+        _atk.push(['action', {'xx': 'bb'}, {'cc': 'dd'}]);
+        $.ajax({
+            url: '/atk/static/test/test1.html?asd=3',
+            data: {a: 1}
+        }).done(function () {
+                });
+    });
+
+    function testPost() {
+        _atk.push(['action', {'name': 'aa', start: new Date()}, {'aa': 'ss'}]);
+        _atk.push(['post']);
+    }
+
+</script>
+<div>
+    <a href="#" onclick="testPost();">test post</a>
+</div>
+</body>
+</html>

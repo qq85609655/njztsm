@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, user-scalable=no" target-densitydpi="device-dpi" />
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>3G智能健康服务机 for Android</title>
+
+<link rel="stylesheet" type="text/css" href="file:///android_asset/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="file:///android_asset/css/theme.css">
+<link rel="stylesheet" type="text/css" href="file:///android_asset/css/bootstrap-responsive.min.css">
+<link rel="stylesheet" type="text/css" href="file:///android_asset/slider/themes/light/light.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="file:///android_asset/slider/nivo-slider.css" media="screen" />
+
+<script src="file:///android_asset/js/jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="file:///android_asset/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="file:///android_asset/js/ichart.1.2.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="file:///android_asset/slider/jquery.nivo.slider.js" type="text/javascript" charset="utf-8"></script>
+<script src="file:///android_asset/js/chart.js" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/javascript">
+	function splitChart(msg){
+	   	 var w = window.njztsm.getW();
+	   	 var h = window.njztsm.getH();
+//	   	 execute(msg,w,h) ;
+    }
+</script>
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+  <div class="navbar-inner">
+  	<div class="container">
+     <!--  <a data-target=".nav-collapse" data-toggle="collapse" class="btn btn-navbar btn-info">${loginView.menus }</a>  -->
+      <a href="javascript:void(0);" class="brand">3G智能健康服务机</a>
+  	</div>
+  </div>
+</div>
+<div class="container form-search">
+	<p>
+	 <div class="input-append" style="padding-left: 30px;">
+	    <input type="tel" name="phone" id="phone" class=" search-query" placeholder="请输入要查询的主手机号码..." required="required">
+	    <button type="button" class="btn" id="search"> 查询</button>
+	 </div>
+ 	</p>
+	<div class="slider-wrapper theme-light" id="slider">
+	    <div id="widget-slider" class="nivoSlider">
+	        <img src="adv/android_400.jpg" alt="" />
+	        <img src="adv/android_401.jpg" alt=""/>
+	    </div>
+	</div>
+	<div class="panel-content" id="panel">
+		<div class=" centered">
+			<h3>亲情无“线”绑定 孝爱永“愿”连接</h3>
+			<p>
+				<a class="btn btn-primary btn-large" href="javascript:void(0);">更多精彩敬请期待</a>
+			</p>
+		</div>
+	</div>
+	
+	<div id='chart' ></div>
+</div>
+<footer id="footer">
+  <div class="container">
+	  <div id="gohome" class="hide">
+			<a href="index.html" class="gohome"><span>进入首页</span></a>
+	  </div>
+	  <div id="credit" style="text-align:center;">
+	   	<p>Create by <a href="mailto:('1988fuyu@163.com')">FuYu</a></p>
+    	<p>3G智能健康服务机 for Android</p>
+    	<p> © 2013-2016 njztsm.net All Rights Reserved 版权所有。苏ICP备13032906号</p>
+	  </div>
+  </div>
+</footer>
+</body>
+</html>

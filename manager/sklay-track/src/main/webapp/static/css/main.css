@@ -1,0 +1,73 @@
+html, body, th, td, dl, dt, dd, ul, ol, li, form, textarea, input, select, h1, h2, h3, h4, h5, h6, iframe, p {
+    margin: 0;
+    padding: 0;
+    font: 13px Arial, Helvetica, sans-serif;
+}
+
+em {
+    font-style: normal;
+}
+
+body {
+    background: #fff;
+}
+
+dl, ul {
+    list-style: none;
+}
+
+img, body, html {
+    border: 0;
+}
+
+img, input, select, button {
+    vertical-align: middle;
+}
+
+a {
+    color: #12c;
+    outline: none;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #f00;
+    text-decoration: underline;
+}
+
+.clearfix {
+    overflow: hidden;
+    zoom: 1;
+}
+
+.pagination-info {
+    padding: 5px 0;
+    line-height: 130%;
+}
+
+.pagination-info span {
+    display: block;
+    float: left;
+    padding: 2px 6px;
+}
+
+.pagination-info a, .pagination-info div, .pagination-info span {
+    display: block;
+    float: left;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 2px 8px;
+    margin: 0 4px;
+}
+
+.pagination-info div {
+    font-weight: bold;
+    color: #000;
+    border: none;
+    padding: 3px 8px;
+}
+
+.pagination-info a:hover {
+    background: #b0d1ea;
+    color: #00c;
+}

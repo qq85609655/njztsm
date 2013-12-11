@@ -6,16 +6,16 @@
 			<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{50} -%msg%n</pattern>
 		</layout>
 	</appender>
-	<!--    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <Encoding>UTF-8</Encoding>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <FileNamePattern>fs.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <FileNamePattern>D:\logs\sklay.%d{yyyy-MM-dd}.log</FileNamePattern>
             <MaxHistory>30</MaxHistory>
         </rollingPolicy>
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
         </layout>
-    </appender>-->
+    </appender>
     
 	<!-- <logger name="com.sklay" level="DEBUG" /> -->
 	<!-- 3rdparty Loggers -->
@@ -33,6 +33,6 @@
 	<root>
 		<level value="ERROR" />
 		<appender-ref ref="STDOUT" />
-		<!--<appender-ref ref="FILE" /> -->
+		<appender-ref ref="FILE" />
 	</root>
 </configuration>

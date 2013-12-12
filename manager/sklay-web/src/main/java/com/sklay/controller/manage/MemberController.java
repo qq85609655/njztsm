@@ -859,6 +859,9 @@ public class MemberController {
 		if (null == user.getAge())
 			throw new SklayException(ErrorCode.MISS_PARAM, null, "年龄");
 
+		if(StringUtils.isEmpty(user.getArea()))
+			throw new SklayException(ErrorCode.MISS_PARAM, null, "地区");
+		
 		if (0 >= user.getAge() || user.getAge() > 150)
 			throw new SklayException(ErrorCode.ILLEGAL_PARAM, null, "年龄不在正常范围内");
 

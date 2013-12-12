@@ -8,11 +8,11 @@
 <div class="widget-box">	
 	<div class="widget-content tab-content" id="createForm">
 		<form class="form-horizontal" action="${ctx }/admin/member/create" method="post">
-		<div class="control-group">
-	        <div class="controls">
-	         <label class="control-label offset1 input-success">请认真填写如下信息！</label>
-	        </div>
-	      </div>
+        	<div class="alert alert-info">
+			  <button type="button" class="close" data-dismiss="alert">&times;</button>
+			  <h4>说明!</h4>
+			   <label class="control-label">请认真填写如下信息！红色带星号的为必填项</label>
+			</div>
 	      <sklay:hasRole value="2">
 	      <div class="control-group">
 	        <label class="control-label" for="inputAuditStatus">审核状态</label>
@@ -30,7 +30,7 @@
 	      </div>
 	      </sklay:hasRole>
 	      <div class="control-group">
-	        <label class="control-label" for="inputUserGroup">所在分组</label>
+	        <label class="control-label" for="inputUserGroup"><span style="color: red;">*</span> 所在分组</label>
 	        <div class="controls">
 	        	<select name="groupId" id="inputUserGroup">
 		        	<c:forEach items="${groups }" var="group" varStatus="status">
@@ -41,19 +41,19 @@
 	      </div>
 	      
 	      <div class="control-group">
-	        <label class="control-label" for="inputName">真实姓名</label>
+	        <label class="control-label" for="inputName"><span style="color: red;">*</span> 真实姓名</label>
 	        <div class="controls">
 	          <input class="span3" type="text" name="name" id="inputName" placeholder="真实姓名">
 	        </div>
 	      </div>
 	      <div class="control-group">
-	        <label class="control-label" for="inputPhone">手机号码</label>
+	        <label class="control-label" for="inputPhone"><span style="color: red;">*</span> 手机号码</label>
 	        <div class="controls">
 	          <input class="span3" type="tel" name="phone" id="inputPhone" placeholder="手机号码">
 	        </div>
 	      </div>
 	      <div class="control-group">
-	        <label class="control-label" for="inputSex">性别</label>
+	        <label class="control-label" for="inputSex"><span style="color: red;">*</span> 性别</label>
 	        <div class="controls">
 	          	<label class="radio inline">
 				  <input type="radio" name="sex" id="inputSex1" value="<%=Sex.MALE %>" checked><%=Sex.MALE.getLable() %>
@@ -64,7 +64,7 @@
 	        </div>
 	      </div>
 	      <div class="control-group">
-	        <label class="control-label" for="inputAge">年龄</label>
+	        <label class="control-label" for="inputAge"><span style="color: red;">*</span> 年龄</label>
 	        <div class="controls">
 	          <input class="span3" type="number" min="1" required="required"  name="age" id="inputAge" placeholder="年龄">
 	        </div>
@@ -88,7 +88,7 @@
 	        </div>
 	      </div>
 	      <div class="control-group">
-	        <label class="control-label" for="inputArea">地区</label>
+	        <label class="control-label" for="inputArea"><span style="color: red;">*</span> 地区</label>
 	        <div class="controls">
 	          <input class="span3" type="text" name="area" id="inputArea" placeholder="地区">
 	        </div>

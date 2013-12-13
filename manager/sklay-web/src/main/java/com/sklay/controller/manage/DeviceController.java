@@ -84,9 +84,10 @@ public class DeviceController {
 	@RequestMapping("/list")
 	@RequiresPermissions("device:list")
 	@Widget(name = ":list", description = "查看设备列表")
-	public String list(Integer levelValue, BindingMold bindingMold,
-			String keyword, @PageableDefaults(value = 20) Pageable pageable,
-			ModelMap modelMap) {
+	public String list(Integer levelValue, Long groupId,
+			BindingMold bindingMold, String keyword, AuditStatus status,
+			AuditStatus moldStatus,
+			@PageableDefaults(value = 20) Pageable pageable, ModelMap modelMap) {
 		Level level = null;
 		if (null != levelValue)
 			level = Level.findByValue(levelValue);
@@ -95,18 +96,29 @@ public class DeviceController {
 
 		User user = LoginUserHelper.getLoginUser();
 		Page<DeviceBinding> page = null;
+		List<Group> groups = null;
+		Set<Group> groupSet = Sets.newHashSet();
+		Group current = null;
+		if (null != groupId) {
+			current = groupService.get(groupId);
+		}
+
 		if (MemberRole.ADMINSTROTAR == user.getGroup().getRole()) {
 
 			if (null == user.getGroup().getParentGroupId()) {
 				user = null;
-				page = bindingService.getDeviceBindingPage(keyword, level,
-						bindingMold, user, pageable);
+
+				if (null != current)
+					groupSet.add(current);
+				page = bindingService.getDeviceBindingPage(groupSet, keyword,
+						level, bindingMold, user, status, moldStatus, pageable);
+				groups = groupService.getGroupAll();
 			} else {
 
 				Group parentGroup = user.getGroup();
 				Long parentGroupId = parentGroup.getId();
 
-				List<Group> groups = groupService.getGroupByOwner(user);
+				groups = groupService.getGroupByOwner(user);
 				Set<Long> groupIds = Sets.newHashSet(parentGroupId);
 
 				/** 取得当前分组 */
@@ -140,23 +152,33 @@ public class DeviceController {
 						groupIds.add(currentGroupId);
 					}
 				}
-
-				Set<Group> groupList = Sets.newHashSet();
-
-				if (CollectionUtils.isNotEmpty(groups)) {
-					groupList.addAll(groups);
+				if (null != current) {
+					groupSet.add(current);
+					user = null;
+				} else if (CollectionUtils.isNotEmpty(groups)) {
+					groupSet.addAll(groups);
 					user = null;
 				}
-				page = bindingService.getDeviceBindingPage(groupList, keyword,
-						level, bindingMold, user, pageable);
+				page = bindingService.getDeviceBindingPage(groupSet, keyword,
+						level, bindingMold, user, status, moldStatus, pageable);
 			}
-		} else
-			page = bindingService.getDeviceBindingPage(keyword, level,
-					bindingMold, user, pageable);
-
+		} else {
+			if (null != current)
+				groupSet.add(current);
+			page = bindingService.getDeviceBindingPage(groupSet, keyword,
+					level, bindingMold, user, status, moldStatus, pageable);
+			groups = groupService.getGroupByOwner(user);
+		}
 		modelMap.addAttribute("checkedOption", level);
+		modelMap.addAttribute("checkedStatus", status);
+		modelMap.addAttribute("checkedMoldStatus", moldStatus);
+		modelMap.addAttribute("groups", groups);
+		modelMap.addAttribute("checkedId", groupId);
 		modelMap.addAttribute("pageModel", page);
-		modelMap.addAttribute("pageQuery", initQuery(keyword, levelValue));
+		modelMap.addAttribute(
+				"pageQuery",
+				initQuery(levelValue, groupId, bindingMold, keyword, status,
+						moldStatus));
 		modelMap.addAttribute("keyword", keyword);
 
 		return "manager.device.list";
@@ -442,14 +464,25 @@ public class DeviceController {
 		return operation;
 	}
 
-	private static String initQuery(String keyword, Integer levelValue) {
+	private static String initQuery(Integer levelValue, Long groupId,
+			BindingMold bindingMold, String keyword, AuditStatus status,
+			AuditStatus moldStatus) {
 
 		String query = "";
 
 		if (null != levelValue)
 			query += "levelValue=" + levelValue + "&";
+		if (null != groupId)
+			query += "groupId=" + groupId + "&";
+		if (null != levelValue)
+			query += "bindingMold=" + bindingMold + "&";
+		if (null != levelValue)
+			query += "status=" + status + "&";
+		if (null != moldStatus)
+			query += "moldStatus=" + moldStatus + "&";
 		if (StringUtils.isNotBlank(keyword))
 			query += "keyword=" + keyword.trim().replaceAll("%", "") + "&";
+		
 		return query;
 	}
 }

@@ -100,10 +100,11 @@ public class BindingServiceImpl implements BindingService {
 	@Override
 	public Page<DeviceBinding> getDeviceBindingPage(Set<Group> groups,
 			String keyword, Level level, BindingMold bindingMold, User creator,
-			Pageable pageable) throws SklayException {
+			AuditStatus status, AuditStatus moldStatus, Pageable pageable)
+			throws SklayException {
 
 		return specificDao.getDeviceBindingPage(groups, keyword, level,
-				bindingMold, creator, pageable);
+				bindingMold, status, moldStatus, creator, pageable);
 	}
 
 	@Override

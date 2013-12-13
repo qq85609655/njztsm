@@ -66,7 +66,8 @@ public interface SpecificDao {
 			Pageable pageable) throws SklayException;
 
 	public Page<DeviceBinding> getDeviceBindingPage(Set<Group> groups,
-			String keyword, Level level, BindingMold bindingMold, User creator,
+			String keyword, Level level, BindingMold bindingMold,
+			AuditStatus status, AuditStatus moldStatus, User creator,
 			Pageable pageable) throws SklayException;
 
 	public List<User> findAgent(User owner);

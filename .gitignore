@@ -25,3 +25,13 @@
 /manager/sklay-core/target
 /manager/sklay-cms-web/target
 /manager/sklay-cms/target
+/android-server/.settings
+/android-server/.project
+/android-server/android-core/.settings
+/android-server/android-core/target
+/android-server/android-core/*.classpath
+/android-server/android-core/*.project
+/android-server/android-web/.settings
+/android-server/android-web/target
+/android-server/android-web/*.classpath
+/android-server/android-web/*.project

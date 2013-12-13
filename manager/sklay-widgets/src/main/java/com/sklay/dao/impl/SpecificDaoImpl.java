@@ -446,9 +446,9 @@ public class SpecificDaoImpl implements SpecificDao {
 			Level level, BindingMold bindingMold, User creator,
 			Pageable pageable) throws SklayException {
 		Query countQuery = initDevicePage(null, keyword, level, bindingMold,
-				creator, true);
+				null, null, creator, true);
 		Query dataQuery = initDevicePage(null, keyword, level, bindingMold,
-				creator, false);
+				null, null, creator, false);
 
 		Long total = (Long) countQuery.getSingleResult();
 		if (!(total > 0))
@@ -464,13 +464,14 @@ public class SpecificDaoImpl implements SpecificDao {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Page<DeviceBinding> getDeviceBindingPage(Set<Group> groups,
-			String keyword, Level level, BindingMold bindingMold, User creator,
+			String keyword, Level level, BindingMold bindingMold,
+			AuditStatus status, AuditStatus moldStatus, User creator,
 			Pageable pageable) throws SklayException {
 
 		Query countQuery = initDevicePage(groups, keyword, level, bindingMold,
-				creator, true);
+				status, moldStatus, creator, true);
 		Query dataQuery = initDevicePage(groups, keyword, level, bindingMold,
-				creator, false);
+				status, moldStatus, creator, false);
 
 		Long total = (Long) countQuery.getSingleResult();
 		if (!(total > 0))
@@ -485,7 +486,8 @@ public class SpecificDaoImpl implements SpecificDao {
 	}
 
 	private Query initDevicePage(Set<Group> groups, String keyword,
-			Level level, BindingMold bindingMold, User creator, boolean count) {
+			Level level, BindingMold bindingMold, AuditStatus status,
+			AuditStatus moldStatus, User creator, boolean count) {
 
 		StringBuffer sb = null;
 		if (count)
@@ -499,6 +501,12 @@ public class SpecificDaoImpl implements SpecificDao {
 
 		if (null != bindingMold)
 			sb.append(" and d.mold = :bindingMold ");
+
+		if (null != moldStatus)
+			sb.append(" and d.moldStatus = :moldStatus ");
+
+		if (null != status)
+			sb.append(" and d.status = :status ");
 
 		if (null != creator)
 			sb.append(" and d.creator = :creator ");
@@ -516,6 +524,12 @@ public class SpecificDaoImpl implements SpecificDao {
 
 		if (null != bindingMold)
 			query.setParameter("bindingMold", bindingMold);
+
+		if (null != moldStatus)
+			query.setParameter("moldStatus", moldStatus);
+
+		if (null != status)
+			query.setParameter("status", status);
 
 		if (null != creator)
 			query.setParameter("creator", creator);

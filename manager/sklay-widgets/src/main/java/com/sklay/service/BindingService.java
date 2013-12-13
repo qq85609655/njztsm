@@ -58,7 +58,8 @@ public interface BindingService {
 
 	public Page<DeviceBinding> getDeviceBindingPage(Set<Group> groups,
 			String keyword, Level level, BindingMold bindingMold, User creator,
-			Pageable pageable) throws SklayException;
+			AuditStatus status, AuditStatus moldStatus, Pageable pageable)
+			throws SklayException;
 
 	public void deleteTargetBinding(Long userId);
 

@@ -1,3 +1,4 @@
+<%@page import="com.sklay.core.enums.AuditStatus"%>
 <%@page import="com.sklay.core.enums.BindingMold"%>
 <%@page import="com.sklay.core.enums.Level"%>
 <%@page import="java.util.Date"%>
@@ -28,6 +29,17 @@
 			</li>
 		</ul>
 		<form action="${ctx }/admin/device/list" method="post">
+		
+			<div class="input-prepend">
+			  	<span class="add-on">分组:</span>
+			    <select class="span2" name="groupId">
+				  <option value="" <c:if test="${empty checkedId}"> selected="selected" </c:if>>所有分组</option>
+				  <c:forEach items="${groups}" var="group">
+					<option value="${group.id}" <c:if test="${group.id eq checkedId}"> selected="selected" </c:if>>${group.name}</option>
+				  </c:forEach>
+				</select>
+			</div>
+		
 			<div class="input-prepend">
 			  <span class="add-on">等级</span>
 			    <select class="span2" name="levelValue">
@@ -43,6 +55,26 @@
 				  <option value="" <c:if test="${empty checkedType}"> selected="selected" </c:if>>所有类型</option>
 					<option value="<%=BindingMold.FREE %>" <c:if test="${ checkedType.value eq 0}"> selected="selected" </c:if>><%=BindingMold.FREE.getLable() %></option>
 					<option value="<%=BindingMold.PAID %>" <c:if test="${ checkedType.value eq 1}"> selected="selected" </c:if>><%=BindingMold.PAID.getLable() %></option>
+				</select>
+			</div>
+			
+			<div class="input-prepend">
+			  <span class="add-on">绑定状态</span>
+			    <select class="span2" name="status">
+				  <option value="" <c:if test="${empty checkedStatus}"> selected="selected" </c:if>>所有状态</option>
+					<option value="<%=AuditStatus.WAIT %>" <c:if test="${ checkedStatus.value eq 0}"> selected="selected" </c:if>><%=AuditStatus.WAIT.getLable() %></option>
+					<option value="<%=AuditStatus.PASS %>" <c:if test="${ checkedStatus.value eq 1}"> selected="selected" </c:if>><%=AuditStatus.PASS.getLable() %></option>
+					<option value="<%=AuditStatus.NOT %>" <c:if test="${ checkedStatus.value eq 2}"> selected="selected" </c:if>><%=AuditStatus.NOT.getLable() %></option>
+				</select>
+			</div>
+			
+			<div class="input-prepend">
+			  <span class="add-on">付费状态</span>
+			    <select class="span2" name="moldStatus">
+				  <option value="" <c:if test="${empty checkedMoldStatus}"> selected="selected" </c:if>>所有状态</option>
+				  	<option value="<%=AuditStatus.WAIT %>" <c:if test="${ checkedMoldStatus.value eq 0}"> selected="selected" </c:if>><%=AuditStatus.WAIT.getLable() %></option>
+					<option value="<%=AuditStatus.PASS %>" <c:if test="${ checkedMoldStatus.value eq 1}"> selected="selected" </c:if>><%=AuditStatus.PASS.getLable() %></option>
+					<option value="<%=AuditStatus.NOT %>" <c:if test="${ checkedMoldStatus.value eq 2}"> selected="selected" </c:if>><%=AuditStatus.NOT.getLable() %></option>
 				</select>
 			</div>
 			

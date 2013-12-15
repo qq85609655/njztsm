@@ -10,6 +10,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -76,6 +78,9 @@ import com.sklay.vo.DataView;
 @RequestMapping("/admin/member")
 @Widgets(value = "member", description = "会员管理")
 public class MemberController {
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(MemberController.class);
 
 	@Autowired
 	private GroupService groupService;
@@ -754,7 +759,7 @@ public class MemberController {
 		Group parentGroup = owner.getGroup();
 		Long parentGroupId = parentGroup.getId();
 
-		List<Group> list = (MemberRole.ADMINSTROTAR == memberRole && null == parentGroupId) ? groupService
+		List<Group> list = LoginUserHelper.isSuperAdmin() ? groupService
 				.getGroupAll() : groupService.getGroupByOwner(owner);
 
 		Group group = null;
@@ -772,8 +777,9 @@ public class MemberController {
 			}
 		}
 
-		boolean hasNext = (MemberRole.ADMINSTROTAR == owner.getGroup()
-				.getRole() && null != owner.getGroup().getParentGroupId());
+		boolean agentAdmin = (!LoginUserHelper.isSuperAdmin() && LoginUserHelper
+				.isAdmin());
+		boolean hasNext = agentAdmin;
 
 		while (hasNext) {
 
@@ -807,18 +813,7 @@ public class MemberController {
 			}
 		}
 
-		if (StringUtils.isNotBlank(keyword)) {
-			pageQuery = "keyword=" + keyword + "&";
-			if (null != groupId)
-				pageQuery += "groupId=" + groupId + "&";
-		} else {
-			if (null != groupId)
-				pageQuery = "groupId=" + groupId + "&";
-		}
-		modelMap.addAttribute("checkedGroup", group);
-
-		if ((MemberRole.ADMINSTROTAR == owner.getGroup().getRole() && null != owner
-				.getGroup().getParentGroupId())) {
+		if (agentAdmin) {
 
 			Set<Group> groups = Sets.newHashSet();
 
@@ -832,6 +827,19 @@ public class MemberController {
 		} else
 			userPage = userAttrService.getUserPage(group, keyword, owner,
 					memberRole, pageable);
+
+		if (StringUtils.isNotBlank(keyword)) {
+			pageQuery = "keyword=" + keyword + "&";
+			if (null != groupId)
+				pageQuery += "groupId=" + groupId + "&";
+		} else {
+			if (null != groupId)
+				pageQuery = "groupId=" + groupId + "&";
+		}
+
+		LOGGER.error("checkedGroup is {}", group);
+
+		modelMap.addAttribute("checkedGroup", group);
 		modelMap.addAttribute("pageModel", userPage);
 		modelMap.addAttribute("pageQuery", pageQuery);
 		modelMap.addAttribute("keyword", keyword);
@@ -859,9 +867,9 @@ public class MemberController {
 		if (null == user.getAge())
 			throw new SklayException(ErrorCode.MISS_PARAM, null, "年龄");
 
-		if(StringUtils.isEmpty(user.getArea()))
+		if (StringUtils.isEmpty(user.getArea()))
 			throw new SklayException(ErrorCode.MISS_PARAM, null, "地区");
-		
+
 		if (0 >= user.getAge() || user.getAge() > 150)
 			throw new SklayException(ErrorCode.ILLEGAL_PARAM, null, "年龄不在正常范围内");
 

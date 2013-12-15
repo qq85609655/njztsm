@@ -5,11 +5,10 @@
 
 <div class="widget-box">
 
-<div class="alert alert-info">
-  <button type="button" class="close" data-dismiss="alert">&times;</button>
-  <h4>说明!</h4>
-   <label class="control-label">请认真填写如下信息！</label>
-</div>
+	<div class="alert alert-info" style="font-size: 14px;text-align: center;">
+	  <h4>说明!</h4>
+	   <p>请认真填写如下信息！红色带星号的为必填项</p>
+	</div>
 	
 	<div class="widget-content tab-content" id="createForm">
 		<form class="form-horizontal" action="${ctx}/admin/member/update" method="post">
@@ -20,7 +19,7 @@
 	    </div>
 	    <c:if test="${session.group.id eq member.group.parentGroupId }">
 	    <div class="control-group">
-	        <label class="control-label" for="inputUserGroup">所在分组</label>
+	        <label class="control-label" for="inputUserGroup"><span style="color: red;">*</span> 所在分组</label>
 	        <div class="controls">
 	        	<select name="groupId" id="inputUserGroup" ${disabled }>
 		        	<c:forEach items="${groups }" var="group" varStatus="status">
@@ -31,19 +30,19 @@
 	      </div>
 	      </c:if>
 	      <div class="control-group">
-	        <label class="control-label" for="inputName">真实姓名</label>
+	        <label class="control-label" for="inputName"><span style="color: red;">*</span> 真实姓名</label>
 	        <div class="controls">
 	          <input class="span3" type="text" name="name" id="inputName" placeholder="未填写真实姓名" value="${member.name }">
 	        </div>
 	      </div>
 	      <div class="control-group">
-	        <label class="control-label" for="inputPhone">手机号码</label>
+	        <label class="control-label" for="inputPhone"><span style="color: red;">*</span> 手机号码</label>
 	        <div class="controls">
 	          <input class="span3" type="tel" name="phone" id="inputPhone" placeholder="未填写手机号码" value="${member.phone }">
 	        </div>
 	      </div>
 	       <div class="control-group">
-	        <label class="control-label" for="inputSex">性别</label>
+	        <label class="control-label" for="inputSex"><span style="color: red;">*</span> 性别</label>
 	        <div class="controls">
 	          	<label class="radio inline">
 				  <input type="radio" name="sex" id="inputSex1" value="<%=Sex.MALE %>" <c:if test="${member.sex.value eq 1}">checked</c:if>><%=Sex.MALE.getLable() %>
@@ -54,7 +53,7 @@
 	        </div>
 	      </div>
 	      <div class="control-group">
-	        <label class="control-label" for="inputAge">年龄</label>
+	        <label class="control-label" for="inputAge"><span style="color: red;">*</span> 年龄</label>
 	        <div class="controls">
 	          <input class="span3" type="number" min="1" required="required" name="age" id="inputAge" placeholder="未填写年龄" value="${member.age }">
 	        </div>
@@ -78,7 +77,7 @@
 	        </div>
 	      </div>
 	      <div class="control-group">
-	        <label class="control-label" for="inputArea">地区</label>
+	        <label class="control-label" for="inputArea"><span style="color: red;">*</span> 地区</label>
 	        <div class="controls">
 	          <input class="span3" type="text" name="area" id="inputArea" placeholder="未填写地区" value="${member.area }">
 	        </div>
@@ -92,7 +91,7 @@
 	      <div class="control-group">
 	        <label class="control-label" for="inputDescription">备注</label>
 	        <div class="controls">
-	          	<textarea class="span3" rows="3" cols="5"  name="description" id="inputDescription" placeholder="未填写备注">${member.description }${member.description }</textarea>
+	          	<textarea class="span3" rows="3" cols="5"  name="description" id="inputDescription" placeholder="未填写备注">${member.description }</textarea>
 	        </div>
 	      </div>
 	      <div class="control-group">

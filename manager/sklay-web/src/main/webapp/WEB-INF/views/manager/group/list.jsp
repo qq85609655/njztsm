@@ -55,7 +55,7 @@
 									<td class="taskDesc">${model.name}</td>
 									<td class="taskDesc">${model.owner.name}</td>
 									<td class="taskDesc">${model.memberCount}</td>
-									<td class="taskDesc">${model.status.lable}</td>
+									<td class="taskDesc" <c:if test="${model.status.value != 1 }">style="color:red;"</c:if>>${model.status.lable}</td>
 									<td>${model.description}</td>
 									<td colspan="4">
 										<shiro:hasPermission name="group:update">

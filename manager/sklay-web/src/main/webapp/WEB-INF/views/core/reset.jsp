@@ -33,48 +33,41 @@
   </div>
 	<div class="container">
 		<div class="content">
-			<div class="row-fluid">
-				<div id="login-container">
-					<div id="login-header">						
-						<h3>登录</h3>						
-					</div> <!-- /login-header -->
-	
-					<div id="login-content" class="clearfix">
-						<form action="${ctx}/login" method="post">
-							<fieldset>
-								<div class="control-group">
-									<label class="control-label" for="username">用户名</label>
-									<div class="controls">
-										<input type="text" class="" id="username" name="username" value="">
+			<div id="login-container">
+				<div id="login-header">						
+				<c:choose>
+					<c:when test="${ empty model }">
+					<div class="row-fluid">
+								<h3>找回密码</h3>						
+							</div> <!-- /login-header -->
+			
+							<div id="login-content" class="clearfix">
+								<form action="${ctx}/reset" method="post">
+									<fieldset>
+										<div class="control-group">
+											<label class="control-label" for="phone">用户名</label>
+											<div class="controls">
+												<input type="text" class="" id="phone" name="phone" value="">
+											</div>
+										</div>
+									</fieldset>
+									<div class="pull-right">
+										<button type="submit" class="btn btn-warning btn-large">
+											提交
+										</button>
 									</div>
-								</div>
-								<div class="control-group">
-									<label class="control-label" for="password">密码</label>
-									<div class="controls">
-										<input type="password" class="" id="password" name="password" value="">
-									</div>
-								</div>
-							</fieldset>
-									
-							<div id="remember-me" class="pull-left">
-								<input type="checkbox" name="rememberme" id="remember">
-								<label id="remember-label" for="remember">记住我</label>
+								</form>							
 							</div>
-							<div class="pull-right">
-								<button type="submit" class="btn btn-warning btn-large">
-									登录
-								</button>
-								<p>忘记密码? <a href="${ctx }/reset">找回它</a></p>
-							</div>
-						</form>							
-					</div> <!-- /login-content -->	
-					<div id="login-extra" style="display: none">
-						<br/>
-						<p>没有帐号? <a href="javascript:;">注册</a></p>
-						<p>忘记密码? <a href="forgot_password.html">找回它</a></p>
-					</div> <!-- /login-extra -->		
+					</c:when>
+					<c:otherwise>
+						<div class="alert alert-success" style="font-size: 14px;">
+			              <strong>亲 , ${model.name } ! 您好</strong>  密码重置成功.<br>新密码已发送到您的手机,请查收,不能再丢了哦.<br>
+			              	点击<a href="${ctx }/login">登入</a>.
+			            </div>
+					</c:otherwise>
+				</c:choose>
 				</div>
-			</div>
+	       </div>
 		</div>
 	</div> <!-- /container -->
 	</body>

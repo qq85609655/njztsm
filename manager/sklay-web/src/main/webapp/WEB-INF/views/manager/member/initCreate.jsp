@@ -6,13 +6,12 @@
 <%@ include file="../../include.jsp"%>
 
 <div class="widget-box">	
+	<div class="alert alert-info" style="font-size: 14px;text-align: center;">
+	  <h4>说明!</h4>
+	   <p>请认真填写如下信息！红色带星号的为必填项</p>
+	</div>
 	<div class="widget-content tab-content" id="createForm">
 		<form class="form-horizontal" action="${ctx }/admin/member/create" method="post">
-        	<div class="alert alert-info">
-			  <button type="button" class="close" data-dismiss="alert">&times;</button>
-			  <h4>说明!</h4>
-			   <label class="control-label">请认真填写如下信息！红色带星号的为必填项</label>
-			</div>
 	      <sklay:hasRole value="2">
 	      <div class="control-group">
 	        <label class="control-label" for="inputAuditStatus">审核状态</label>

@@ -64,9 +64,11 @@
 
 
 </style>
-<div class="row">
+<div class="container">
+<div class="row-fluid" style="min-height: 800px;margin-top: 200px">
   <div class="error-404">
     <p><span>4</span><span>0</span><span>4</span></p>
-    <p>该页面不存在(´･ω･`)</p>
   </div>
+	<p style="text-align: center;margin-top:100px;">该页面不存在(´･ω･`) 点击 <a href="${ctx}/">这里</a> 继续浏览其他页面</p>
+</div>
 </div>

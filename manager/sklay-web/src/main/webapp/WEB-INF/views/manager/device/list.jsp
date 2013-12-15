@@ -116,11 +116,11 @@
 									<td>${model.serialNumber}</td>
 									<td>${model.level.lable} </td>
 									<td>${model.mold.lable} </td>
-									<td>${model.status.lable}</td>
+									<td <c:if test="${model.status.value != 1 }">style="color:red;"</c:if>>${model.status.lable}</td>
 									<td><fmt:formatDate type="both" dateStyle="default" timeStyle="default" value="${model.createTime}" /></td>
 									<td>
 										<shiro:hasPermission name="device:audit">
-										 <a class="modal-link" data-target="#modalTemplate" data-title="设备审核" href="${ctx}/admin/device/initAudit/${model.id}" >审核</a>
+										 <a class="modal-link" data-target="#modalTemplate" data-title="设备审核" href="${ctx}/admin/device/initAudit/${model.id}">审核</a>
 										</shiro:hasPermission>
 										<shiro:hasPermission name="device:update">
 										 | <a class="modal-link" data-target="#modalTemplate" data-title="设备修改" href="${ctx}/admin/device/initUpdate/${model.id}" >修改</a>
@@ -130,7 +130,7 @@
 										</shiro:hasPermission>
 										<shiro:hasPermission name="device:moldAudit">
 											<c:if test="${model.mold.value eq 1}">
-										 | <a class="modal-link" data-target="#modalTemplate" data-title="付费设备审核" href="${ctx}/admin/device/initMoldAudit/${model.id}" >付费审核</a>
+										 | <a class="modal-link" data-target="#modalTemplate" data-title="付费设备审核" href="${ctx}/admin/device/initMoldAudit/${model.id}">付费审核</a>
 											</c:if>
 										</shiro:hasPermission>
 										| <a class="modal-link" data-target="#modalTemplate" data-title="健康报告" data-nofooter='true' href="${ctx}/admin/member/initLineChart/${model.targetUser.id}">健康报告</a>

@@ -38,21 +38,27 @@ $(function($){
 	        $target.modal("show");
 	    }) ;
 	
-	function popoverDestory (btn){
+	function popoverDestory (btn ,form){
+		
 		$('.btn-primary').popover('destroy') ;
 		var $href = btn.attr('data-href') ;
+		var $reload = $('#pagination').find('.active') ;
 		$('.btn-close').click() ;
 		if('reload' == $href){
+			
+			if($reload)
+				window.location.href = $reload.find('a').attr('href') ;
+			return  ;
 			window.location.reload() ;
 		}else{
 			window.location.href = $href ;
 		} ;
 	}
 	
-	function callLater(fRef, argu1) 
+	function callLater(fRef, argu1 ,argu2) 
 	{
 		return (function() {
-				fRef(argu1);
+				fRef(argu1 , argu2);
 		});
 	};
 	function initOnce(formEl,action){
@@ -69,7 +75,7 @@ $(function($){
 				$.post(frm.attr('action'),frm.serialize(),function(res){
 					var alertEl = $(formEl).find(".alert");
 					switch (res.code) {
-						case 0: {btn.attr('data-content',res.msg) ;$('.btn-primary').popover('show');window.setTimeout(callLater(popoverDestory, btn),500); break;}
+						case 0: {btn.attr('data-content',res.msg) ;$('.btn-primary').popover('show');window.setTimeout(callLater(popoverDestory, btn,frm),500); break;}
 						default: alertEl.html(res.msg).show(); break;
 					}
 					btn.button('reset');

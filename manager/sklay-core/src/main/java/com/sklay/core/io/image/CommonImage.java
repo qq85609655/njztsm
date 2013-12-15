@@ -1,9 +1,3 @@
-/*
- * @(#)CommonImage.java 2011
- *
- * Copyright 2011 Sklay SoftWare, Inc. All rights reserved.
- * SKLAY Limited Company/CONFIDENTIAL. Use is subject to license terms.
- */
 package com.sklay.core.io.image;
 
 import java.awt.image.BufferedImage;
@@ -23,14 +17,7 @@ import javax.imageio.stream.ImageInputStream;
 import org.apache.commons.io.FileUtils;
 
 import com.sklay.core.io.FileOperation;
-import com.sklay.core.io.image.CommonImage;
-import com.sklay.core.io.image.ImageOperation;
-import com.sklay.core.io.image.ImageOperationFactory;
 
-/**
- * @author StormNing
- * 
- */
 public class CommonImage implements FileOperation {
 	private BufferedImage bufferedImage = null;
 
@@ -148,7 +135,7 @@ public class CommonImage implements FileOperation {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.sklay.base.io.FileOperation#save(java.lang.String)
+	 * @see com.slyak.base.io.FileOperation#save(java.lang.String)
 	 */
 	public void save(String destination) throws IOException {
 		save(new File(destination));
@@ -162,7 +149,7 @@ public class CommonImage implements FileOperation {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.sklay.base.io.FileOperation#send(java.io.OutputStream)
+	 * @see com.slyak.base.io.FileOperation#send(java.io.OutputStream)
 	 */
 	public void send(OutputStream outputStream) throws IOException {
 		ImageIO.write(bufferedImage, formatName, outputStream);

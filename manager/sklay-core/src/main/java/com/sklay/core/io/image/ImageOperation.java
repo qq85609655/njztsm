@@ -1,9 +1,3 @@
-/*
- * @(#)ImageOperation.java 2011
- *
- * Copyright 2011 Sklay SoftWare, Inc. All rights reserved.
- * SKLAY Limited Company/CONFIDENTIAL. Use is subject to license terms.
- */
 package com.sklay.core.io.image;
 
 import java.awt.image.BufferedImage;

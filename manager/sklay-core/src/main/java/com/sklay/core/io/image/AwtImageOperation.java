@@ -1,9 +1,3 @@
-/*
- * @(#)DefaultImageOperation.java 2011
- *
- * Copyright 2011 Sklay SoftWare, Inc. All rights reserved.
- * SKLAY Limited Company/CONFIDENTIAL. Use is subject to license terms.
- */
 package com.sklay.core.io.image;
 
 import java.awt.Graphics2D;
@@ -12,10 +6,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 
-/**
- * @author StormNing
- * 
- */
 public class AwtImageOperation implements ImageOperation {
 
 	public BufferedImage resize(BufferedImage src, double ratio) {

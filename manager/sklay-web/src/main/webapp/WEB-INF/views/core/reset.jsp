@@ -55,6 +55,7 @@
 										<button type="submit" class="btn btn-warning btn-large">
 											提交
 										</button>
+										<p>想起密码? <a href="${ctx }/login">登录</a></p>
 									</div>
 								</form>							
 							</div>

@@ -7,47 +7,35 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.HttpRequestHandler;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.ServletContextAware;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
-import org.springframework.web.servlet.resource.ResourceHttpRequestHandler;
-import org.springframework.web.util.WebUtils;
 
 @Controller
 @RequestMapping("/file")
-public class FileController implements ServletContextAware,
-		ApplicationContextAware, InitializingBean {
+public class FileController implements ApplicationContextAware {
 
-	private ServletContext servletContext;
+	@Autowired
+	private StaticResourceMappingManager fileUplodaeManager;
 
 	private ApplicationContext applicationContext;
 
-	private static final String DEFAULT_UPLOAD_PATH = "/WEB-INF/upload";
-
-	private int cacheSeconds = 31556926;
-
-	private String uploadPath = DEFAULT_UPLOAD_PATH;
-
 	private TextEditor textEditor = new Kindeditor();
+
+	private ResourceLoader resourceLoader = new DefaultResourceLoader();
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String upload() {
@@ -73,16 +61,17 @@ public class FileController implements ServletContextAware,
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/textEditor", method = RequestMethod.GET)
 	@ResponseBody
 	public Map<String, Object> textEditorFiles(String order, String path) {
 		try {
-			String rootPath = WebUtils.getRealPath(servletContext,
-					preparePath(uploadPath) + "/textEditor");
-			return textEditor.listFiles(rootPath, path, order);
+			Resource resource = resourceLoader.getResource(StringUtils
+					.cleanPath(fileUplodaeManager.getUploadPath()
+							+ File.separator + "textEditor"));
+			return textEditor.listFiles(resource.getFile().getAbsolutePath(),
+					path, order);
 		} catch (Exception e) {
-			return Collections.EMPTY_MAP;
+			return Collections.emptyMap();
 		}
 	}
 
@@ -90,9 +79,10 @@ public class FileController implements ServletContextAware,
 			throws IOException {
 		CommonFile cf = new CommonFile(file.getInputStream());
 		String relativePath = generatePath(file, owner);
-		String realPath = servletContext.getRealPath(preparePath(uploadPath))
-				+ relativePath;
-		cf.save(realPath);
+		Resource resource = resourceLoader.getResource(StringUtils
+				.cleanPath(fileUplodaeManager.getUploadPath() + File.separator
+						+ relativePath));
+		cf.save(resource.getFile());
 		// url for web
 		return "/file" + relativePath.replace('\\', '/');
 	}
@@ -102,20 +92,8 @@ public class FileController implements ServletContextAware,
 			return generateDataFolder() + File.separator
 					+ file.getOriginalFilename();
 		} else {
-			return preparePath(generatePathByOwner(file, owner));
+			return StringUtils.cleanPath(generatePathByOwner(file, owner));
 		}
-	}
-
-	private String preparePath(String path) {
-		if (path == null) {
-			return StringUtils.EMPTY;
-		}
-		path = StringUtils.replaceEach(path, new String[] { "/", "\\" },
-				new String[] { File.separator, File.separator });
-		if (!path.startsWith(File.separator)) {
-			path = File.separator + path;
-		}
-		return path;
 	}
 
 	private String generateDataFolder() {
@@ -140,42 +118,6 @@ public class FileController implements ServletContextAware,
 				+ file.getOriginalFilename();
 	}
 
-	private void initStaticResourceHandlerMapping() {
-		Map<String, HttpRequestHandler> urlMap = new LinkedHashMap<String, HttpRequestHandler>();
-		ResourceHttpRequestHandler requestHandler = new ResourceHttpRequestHandler();
-		requestHandler.setLocations(Collections
-				.singletonList(applicationContext
-						.getResource(preparePath(uploadPath) + "/")));
-		requestHandler.setCacheSeconds(cacheSeconds);
-		requestHandler.setServletContext(servletContext);
-		requestHandler.setApplicationContext(applicationContext);
-		urlMap.put("/file/**", requestHandler);
-
-		SimpleUrlHandlerMapping handlerMapping = new SimpleUrlHandlerMapping();
-		handlerMapping.setUrlMap(urlMap);
-		applicationContext.getAutowireCapableBeanFactory().initializeBean(
-				handlerMapping, null);
-		ConfigurableApplicationContext configurableApplicationContext = (ConfigurableApplicationContext) applicationContext;
-		DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) configurableApplicationContext
-				.getBeanFactory();
-		defaultListableBeanFactory.registerSingleton(
-				"fileResourceHandlerMapping", handlerMapping);
-
-		// refresh context
-		applicationContext.publishEvent(new ContextRefreshedEvent(
-				applicationContext));
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		initStaticResourceHandlerMapping();
-	}
-
-	@Override
-	public void setServletContext(ServletContext servletContext) {
-		this.servletContext = servletContext;
-	}
-
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext)
 			throws BeansException {
@@ -183,7 +125,14 @@ public class FileController implements ServletContextAware,
 	}
 
 	public static void main(String[] args) {
-		System.out.println(StringUtils.replaceEach("/WEB-INF\\a", new String[] {
-				"/", "\\" }, new String[] { File.separator, File.separator }));
+		// System.out.println(StringUtils.replaceEach("/WEB-INF\\a", new
+		// String[]{"/","\\"}, new String[]{File.separator,File.separator}));
+		// FileSystemResourceLoader fileSystemResourceLoader = new
+		// FileSystemResourceLoader();
+		// Path
+		// ResourceLoader resourceLoader = new DefaultResourceLoader();
+		// Resource resource =
+		// resourceLoader.getResource("file:///opt/aaa/bbb");
+		// System.out.println(resource.exists());
 	}
 }

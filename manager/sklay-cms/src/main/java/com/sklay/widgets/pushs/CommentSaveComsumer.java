@@ -7,8 +7,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -30,9 +28,6 @@ import com.sklay.event.EventComsumer;
 @Component
 public class CommentSaveComsumer implements EventComsumer {
 
-	private final static Logger LOGGER = LoggerFactory
-			.getLogger(CommentSaveComsumer.class);
-
 	@Autowired
 	private CommentDao commentDao;
 
@@ -51,54 +46,79 @@ public class CommentSaveComsumer implements EventComsumer {
 		String content = comment.getContent();
 		Set<String> imgSrcs = StringUtils.findImgSrcs(content);
 		int index = 0;
-		if(!org.springframework.util.CollectionUtils.isEmpty(imgSrcs)){
+		if (!org.springframework.util.CollectionUtils.isEmpty(imgSrcs)) {
 			for (String src : imgSrcs) {
 				String fullPathSrc = new String(src);
-				//from editor
-				if(org.apache.commons.lang.StringUtils.startsWithIgnoreCase(src, "//")){
-					fullPathSrc = "http:"+src;
-				}
-				else if(org.apache.commons.lang.StringUtils.startsWithIgnoreCase(src, "/")){
-					fullPathSrc =  baseUrl+src;
-				}else if (!org.apache.commons.lang.StringUtils.startsWithIgnoreCase(src, "http")){
-					fullPathSrc = "http://"+src;
+				// from editor
+				if (org.apache.commons.lang.StringUtils.startsWithIgnoreCase(
+						src, "//")) {
+					fullPathSrc = "http:" + src;
+				} else if (org.apache.commons.lang.StringUtils
+						.startsWithIgnoreCase(src, "/")) {
+					fullPathSrc = baseUrl + src;
+				} else if (!org.apache.commons.lang.StringUtils
+						.startsWithIgnoreCase(src, "http")) {
+					fullPathSrc = "http://" + src;
 				}
 
 				CommonImage ci = null;
-				try{
+				try {
 					ci = new CommonImage(new URI(fullPathSrc));
-				} catch (Exception e){
-					//ignore
+				} catch (Exception e) {
+					// ignore
 				}
-				if(ci!=null){
-					Resource parent = resourceMappingManager.getRealPathByBizAndOwner(com.sklay.widgets.pushs.Constants.BIZ_NEWSIMG, String.valueOf(comment.getId()));
-					ImgConfig imgConfig = configService.findData(new ConfigPK(com.sklay.widgets.pushs.Constants.BIZ_NEWSTYPE, comment.getOwner()), ImgConfig.class);
-					LOGGER.debug("Resource parent exists {} "+parent.exists()) ;
-					LOGGER.debug("Resource parent {} "+parent) ; 
-					String resouceWithIndex = parent.getFile().getPath()+File.separator+index;
-					LOGGER.debug("resouceWithIndex: "+resouceWithIndex) ;
+				if (ci != null) {
+					Resource parent = resourceMappingManager
+							.getRealPathByBizAndOwner(
+									com.sklay.widgets.pushs.Constants.BIZ_NEWSIMG,
+									String.valueOf(comment.getId()));
+					ImgConfig imgConfig = configService.findData(new ConfigPK(
+							com.sklay.widgets.pushs.Constants.BIZ_NEWSTYPE,
+							comment.getOwner()), ImgConfig.class);
+					String resouceWithIndex = parent.getFile().getPath()
+							+ File.separator + index;
 					FileUtils.forceMkdir(new File(resouceWithIndex));
-					if(imgConfig == null||(imgConfig.getMaxHeight()<=0||imgConfig.getMaxHeight()<=0)){
-						ci.save(resouceWithIndex+File.separator+"orginal.jpg");
-					} else{
-						ci.resizeWithContainer(imgConfig.getMaxWidth(), imgConfig.getMaxHeight()).save(resouceWithIndex+File.separator+"orginal.jpg");
+					if (imgConfig == null
+							|| (imgConfig.getMaxHeight() <= 0 || imgConfig
+									.getMaxHeight() <= 0)) {
+						ci.save(resouceWithIndex + File.separator
+								+ "orginal.jpg");
+					} else {
+						ci.resizeWithContainer(imgConfig.getMaxWidth(),
+								imgConfig.getMaxHeight()).save(
+								resouceWithIndex + File.separator
+										+ "orginal.jpg");
 					}
-					if(imgConfig!=null){
+					if (imgConfig != null) {
 						List<ImgSize> imgSizes = imgConfig.getImgSizes();
-						if(!CollectionUtils.isEmpty(imgSizes)){
-							int sizeIndex=0;
+						if (!CollectionUtils.isEmpty(imgSizes)) {
+							int sizeIndex = 0;
 							for (ImgSize imgSize : imgSizes) {
-								if(imgSize.getWidth()!=null&&imgSize.getHeight()!=null&&imgSize.getWidth()>0&&imgSize.getHeight()>0){
-									ci.resizeWithMaxWidth(imgSize.getWidth()).save(resouceWithIndex+File.separator+'z'+sizeIndex+".jpg");
-									ci.cropWithContainer(imgSize.getWidth(), imgSize.getHeight()).save(resouceWithIndex+File.separator+'c'+sizeIndex+".jpg");
+								if (imgSize.getWidth() != null
+										&& imgSize.getHeight() != null
+										&& imgSize.getWidth() > 0
+										&& imgSize.getHeight() > 0) {
+									ci.resizeWithMaxWidth(imgSize.getWidth())
+											.save(resouceWithIndex
+													+ File.separator + 'z'
+													+ sizeIndex + ".jpg");
+									ci.cropWithContainer(imgSize.getWidth(),
+											imgSize.getHeight()).save(
+											resouceWithIndex + File.separator
+													+ 'c' + sizeIndex + ".jpg");
 									sizeIndex++;
 								}
 							}
 						}
 					}
-					String httpPath = resourceMappingManager.getHttpPathByBizAndOwner(com.sklay.widgets.pushs.Constants.BIZ_NEWSIMG, String.valueOf(comment.getId()));
-					String orginalhttpPath = httpPath+"/"+index+"/orginal.jpg?ver="+comment.getVer();
-					content = org.apache.commons.lang.StringUtils.replace(content, src, orginalhttpPath);
+					String httpPath = resourceMappingManager
+							.getHttpPathByBizAndOwner(
+									com.sklay.widgets.pushs.Constants.BIZ_NEWSIMG,
+									String.valueOf(comment.getId()));
+					String orginalhttpPath = httpPath + "/" + index
+							+ "/orginal.jpg?ver=" + comment.getVer();
+					content = org.apache.commons.lang.StringUtils.replace(
+							content, src, orginalhttpPath);
 				}
 				index++;
 			}

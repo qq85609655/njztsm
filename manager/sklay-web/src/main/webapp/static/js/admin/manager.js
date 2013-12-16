@@ -46,10 +46,13 @@ $(function($){
 		$('.btn-close').click() ;
 		if('reload' == $href){
 			
-			if($reload)
+			if($reload.size() > 0){
 				window.location.href = $reload.find('a').attr('href') ;
-			return  ;
-			window.location.reload() ;
+			}else if($('#searchBtn').size() > 0){
+				 $("#searchBtn").click() ;
+			}else{
+				window.location.reload() ;
+			}
 		}else{
 			window.location.href = $href ;
 		} ;

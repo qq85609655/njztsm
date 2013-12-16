@@ -31,7 +31,7 @@
 				
 			</li>
 		</ul>
-		<form action="">
+		<form action="${ctx }/admin/member/list">
 			<div class="input-prepend">
 			  	<span class="add-on">分组:</span>
 			    <select class="span2" name="groupId">
@@ -44,7 +44,7 @@
 			<div class="input-prepend">
 			  	<span class="add-on" data-name="tooltip" data-toggle="tooltip" data-original-title="【姓名、手机号、地址、区域、备注】">关键字:</span>
 			    <input type="text" name="keyword" class="span3" value='${keyword }'>
-			    <button type="submit" class="btn">搜索</button>
+			    <button type="submit" class="btn" id="searchBtn">搜索</button>
 			</div>
 		</form>			
 		<div class="tab-pane active">
@@ -66,7 +66,7 @@
 					<c:choose>
 						<c:when test="${pageModel.totalElements==0}">
 							<tr>
-								<td colspan="5">还未添加过相关记录 , <a href="${ctx}/admin/member/initCreate">加一个</a> ?
+								<td colspan="5">还未添加过相关记录 
 								</td>
 							</tr>
 						</c:when>

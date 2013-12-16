@@ -837,8 +837,6 @@ public class MemberController {
 				pageQuery = "groupId=" + groupId + "&";
 		}
 
-		LOGGER.error("checkedGroup is {}", group);
-
 		modelMap.addAttribute("checkedGroup", group);
 		modelMap.addAttribute("pageModel", userPage);
 		modelMap.addAttribute("pageQuery", pageQuery);

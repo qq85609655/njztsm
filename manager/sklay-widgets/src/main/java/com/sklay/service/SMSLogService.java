@@ -26,5 +26,6 @@ public interface SMSLogService {
 	public void deleteByReceiver(User receiver);
 
 	public Page<SMSLog> getSMSPage(String keyword, Date startDate,
-			Date endDate, SMSStatus status, Long userOwner, Pageable pageable);
+			Date endDate, SMSStatus status, Long userOwner, Set<Long> gropuId,
+			Pageable pageable);
 }

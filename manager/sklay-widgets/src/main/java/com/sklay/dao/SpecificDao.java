@@ -59,7 +59,8 @@ public interface SpecificDao {
 			User creator);
 
 	public Page<SMSLog> getSMSPage(String keyword, Date startDate,
-			Date endDate, SMSStatus status, Long userOwner, Pageable pageable);
+			Date endDate, SMSStatus status, Long userOwner, Set<Long> gropuId,
+			Pageable pageable);
 
 	public Page<DeviceBinding> getDeviceBindingPage(String keyword,
 			Level level, BindingMold bindingMold, User creator,

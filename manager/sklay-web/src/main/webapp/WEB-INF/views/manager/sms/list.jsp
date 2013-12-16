@@ -18,6 +18,15 @@
 <div class="widget-content tab-content">
 	
 	<form action="${ctx }/admin/sms/list" method="post">
+		<div class="input-prepend">
+		  	<span class="add-on">分组:</span>
+		    <select class="span2" name="groupId">
+			  <option value="" <c:if test="${empty checkedGroup}"> selected="selected" </c:if>>所有分组</option>
+			  <c:forEach items="${groups}" var="group">
+				<option value="${group.id}" <c:if test="${group.id eq checkedGroup}"> selected="selected" </c:if>>${group.name}</option>
+			  </c:forEach>
+			</select>
+		</div>
 		<div class="control-group input-prepend hide">
                <span class="add-on">起始时间</span>
                	<div class="input-append date form_datetime" data-date="2013-09-16T05:25:07Z" data-date-format="yyyy-mm-dd hh:mm" data-link-field="startTime">
@@ -25,7 +34,7 @@
                     <span class="add-on"><i class="icon-remove"></i></span>
 					<span class="add-on"><i class="icon-th"></i></span>
 				</div>
-			<input type="hidden" id="startTime" name="startDates">
+			<input type="hidden" id="startTime" name="startDates" >
 		</div>
 			
 		<div class="control-group input-prepend offset1 hide">
@@ -37,7 +46,7 @@
 				</div>
 			<input type="hidden" id="endTime" name="endDates">
 		</div>
-		<div class="control-group input-prepend">
+		<div class="input-prepend">
 		  <span class="add-on">短信状态</span>
 		    <select class="span2" name="status">
 			  <option value="-1" <c:if test="${empty checkedStatus}"> selected="selected" </c:if>>所有状态</option>
@@ -46,10 +55,10 @@
 				<option value="<%=SMSStatus.SUCCESS.getValue() %>" <c:if test="${checkedStatus.value eq 1}"> selected="selected" </c:if>><%=SMSStatus.SUCCESS.getLable() %></option>
 			</select>
 		</div>
-		<div class="control-group input-prepend offset1">
+		<div class=" input-prepend">
 		  	<span class="add-on" data-name="tooltip" data-toggle="tooltip" data-original-title="【收信姓名、手机号、备注】">关键字</span>
 		    <input type="text" name="keyword" class="span3" value='${keyword }'>
-		    <button type="submit" class="btn">搜索</button>
+		    <button type="submit" class="btn" id="searchBtn">搜索</button>
 		</div>
 	</form>
 	<div class="tab-pane active">

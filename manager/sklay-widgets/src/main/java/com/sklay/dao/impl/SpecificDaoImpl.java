@@ -380,11 +380,12 @@ public class SpecificDaoImpl implements SpecificDao {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Page<SMSLog> getSMSPage(String keyword, Date startDate,
-			Date endDate, SMSStatus status, Long userOwner, Pageable pageable) {
+			Date endDate, SMSStatus status, Long userOwner, Set<Long> gropuIds,
+			Pageable pageable) {
 		Query countQuery = initMSMSearch(keyword, startDate, endDate, status,
-				userOwner, true);
+				userOwner, gropuIds, true);
 		Query dataQuery = initMSMSearch(keyword, startDate, endDate, status,
-				userOwner, false);
+				userOwner, gropuIds, false);
 
 		Long total = (Long) countQuery.getSingleResult();
 		if (!(total > 0))
@@ -398,7 +399,7 @@ public class SpecificDaoImpl implements SpecificDao {
 	}
 
 	private Query initMSMSearch(String keyword, Date startDate, Date endDate,
-			SMSStatus status, Long userOwner, boolean count) {
+			SMSStatus status, Long userOwner, Set<Long> gropuIds, boolean count) {
 		StringBuffer sb = null;
 
 		if (count)
@@ -408,6 +409,9 @@ public class SpecificDaoImpl implements SpecificDao {
 
 		if (null != userOwner)
 			sb.append(" and s.user.group.owner.id = :userOwner ");
+
+		if (CollectionUtils.isNotEmpty(gropuIds))
+			sb.append(" and s.receiver.group.id in (:gropuIds) ");
 
 		if (null != startDate && null != endDate)
 			sb.append(" and  s.sendTime >= :startDate and s.sendTime <= :endDate ");
@@ -432,6 +436,9 @@ public class SpecificDaoImpl implements SpecificDao {
 
 		if (null != status)
 			query.setParameter("status", status);
+
+		if (CollectionUtils.isNotEmpty(gropuIds))
+			query.setParameter("gropuIds", gropuIds);
 
 		if (StringUtils.isNotBlank(keyword)) {
 			query.setParameter("keyword", "%"

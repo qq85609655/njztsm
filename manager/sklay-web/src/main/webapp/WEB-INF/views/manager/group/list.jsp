@@ -12,7 +12,7 @@
 						<div class="input-prepend">
 						  	<span class="add-on" data-name="tooltip" data-toggle="tooltip" data-original-title="【名称、备注】"><abbr class="initialism">关键字</abbr></span>
 						    <input type="text" name="keyword" class="span3" value='${keyword }'>
-						    <button type="submit" class="btn btn-info"><i class="icon-search"></i>搜索</button>
+						    <button type="submit" class="btn btn-info" id="searchBtn"><i class="icon-search"></i>搜索</button>
 						</div>
 					</form>
 				</div>

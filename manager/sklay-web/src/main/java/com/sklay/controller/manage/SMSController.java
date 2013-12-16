@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.sklay.api.SklayApi;
 import com.sklay.core.annotation.Widget;
@@ -36,8 +37,10 @@ import com.sklay.core.sdk.model.vo.SMSSetting;
 import com.sklay.core.sdk.model.vo.SMSStockDetail;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.PropertieUtils;
+import com.sklay.model.Group;
 import com.sklay.model.SMSLog;
 import com.sklay.model.User;
+import com.sklay.service.GroupService;
 import com.sklay.service.SMSLogService;
 import com.sklay.service.UserService;
 import com.sklay.util.Convert;
@@ -68,6 +71,9 @@ public class SMSController {
 	@Autowired
 	private UserService userService;
 
+	@Autowired
+	private GroupService groupService;
+
 	@ModelAttribute
 	public void populateModel(Model model) {
 		model.addAttribute("nav", "sms:model");
@@ -78,22 +84,79 @@ public class SMSController {
 	@RequiresPermissions("sms:list")
 	@Widget(name = ":list", description = "短信列表")
 	public String list(String keyword, Date startDate, Date endDate,
-			Integer status, @PageableDefaults(value = 20) Pageable pageable,
-			ModelMap modelMap) {
+			Integer status, Long groupId,
+			@PageableDefaults(value = 20) Pageable pageable, ModelMap modelMap) {
 
 		SMSStatus smsStatus = null == status ? null : SMSStatus
 				.findByValue(status);
 
-		Long userOwner = LoginUserHelper.getLoginUser().getId();
+		User session = LoginUserHelper.getLoginUser();
+		Long userOwner = session.getId();
 
-		if (LoginUserHelper.isSuperAdmin())
+		Group parentGroup = session.getGroup();
+		Long parentGroupId = parentGroup.getId();
+
+		List<Group> list = LoginUserHelper.isSuperAdmin() ? groupService
+				.getGroupAll() : groupService.getGroupByOwner(session);
+
+		String pageQuery = "";
+		Set<Long> groupIds = Sets.newHashSet(parentGroupId);
+		Set<Long> allGroupId = Sets.newHashSet(parentGroupId);
+
+		Page<SMSLog> page = null;
+		/** 取得当前分组 */
+		if (CollectionUtils.isNotEmpty(list)) {
+			for (Group currentGroup : list) {
+				Long currentGroupId = currentGroup.getId();
+				groupIds.add(currentGroupId);
+			}
+		}
+		allGroupId.addAll(groupIds);
+
+		boolean hasNext = (!LoginUserHelper.isSuperAdmin() && LoginUserHelper
+				.isAdmin());
+
+		while (hasNext) {
+			List<Group> nextGroups = groupService.getGroupByParentId(groupIds);
+
+			groupIds = Sets.newHashSet();
+
+			if (CollectionUtils.isEmpty(nextGroups)) {
+				hasNext = false;
+				break;
+			}
+			if (CollectionUtils.isEmpty(list))
+				list = Lists.newArrayList();
+
+			list.addAll(nextGroups);
+
+			for (Group currentGroup : nextGroups) {
+				Long currentGroupId = currentGroup.getId();
+				groupIds.add(currentGroupId);
+			}
+			allGroupId.addAll(groupIds);
+		}
+
+		if (LoginUserHelper.isSuperAdmin()) {
 			userOwner = null;
+			allGroupId.clear();
+			if (null != groupId) {
+				allGroupId.add(groupId);
+			}
+		} else {
+			if (null != groupId) {
+				allGroupId.clear();
+				allGroupId.add(groupId);
+			}
+			if (CollectionUtils.isNotEmpty(allGroupId))
+				userOwner = null;
+		}
+		page = smsLogService.getSMSPage(keyword, startDate, endDate, smsStatus,
+				userOwner, allGroupId, pageable);
+		pageQuery = initQuery(keyword, startDate, endDate, status, userOwner);
 
-		Page<SMSLog> page = smsLogService.getSMSPage(keyword, startDate,
-				endDate, smsStatus, userOwner, pageable);
-		String pageQuery = initQuery(keyword, startDate, endDate, status,
-				userOwner);
-
+		modelMap.addAttribute("checkedGroup", groupId);
+		modelMap.addAttribute("groups", list);
 		modelMap.addAttribute("pageModel", page);
 		modelMap.addAttribute("pageQuery", pageQuery);
 		modelMap.addAttribute("keyword", keyword);

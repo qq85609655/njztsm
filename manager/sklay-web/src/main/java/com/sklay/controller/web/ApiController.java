@@ -263,8 +263,8 @@ public class ApiController {
 		List<User> freeList = initUser(gatherData);
 		if (CollectionUtils.isNotEmpty(freeList)) {
 			for (User reciver : freeList) {
-				SMSLog log = new SMSLog(user, medicalReport.getResult(),
-						new Date(medicalReport.getReportTime()), reciver,
+				SMSLog log = new SMSLog(user, SMSContent, new Date(
+						medicalReport.getReportTime()), reciver,
 						medicalReport.getReportTime(), SMSStatus.FAIL);
 				smsLogs.add(log);
 			}
@@ -339,7 +339,8 @@ public class ApiController {
 						Integer lastLowP = Integer.parseInt(data
 								.getLowPressure());
 
-						if ((highP - lastHighP) >= 15 || (lowP - lastLowP) >= 15)
+						if ((highP - lastHighP) >= 15
+								|| (lowP - lastLowP) >= 15)
 							tipType = TipType.WARNING;
 					}
 

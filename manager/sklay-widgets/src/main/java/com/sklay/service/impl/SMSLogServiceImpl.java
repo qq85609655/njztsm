@@ -42,9 +42,10 @@ public class SMSLogServiceImpl implements SMSLogService {
 
 	@Override
 	public Page<SMSLog> getSMSPage(String keyword, Date startDate,
-			Date endDate, SMSStatus status, Long userOwner, Pageable pageable) {
+			Date endDate, SMSStatus status, Long userOwner, Set<Long> gropuId,
+			Pageable pageable) {
 		return specificDao.getSMSPage(keyword, startDate, endDate, status,
-				userOwner, pageable);
+				userOwner,gropuId, pageable);
 	}
 
 	@Override
@@ -59,17 +60,17 @@ public class SMSLogServiceImpl implements SMSLogService {
 
 	@Override
 	public void updateSMSLog(SMSLog log) {
-		smsLogDao.saveAndFlush(log) ;
+		smsLogDao.saveAndFlush(log);
 	}
 
 	@Override
 	public void deleteSMSLog(Long userId) {
-		smsLogDao.deleteSMSLog(userId) ;
+		smsLogDao.deleteSMSLog(userId);
 	}
 
 	@Override
 	public void deleteByReceiver(User receiver) {
-		smsLogDao.deleteByReceiver(receiver) ;
+		smsLogDao.deleteByReceiver(receiver);
 	}
 
 }

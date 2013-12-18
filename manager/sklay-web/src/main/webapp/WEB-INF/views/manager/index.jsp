@@ -63,7 +63,8 @@
 						<th class="input-mini"><label class="checkbox" for="checkbox_all"><input id="checkbox_all" type="checkbox" name="checkbox">编号</label></th>
 						<th>姓名</th>
 						<th>手机号</th>
-						<th>体检报告</th>
+						<th class="span5">体检报告</th>
+						<th>创建时间</th>
 						<th>备注</th>
 					</tr>
 				</thead>
@@ -71,9 +72,10 @@
 					<c:forEach items="${pageModel.content}" var="model">
 						<tr>
 							<td><label class="checkbox" for="checkbox_${model.id}"><input id="checkbox_${model.id}" type="checkbox" data-widget="checkbox_all" data-phone="${model.targetUser.phone}" name="checkbox" value="${model.id}">  ${model.id}</label></td>
-							<td class="taskDesc">${model.targetUser.name}</td>
-							<td class="taskDesc">${model.targetUser.phone}</td>
-							<td class="taskDesc">${model.smsContent}</td>
+							<td>${model.targetUser.name}</td>
+							<td>${model.targetUser.phone}</td>
+							<td>${model.smsContent}</td>
+							<td><sklay:menuTag method="date" date="${model.reportTime }">${date}</sklay:menuTag></td>
 							<td>${model.remark}</td>
 						</tr>
 					</c:forEach>

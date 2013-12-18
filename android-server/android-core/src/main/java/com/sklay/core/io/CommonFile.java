@@ -1,9 +1,3 @@
-/*
- * @(#)CommonFileOperation.java 2011
- *
- * Copyright 2011 Sklay SoftWare, Inc. All rights reserved.
- * SKLAY Limited Company/CONFIDENTIAL. Use is subject to license terms.
- */
 package com.sklay.core.io;
 
 import java.io.File;
@@ -16,15 +10,6 @@ import java.net.URI;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-/**
- * 
- *  .
- * <p/>
- *
- * @author <a href="mailto:1988fuyu@163.com">fuyu</a>
- * 
- * @version v1.0 2013-8-28
- */
 public class CommonFile implements FileOperation {
 
 	private InputStream inputStream;

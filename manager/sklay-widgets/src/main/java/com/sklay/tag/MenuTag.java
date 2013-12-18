@@ -1,5 +1,6 @@
 package com.sklay.tag;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,7 @@ import com.sklay.core.enums.WidgetLevel;
 import com.sklay.core.support.SimpleSklayManager;
 import com.sklay.core.support.WidgetInfo;
 import com.sklay.core.support.WidgetManager;
+import com.sklay.core.util.DateTimeUtil;
 import com.sklay.model.Group;
 import com.sklay.model.User;
 import com.sklay.util.LoginUserHelper;
@@ -31,45 +33,61 @@ public class MenuTag extends RequestContextAwareTag {
 
 	private String menuName;
 
+	private String method;
+
+	private String date;
+
 	@Override
 	protected int doStartTagInternal() throws Exception {
 
-		List<Menu> menus = Lists.newArrayList();
+		if (StringUtils.isNotBlank(method) && "date".equals(method)) {
+			date = DateTimeUtil.getDateTime(new Date(Long.parseLong(date)));
+			pageContext.setAttribute("date", date);
+		} else {
+			List<Menu> menus = Lists.newArrayList();
 
-		User user = LoginUserHelper.getLoginUser();
+			User user = LoginUserHelper.getLoginUser();
 
-		if (StringUtils.isBlank(menuName))
-			menus = findMenus(user, menus);
-		else
-			menus = findMenusByName(user, menus, menuName);
-		pageContext.setAttribute("menus", menus);
+			if (StringUtils.isBlank(menuName))
+				menus = findMenus(user, menus);
+			else
+				menus = findMenusByName(user, menus, menuName);
+
+			pageContext.setAttribute("menus", menus);
+		}
 
 		return EVAL_BODY_INCLUDE;
 		// EVAL_BODY_INCLUDE隐含1：将body的内容输出到存在的输出流中
 	}
+	
 
 	@Override
 	public int doAfterBody() throws JspException {
 		return super.doAfterBody();
 	}
+	
 
 	@Override
 	public int doEndTag() throws JspException {
 		return super.doEndTag();
 	}
+	
 
 	@Override
 	public void release() {
 		super.release();
 	}
+	
 
 	public String getMenuName() {
 		return menuName;
 	}
+	
 
 	public void setMenuName(String menuName) {
 		this.menuName = menuName;
 	}
+	
 
 	private List<Menu> findMenus(User user, List<Menu> menus) {
 		if (null != user && null != user.getGroup()) {
@@ -138,6 +156,7 @@ public class MenuTag extends RequestContextAwareTag {
 		}
 		return menus;
 	}
+	
 
 	private List<Menu> findMenusByName(User user, List<Menu> menus,
 			String menuName) {
@@ -206,5 +225,22 @@ public class MenuTag extends RequestContextAwareTag {
 
 		}
 		return menus;
+	}
+	
+
+	public String getMethod() {
+		return method;
+	}
+
+	public void setMethod(String method) {
+		this.method = method;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
 	}
 }

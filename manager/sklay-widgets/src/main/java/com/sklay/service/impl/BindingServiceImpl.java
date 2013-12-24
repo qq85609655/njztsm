@@ -180,4 +180,11 @@ public class BindingServiceImpl implements BindingService {
 		deviceBindingDao.updateBindingCreator(creator, updator, original);
 	}
 
+	@Override
+	public List<DeviceBinding> getDefaultBindingUser(String target)
+			throws SklayException {
+		return deviceBindingDao.getDefaultBindingUser(AuditStatus.PASS,
+				BindingMold.FREE, BindingMold.PAID, target, Level.FIRST);
+	}
+
 }

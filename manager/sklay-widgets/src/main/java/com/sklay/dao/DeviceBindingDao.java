@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.sklay.core.enums.AuditStatus;
+import com.sklay.core.enums.BindingMold;
 import com.sklay.core.enums.Level;
+import com.sklay.core.ex.SklayException;
 import com.sklay.model.DeviceBinding;
 import com.sklay.model.User;
 
@@ -45,6 +47,11 @@ public interface DeviceBindingDao extends JpaRepository<DeviceBinding, Long> {
 	@Query("select d from DeviceBinding d where d.targetUser in ( ?1 ) and d.level= ?2 and d.creator = ?3 ")
 	public List<DeviceBinding> getUserBinding(Set<Long> userId, Level level,
 			User creator);
+
+	@Query("select d from DeviceBinding d where ( ( d.status = ?1 and d.mold = ?2 ) or ( d.moldStatus = ?1 and d.mold = ?3) ) and d.serialNumber in ( select b.serialNumber from DeviceBinding b where b.targetUser.phone = ?4  and b.level= ?5 )")
+	public List<DeviceBinding> getDefaultBindingUser(AuditStatus status,
+			BindingMold free, BindingMold pay, String target, Level level)
+			throws SklayException;
 
 	@Modifying
 	@Query("update DeviceBinding d set d.creator = ?1 , d.updator= ?2 where d.creator = ?3 ")

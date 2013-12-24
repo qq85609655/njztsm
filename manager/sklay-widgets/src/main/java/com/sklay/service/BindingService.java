@@ -18,6 +18,9 @@ public interface BindingService {
 
 	public DeviceBinding get(Long id) throws SklayException;
 
+	public List<DeviceBinding> getDefaultBindingUser(String target)
+			throws SklayException;
+
 	public void update(DeviceBinding deviceBinding) throws SklayException;
 
 	public DeviceBinding createBinding(DeviceBinding deviceBinding)

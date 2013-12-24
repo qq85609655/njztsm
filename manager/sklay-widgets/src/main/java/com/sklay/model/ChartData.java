@@ -100,6 +100,13 @@ public class ChartData implements Serializable {
 		this.indexHealth = indexHealth;
 	}
 
+	public ChartData(String simNo, String lowPressure, String highPressure) {
+		super();
+		this.simNo = simNo;
+		this.lowPressure = lowPressure;
+		this.highPressure = highPressure;
+	}
+
 	@Override
 	public String toString() {
 		return "ChartData [simNo=" + simNo + ", lowPressure=" + lowPressure

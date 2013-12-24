@@ -13,11 +13,12 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
 
 	<task:annotation-driven />
-	
+
 	<jpa:repositories base-package="com.sklay.**.dao" />
 
 	<!-- entityManagerFactory -->
-	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+	<bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<property name="packagesToScan" value="com.sklay.model" />
 		<property name="jpaVendorAdapter">
@@ -36,7 +37,8 @@
 				<prop key="use_streams_for_binary">true</prop>
 				<prop key="hibernate.cache.use_second_level_cache">true</prop>
 				<prop key="hibernate.cache.use_query_cache">true</prop>
-				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</prop>
+				<prop key="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory
+				</prop>
 				<prop key="hibernate.show_sql">${hibernate.debug}</prop>
 				<prop key="hibernate.format_sql">${hibernate.debug}</prop>
 				<prop key="hibernate.generate_statistics">${hibernate.debug}</prop>
@@ -47,7 +49,8 @@
 	</bean>
 
 	<!-- sql executor -->
-	<jdbc:initialize-database data-source="dataSource" ignore-failures="ALL">
+	<jdbc:initialize-database data-source="dataSource"
+		ignore-failures="ALL">
 		<jdbc:script encoding="UTF-8" location="classpath:*.sql" />
 	</jdbc:initialize-database>
 
@@ -61,31 +64,42 @@
 
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
-			<tx:method name="create*" propagation="REQUIRED" rollback-for="Throwable"/>
-			<tx:method name="add*" propagation="REQUIRED" rollback-for="Throwable"/>
-	        <tx:method name="insert*" propagation="REQUIRED" rollback-for="Throwable"/>
-	        <tx:method name="save" propagation="REQUIRED" rollback-for="Throwable"/>
-			<tx:method name="update*" propagation="REQUIRED" rollback-for="Throwable"/>
-	        <tx:method name="delete*" propagation="REQUIRED" rollback-for="Throwable"/>
-	        <tx:method name="remove*" propagation="REQUIRED" rollback-for="Throwable"/>
-	        <tx:method name="find*" read-only="true" />
+			<tx:method name="create*" propagation="REQUIRED"
+				rollback-for="Throwable" />
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="Throwable" />
+			<tx:method name="insert*" propagation="REQUIRED"
+				rollback-for="Throwable" />
+			<tx:method name="save" propagation="REQUIRED" rollback-for="Throwable" />
+			<tx:method name="update*" propagation="REQUIRED"
+				rollback-for="Throwable" />
+			<tx:method name="delete*" propagation="REQUIRED"
+				rollback-for="Throwable" />
+			<tx:method name="remove*" propagation="REQUIRED"
+				rollback-for="Throwable" />
+			<tx:method name="find*" read-only="true" />
 			<tx:method name="get*" read-only="true" />
 			<tx:method name="paginate*" read-only="true" />
 			<tx:method name="search*" read-only="true" />
 			<!-- <tx:method name="*" propagation="REQUIRED" /> -->
 		</tx:attributes>
 	</tx:advice>
-	
+
 	<aop:aspectj-autoproxy proxy-target-class="true" />
 	<aop:config proxy-target-class="true">
-		<aop:advisor id="serviceAdvisor" pointcut="execution(* com.sklay.service.impl.*.*(..))" advice-ref="txAdvice" order="1"/>
-		<aop:advisor id="controllerAdvisor" pointcut="execution(* com.sklay.controller.*.*(..))" advice-ref="txAdvice" order="1"/>
-		<aop:advisor id="widgetAdvisor" pointcut="execution(* com.sklay.widgets.*.*(..))" advice-ref="txAdvice" order="1"/>
+		<aop:advisor id="serviceAdvisor"
+			pointcut="execution(* com.sklay.service.impl.*.*(..))" advice-ref="txAdvice"
+			order="1" />
+		<aop:advisor id="controllerAdvisor"
+			pointcut="execution(* com.sklay.controller.*.*(..))" advice-ref="txAdvice"
+			order="1" />
+		<aop:advisor id="widgetAdvisor" pointcut="execution(* com.sklay.widgets.*.*(..))"
+			advice-ref="txAdvice" order="1" />
 	</aop:config>
-	
-	
+
+
 	<!-- messagesource -->
-	<bean id="messageSource" class="com.sklay.core.support.PathMatchingReloadableResourceBundleMessageSource">
+	<bean id="messageSource"
+		class="com.sklay.core.support.PathMatchingReloadableResourceBundleMessageSource">
 		<property name="basenames">
 			<list>
 				<value>classpath:messages</value>
@@ -101,16 +115,19 @@
 	</bean>
 
 	<!-- validator -->
-	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+	<bean id="validator"
+		class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
 		<property name="providerClass" value="org.hibernate.validator.HibernateValidator" />
 		<property name="validationMessageSource" ref="messageSource" />
 	</bean>
 
-	<bean class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor">
+	<bean
+		class="org.springframework.validation.beanvalidation.MethodValidationPostProcessor">
 		<property name="validator" ref="validator" />
 	</bean>
 
-	<bean class="org.springframework.validation.beanvalidation.BeanValidationPostProcessor">
+	<bean
+		class="org.springframework.validation.beanvalidation.BeanValidationPostProcessor">
 		<property name="validator" ref="validator" />
 	</bean>
 	<!-- js handler -->
@@ -122,13 +139,15 @@
 			</list>
 		</property>
 	</bean>
-	
-	<bean id="layout" class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean">
+
+	<bean id="layout"
+		class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean">
 		<property name="templateLoaderPath" value="${page.layout.location}" />
 		<property name="defaultEncoding" value="UTF-8" />
 	</bean>
 
-	<bean id="border" class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean">
+	<bean id="border"
+		class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean">
 		<property name="templateLoaderPath" value="${widget.border.location}" />
 		<property name="defaultEncoding" value="UTF-8" />
 	</bean>

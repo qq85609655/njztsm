@@ -120,12 +120,12 @@ public class LoginoutController {
 		if (AuditStatus.PASS != user.getStatus())
 			throw new SklayException(ErrorCode.AUTIT_ERROR, null, new Object[] {
 					"手机号码[" + phone + "]用户信息", "重置密码" });
-		String pwd ="753951wan" ;// PwdUtils.genRandomNum(6);
+		String pwd = PwdUtils.genRandomNum(6);
 		user.setPassword(PwdUtils.MD256Pws(pwd.trim()));
-		 userService.update(user);
+		userService.update(user);
 		String content = "亲 ，" + user.getName() + "，您本次重置的新密码为:" + pwd.trim()
-				+ "请及时登录修改!确保您的账户安全。";
-		 sendSMS(Lists.newArrayList(user), content);
+				+ "请及时登录修改!确保您的账户安全。【安全中心】";
+		sendSMS(Lists.newArrayList(user), content);
 		modelMap.addAttribute("model", user);
 
 		return "alone:core.reset";

@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -51,6 +52,7 @@ import com.sklay.service.MatadataService;
 import com.sklay.service.MedicalReportService;
 import com.sklay.service.OperationService;
 import com.sklay.service.SMSLogService;
+import com.sklay.service.TaskManager;
 import com.sklay.service.UserAttrService;
 import com.sklay.service.UserService;
 import com.sklay.util.Convert;
@@ -82,6 +84,9 @@ public class ApiController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private TaskManager taskManager;
 
 	@Autowired
 	private GlobalService globalService;
@@ -201,6 +206,13 @@ public class ApiController {
 
 		return 0;
 
+	}
+
+	@RequestMapping("/asyncphysical")
+	@ResponseBody
+	@Async
+	public void asyncPhysicalc(GatherData gatherData) throws SklayException {
+		taskManager.doDayJob() ;
 	}
 
 	@RequestMapping("/sos")

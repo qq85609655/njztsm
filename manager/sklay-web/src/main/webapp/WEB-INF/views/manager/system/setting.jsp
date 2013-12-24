@@ -97,27 +97,32 @@
 	        </div>
 	      </div>
 	      <div class="control-group">
-	        <label class="control-label">短信发送时间开关</label>
+	        <label class="control-label">体检短信开关</label>
 	         <div class="controls">
 	         	<label class="radio inline span1" for="inputPhysicalSMS2">
-				  <input type="radio" name="physicalSMS" id="inputPhysicalSMS2" value="<%=SwitchStatus.CLOSE %>" <c:if test="${setting.physicalSMS.value eq 0}">checked</c:if> title="(不发送)"><%=SwitchStatus.CLOSE.getLable() %>
+				  <input onclick="javascript:$('.time-switch').hide() ;" type="radio" name="physicalSMS" id="inputPhysicalSMS2" value="<%=SwitchStatus.CLOSE %>" <c:if test="${setting.physicalSMS.value eq 0}">checked</c:if> title="(不发送)"><%=SwitchStatus.CLOSE.getLable() %>
 				</label>
-	          	<label class="radio inline span1" for="inputPhysicalSMS1">
+	          	<label class="radio inline span1 hide" for="inputPhysicalSMS1">
 				  <input type="radio" name="physicalSMS" id="inputPhysicalSMS1" value="<%=SwitchStatus.OPEN %>" <c:if test="${setting.physicalSMS.value eq 1}">checked</c:if> title="(全程发送)">全程发送
 				</label>
-				<label class="radio inline span1" for="inputPhysicalSMS3">
+				<label onclick="javascript:$('.time-switch').show() ;" class="radio inline span1" for="inputPhysicalSMS3">
 				  <input type="radio" name="physicalSMS" id="inputPhysicalSMS3" value="<%=SwitchStatus.PERIOD %>" <c:if test="${setting.physicalSMS.value eq 2}">checked</c:if> title="(时段发送)"><%=SwitchStatus.PERIOD.getLable() %>
 				</label>
 	        </div>
 	      </div>
 	      
-	      <div class="control-group">
-	        <label class="control-label">发送时间区间(24)</label>
+	      <div class="control-group time-switch <c:if test="${!(setting.physicalSMS.value eq 2)}">hide</c:if>">
+	        <label class="control-label">上午发送时间点</label>
 	         <div class="controls">
-				
 				<label class="inline span input-append bootstrap-timepicker" for="inputSendStartTime">
 				 	<input type="text" data-pick="pick" class="input-mini" name="sendStartTime" id="inputSendStartTime" value="${setting.sendStartTime}" readonly="readonly"><span class="add-on"><i class="icon-time"></i></span>
 				</label>
+	        </div>
+	      </div>
+	      
+	      <div class="control-group time-switch <c:if test="${!(setting.physicalSMS.value eq 2)}">hide</c:if>">
+	        <label class="control-label">下午发送时间点</label>
+	         <div class="controls">
 	          	<label class=" inline span input-append bootstrap-timepicker" for="inputSendEndTime">
 				 	<input type="text" data-pick="pick" class="input-mini" name="sendEndTime" id="inputSendEndTime" value="${setting.sendEndTime}" readonly="readonly"><span class="add-on"><i class="icon-time"></i></span>
 				</label>
@@ -132,7 +137,6 @@
 			  </label>
 	        </div>
 	      </div>
-	      
 	      
 	      <div class="control-group hide">
 	        <label class="control-label">短信任务开关</label>

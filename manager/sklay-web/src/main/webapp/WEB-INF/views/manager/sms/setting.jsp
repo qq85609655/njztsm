@@ -4,7 +4,6 @@
 	<ul class="nav nav-tabs">
 	    <li <c:if test="${'api'  eq active}"> class="active" </c:if>><a href="#widget-api" data-toggle="tab">短信API配置</a></li>
 	    <li><a href="#widget-info" data-toggle="tab">短信统计</a></li>
-	    <li <c:if test="${'phone' eq active}"> class="active" </c:if>><a href="#widget-phone" data-toggle="tab">手机号段</a></li>
 	</ul>
 	<div class="tab-content " >
 		<div class="tab-pane <c:if test="${'api' eq active}"> active </c:if>" id="widget-api">
@@ -19,19 +18,13 @@
 		      <div class="control-group">
 		        <label class="control-label" for="inputAccountId">短信帐号</label>
 		        <div class="controls">
-		          <input class="span3" type="text" name="accountId" id="inputAccountId" placeholder="短信帐号" value="${smsSetting.accountId }">
+		          <input class="span3" type="text" name="accountId" id="inputAccountId" placeholder="短信帐号" value="${smsSetting.account }">
 		        </div>
 		      </div>
 		      <div class="control-group">
 		        <label class="control-label" for="inputPassword">短信帐号密码</label>
 		        <div class="controls">
 		          <input class="span3" type="text" name="password" id="inputPassword" placeholder="短信帐号密码" value="${smsSetting.password }">
-		        </div>
-		      </div>
-		      <div class="control-group">
-		        <label class="control-label" for="inputUserId">短信用户帐号Id</label>
-		        <div class="controls">
-		          <input class="span3" type="number" min="1" required="required"  name="userId" id="inputUserId" placeholder="短信用户帐号Id" value="${smsSetting.userId }">
 		        </div>
 		      </div>
 		      
@@ -45,7 +38,14 @@
 		      <div class="control-group">
 		        <label class="control-label" for="inputUserId">定位短信模版</label>
 		        <div class="controls">
-		        	<textarea rows="4" cols="4" class="span3" name="sos" id="inputSOS" placeholder="定位短信模版">${smsSetting.sos }</textarea>
+		        	<input class="span3" name="sos" id="inputSOS" placeholder="定位短信模版" value="${smsSetting.sos }"/>
+		        </div>
+		      </div>
+		      
+		      <div class="control-group">
+		        <label class="control-label" for="inputUserId">重置密码模版</label>
+		        <div class="controls">
+		        	<input class="span3" name="sos" id="inputPwd" placeholder="定位短信模版" value="${smsSetting.pwd }"/>
 		        </div>
 		      </div>
 		      
@@ -115,33 +115,6 @@
 			      </div>
 				</div>
 			</div>
-		</div>
-		<div class="tab-pane <c:if test="${'phone' eq active}"> active </c:if>" id="widget-phone">
-			<form class="form-horizontal" action="${ctx }/admin/sms/paragraph?active=phone" method="post">
-		      <div class="control-group">
-		        <label class="control-label" for="inputMobile">移动</label>
-		        <div class="controls">
-		          <textarea rows="5" cols="5" class="span3" id="inputMobile" name="mobile">${smsSetting.mobile }</textarea>
-		        </div>
-		      </div>
-		      <div class="control-group">
-		        <label class="control-label" for="inputUnicom">联通</label>
-		        <div class="controls">
-		          <textarea rows="5" cols="5" class="span3" id="inputUnicom" name="unicom">${smsSetting.unicom }</textarea>
-		        </div>
-		      </div>
-		      <div class="control-group">
-		        <label class="control-label" for="inputTelecom">电信</label>
-		        <div class="controls">
-		          <textarea rows="5" cols="5" class="span3" id="inputTelecom" name="telecom">${smsSetting.telecom }</textarea>
-		        </div>
-		      </div>
-		      <div class="control-group">
-		        <div class="controls">
-		          <button type="button" class="btn btn-primary"  title="" data-delay="5" data-html="true" data-href='${ctx}/admin/sms/initSetting' data-original-title="消息...">提交</button>
-		        </div>
-		      </div>
-		  </form>
 		</div>
 	</div>
 

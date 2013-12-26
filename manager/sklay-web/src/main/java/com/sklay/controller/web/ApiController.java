@@ -22,7 +22,6 @@ import com.sklay.api.SklayApi;
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.BindingMold;
 import com.sklay.core.enums.Level;
-import com.sklay.core.enums.OperatorType;
 import com.sklay.core.enums.ReadType;
 import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.enums.SMSType;
@@ -43,6 +42,7 @@ import com.sklay.model.MataData;
 import com.sklay.model.MedicalReport;
 import com.sklay.model.Mold;
 import com.sklay.model.Operation;
+import com.sklay.model.SMS;
 import com.sklay.model.SMSLog;
 import com.sklay.model.User;
 import com.sklay.model.UserAttr;
@@ -51,11 +51,10 @@ import com.sklay.service.GlobalService;
 import com.sklay.service.MatadataService;
 import com.sklay.service.MedicalReportService;
 import com.sklay.service.OperationService;
-import com.sklay.service.SMSLogService;
+import com.sklay.service.SMSService;
 import com.sklay.service.TaskManager;
 import com.sklay.service.UserAttrService;
 import com.sklay.service.UserService;
-import com.sklay.util.Convert;
 import com.sklay.util.DateUtils;
 
 @Controller
@@ -77,7 +76,7 @@ public class ApiController {
 	private BindingService bindingService;
 
 	@Autowired
-	private SMSLogService smsLogService;
+	private SMSService smsService;
 
 	@Autowired
 	private UserAttrService attrService;
@@ -179,7 +178,7 @@ public class ApiController {
 		Long reportTime = medicalReport.getReportTime();
 		Date reportDate = new Date(reportTime);
 		SwitchStatus switchStatus = setting.getSmsFetch();
-		Set<SMSLog> smsLogs = Sets.newHashSet();
+		Set<SMS> smsLogs = Sets.newHashSet();
 
 		/** 全部发送 */
 		if (SwitchStatus.OPEN == switchStatus) {
@@ -188,16 +187,16 @@ public class ApiController {
 
 			if (CollectionUtils.isNotEmpty(freeList)) {
 				for (User reciver : freeList) {
-					SMSLog log = new SMSLog(targetUser, SMSContent, reportDate,
-							reciver, reportTime, SMSStatus.FAIL);
+					SMS log = new SMS(targetUser.getId(), SMSContent, reportDate,
+							reciver.getPhone(), SMSStatus.FAIL, reportTime);
 					smsLogs.add(log);
 				}
 			}
 		}
 		/** 只发送给主机号 */
 		else {
-			SMSLog log = new SMSLog(targetUser, SMSContent, reportDate,
-					targetUser, reportTime, SMSStatus.FAIL);
+			SMS log = new SMS(targetUser.getId(), SMSContent, reportDate,
+					targetUser.getPhone(), SMSStatus.FAIL, reportTime);
 			smsLogs.add(log);
 		}
 
@@ -267,23 +266,23 @@ public class ApiController {
 				sklayApi.getSos(), SMSType.LOCATION, dataTime);
 
 		/** 短信內容 */
-		String SMSContent = medicalReport.getSmsContent();
+		String content = medicalReport.getSmsContent();
 
-		Set<SMSLog> smsLogs = Sets.newHashSet();
+		Set<SMS> smsLogs = Sets.newHashSet();
 
 		/** 获取已绑定的审核通过的用户 */
 		List<User> freeList = initUser(gatherData);
 		if (CollectionUtils.isNotEmpty(freeList)) {
 			for (User reciver : freeList) {
-				SMSLog log = new SMSLog(user, SMSContent, new Date(
-						medicalReport.getReportTime()), reciver,
-						medicalReport.getReportTime(), SMSStatus.FAIL);
+				SMS log = new SMS(user.getId(), content, new Date(
+						medicalReport.getReportTime()), reciver.getPhone(), SMSStatus.FAIL,
+						medicalReport.getReportTime());
 				smsLogs.add(log);
 			}
 		}
 
 		/** 发送短信 */
-		sendSMS(smsLogs, SMSContent);
+		sendSMS(smsLogs, content);
 
 		return 0;
 	}
@@ -392,27 +391,16 @@ public class ApiController {
 		return report;
 	}
 
-	private void sendSMS(Set<SMSLog> smsLogs, String SMSContent) {
+	//TODO
+	private void sendSMS(Set<SMS> smsLogs, String content) {
 
 		if (CollectionUtils.isEmpty(smsLogs))
 			throw new SklayException(ErrorCode.SMS_NULL_SMS);
 
-		/** 检查用户手机类型 */
-		Map<OperatorType, Set<SMSLog>> mobileResult = sklayApi
-				.mergeValidateMobile(smsLogs);
+		smsLogs = sklayApi.sendSMS(smsLogs);
 
-		Set<SMSLog> allSMSLog = Sets.newHashSet();
-		Set<OperatorType> keyset = mobileResult.keySet();
-		for (OperatorType key : keyset)
-			allSMSLog.addAll(mobileResult.get(key));
-
-		Map<String, String> recivers = sklayApi.sendSMS(
-				Convert.toSMSPhoneMap(mobileResult), SMSContent);
-
-		Set<SMSLog> smsLogSet = Convert.toPhoneSMSLogSet(recivers, allSMSLog);
-
-		if (CollectionUtils.isNotEmpty(smsLogSet))
-			smsLogService.createSMSLog(smsLogSet);
+		if (CollectionUtils.isNotEmpty(smsLogs))
+			smsService.create(smsLogs);
 	}
 
 	private static SwitchStatus filterPhysicalSetting(GlobalSetting setting) {

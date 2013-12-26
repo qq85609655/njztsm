@@ -3,12 +3,12 @@ package com.sklay.core.enums;
 public enum SMSStatus implements LabeledEnum {
 
 	/**
-	 * 失败
+	 * 发送失败
 	 */
-	FAIL("失败", 0),
+	FAIL("发送失败", 0),
 
-	/** 成功 */
-	SUCCESS("成功", 1),
+	/** 发送成功 */
+	SUCCESS("发送成功", 1),
 	
 	/** 未发送 */
 	NOSEND("未发送", 2);

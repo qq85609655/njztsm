@@ -27,7 +27,6 @@ import com.sklay.api.SklayApi;
 import com.sklay.core.enums.AppType;
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.DelStatus;
-import com.sklay.core.enums.OperatorType;
 import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
@@ -39,7 +38,6 @@ import com.sklay.model.User;
 import com.sklay.service.ApplicationService;
 import com.sklay.service.ProductService;
 import com.sklay.service.SMSService;
-import com.sklay.util.Convert;
 import com.sklay.util.LoginUserHelper;
 import com.sklay.util.MobileUtil;
 import com.sklay.vo.DataView;
@@ -145,7 +143,7 @@ public class AppController {
 	public String initApply(@PathVariable Long appId, ModelMap modelMap) {
 
 		User session = LoginUserHelper.getLoginUser();
-		List<Application> list = appService.getByCreator(AppType.SMS,
+		List<Application> list = appService.getByCreator(AppType.PUSH,
 				AuditStatus.PASS, session);
 		if (CollectionUtils.isNotEmpty(list))
 			throw new SklayException(ErrorCode.EXIST, null, new Object[] {
@@ -208,7 +206,7 @@ public class AppController {
 	public String initSMS(String phones, ModelMap modelMap) {
 		modelMap.addAttribute("nav", "myApp");
 		User session = LoginUserHelper.getLoginUser();
-		List<Application> list = appService.getByCreator(AppType.SMS,
+		List<Application> list = appService.getByCreator(AppType.PUSH,
 				AuditStatus.PASS, session);
 		String success = "";
 		if (CollectionUtils.isEmpty(list)) {
@@ -226,7 +224,7 @@ public class AppController {
 	public DataView SMS(String phones, String content, ModelMap modelMap) {
 		modelMap.addAttribute("nav", "myApp");
 		User session = LoginUserHelper.getLoginUser();
-		List<Application> list = appService.getByCreator(AppType.SMS,
+		List<Application> list = appService.getByCreator(AppType.PUSH,
 				AuditStatus.PASS, session);
 		if (CollectionUtils.isEmpty(list))
 			throw new SklayException(ErrorCode.FINF_NULL, null,
@@ -267,27 +265,18 @@ public class AppController {
 
 		Date date = new Date();
 		for (String reciver : phoneSet) {
-			SMS sms = new SMS(session, content, date, reciver, SMSStatus.FAIL);
+			SMS sms = new SMS(session.getId(), content, date, reciver, SMSStatus.FAIL,date.getTime());
 			sms.setApp(app);
 			smsList.add(sms);
 		}
 
-		/** 检查用户手机类型 */
-		Map<OperatorType, Set<SMS>> mobileResult = sklayApi
-				.mergeSMSValidateMobile(smsList);
+		smsList = sklayApi.sendSMS(smsList);
 
-		Set<SMS> allSMSLog = Sets.newHashSet();
-		Set<OperatorType> keyset = mobileResult.keySet();
-		for (OperatorType key : keyset)
-			allSMSLog.addAll(mobileResult.get(key));
-
-		Map<String, String> recivers = sklayApi.sendSMS(
-				Convert.toPhoneMap(mobileResult), content);
-
-		Set<SMS> smsSet = Convert.toPhoneSMSSet(recivers, allSMSLog);
-
-		if (CollectionUtils.isNotEmpty(smsSet)) {
-			smsService.create(smsSet);
+		/**
+		 * TODO
+		 */
+		if (CollectionUtils.isNotEmpty(smsList)) {
+			smsService.create(smsList);
 			app.setUsed(used + app.getUsed());
 			appService.update(app);
 		}

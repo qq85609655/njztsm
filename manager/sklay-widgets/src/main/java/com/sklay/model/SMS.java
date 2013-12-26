@@ -28,14 +28,12 @@ public class SMS implements Serializable {
 	@Column(unique = true, nullable = false)
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "creator", nullable = false)
-	private User creator;
+	private Long creator;
 
 	@ManyToOne
 	@JoinColumn(name = "app", nullable = false)
 	private Application app;
-	
+
 	@Column(nullable = false)
 	@Lob
 	private String content;
@@ -48,6 +46,10 @@ public class SMS implements Serializable {
 	@Column(columnDefinition = " int default 0")
 	private SMSStatus status;
 
+	private Long reportTime;
+
+	private String remark;
+
 	public Long getId() {
 		return id;
 	}
@@ -56,11 +58,11 @@ public class SMS implements Serializable {
 		this.id = id;
 	}
 
-	public User getCreator() {
+	public Long getCreator() {
 		return creator;
 	}
 
-	public void setCreator(User creator) {
+	public void setCreator(Long creator) {
 		this.creator = creator;
 	}
 
@@ -100,9 +102,10 @@ public class SMS implements Serializable {
 		super();
 	}
 
-	public SMS(User creator, String content, Date sendTime, String receiver,
-			SMSStatus status) {
+	public SMS(Long creator, String content, Date sendTime, String receiver,
+			SMSStatus status, Long reportTime) {
 		super();
+		this.reportTime = reportTime;
 		this.creator = creator;
 		this.content = content;
 		this.sendTime = sendTime;
@@ -112,9 +115,10 @@ public class SMS implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SMS [id=" + id + ", creator=" + creator + ", content="
-				+ content + ", sendTime=" + sendTime + ", receiver=" + receiver
-				+ ", status=" + status + "]";
+		return "SMS [id=" + id + ", creator=" + creator + ", app=" + app
+				+ ", content=" + content + ", sendTime=" + sendTime
+				+ ", receiver=" + receiver + ", status=" + status
+				+ ", reportTime=" + reportTime + ", remark=" + remark + "]";
 	}
 
 	public Application getApp() {
@@ -123,6 +127,22 @@ public class SMS implements Serializable {
 
 	public void setApp(Application app) {
 		this.app = app;
+	}
+
+	public Long getReportTime() {
+		return reportTime;
+	}
+
+	public void setReportTime(Long reportTime) {
+		this.reportTime = reportTime;
+	}
+
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 
 }

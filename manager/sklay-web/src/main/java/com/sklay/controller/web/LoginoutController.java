@@ -2,7 +2,6 @@ package com.sklay.controller.web;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -22,17 +21,15 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.sklay.api.SklayApi;
 import com.sklay.core.enums.AuditStatus;
-import com.sklay.core.enums.OperatorType;
 import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.PwdUtils;
-import com.sklay.model.SMSLog;
+import com.sklay.model.SMS;
 import com.sklay.model.User;
-import com.sklay.service.SMSLogService;
+import com.sklay.service.SMSService;
 import com.sklay.service.UserService;
-import com.sklay.util.Convert;
 import com.sklay.util.LoginUserHelper;
 import com.sklay.util.MobileUtil;
 import com.sklay.vo.DataView;
@@ -47,7 +44,7 @@ public class LoginoutController {
 	private UserService userService;
 
 	@Autowired
-	private SMSLogService smsLogService;
+	private SMSService smsService;
 
 	@RequestMapping(value = "/regist", method = RequestMethod.GET)
 	public String regist() {
@@ -138,31 +135,19 @@ public class LoginoutController {
 	}
 
 	private void sendSMS(List<User> reciverList, String content) {
-		Set<SMSLog> smsLogs = Sets.newHashSet();
+		Set<SMS> smsLogs = Sets.newHashSet();
 
 		User session = reciverList.get(Constants.ZERO);
 		Date date = new Date();
 		for (User reciver : reciverList) {
-			SMSLog log = new SMSLog(session, content, date, reciver,
-					date.getTime(), SMSStatus.FAIL);
+			SMS log = new SMS(session.getId(), content, date, reciver.getPhone(), SMSStatus.FAIL,
+					date.getTime());
 			smsLogs.add(log);
 		}
 
-		/** 检查用户手机类型 */
-		Map<OperatorType, Set<SMSLog>> mobileResult = sklayApi
-				.mergeValidateMobile(smsLogs);
+		smsLogs = sklayApi.resetPwd(smsLogs) ;
 
-		Set<SMSLog> allSMSLog = Sets.newHashSet();
-		Set<OperatorType> keyset = mobileResult.keySet();
-		for (OperatorType key : keyset)
-			allSMSLog.addAll(mobileResult.get(key));
-
-		Map<String, String> recivers = sklayApi.sendSMS(
-				Convert.toSMSPhoneMap(mobileResult), content);
-
-		Set<SMSLog> smsLogSet = Convert.toPhoneSMSLogSet(recivers, allSMSLog);
-
-		if (CollectionUtils.isNotEmpty(smsLogSet))
-			smsLogService.createSMSLog(smsLogSet);
+		if (CollectionUtils.isNotEmpty(smsLogs))
+			smsService.create(smsLogs);
 	}
 }

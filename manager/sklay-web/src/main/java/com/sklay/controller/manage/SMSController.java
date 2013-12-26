@@ -2,7 +2,6 @@ package com.sklay.controller.manage;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -27,7 +26,6 @@ import com.google.common.collect.Sets;
 import com.sklay.api.SklayApi;
 import com.sklay.core.annotation.Widget;
 import com.sklay.core.annotation.Widgets;
-import com.sklay.core.enums.OperatorType;
 import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.enums.WidgetLevel;
 import com.sklay.core.ex.ErrorCode;
@@ -38,12 +36,12 @@ import com.sklay.core.sdk.model.vo.SMSStockDetail;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.PropertieUtils;
 import com.sklay.model.Group;
+import com.sklay.model.SMS;
 import com.sklay.model.SMSLog;
 import com.sklay.model.User;
 import com.sklay.service.GroupService;
-import com.sklay.service.SMSLogService;
+import com.sklay.service.SMSService;
 import com.sklay.service.UserService;
-import com.sklay.util.Convert;
 import com.sklay.util.LoginUserHelper;
 import com.sklay.util.MobileUtil;
 import com.sklay.vo.DataView;
@@ -63,7 +61,7 @@ public class SMSController {
 			.getLogger(SMSController.class);
 
 	@Autowired
-	private SMSLogService smsLogService;
+	private SMSService smsService;
 
 	@Autowired
 	private SklayApi sklayApi;
@@ -151,8 +149,11 @@ public class SMSController {
 			if (CollectionUtils.isNotEmpty(allGroupId))
 				userOwner = null;
 		}
-		page = smsLogService.getSMSPage(keyword, startDate, endDate, smsStatus,
-				userOwner, allGroupId, pageable);
+
+		// TODO
+		page = null;// smsLogService.getSMSPage(keyword, startDate, endDate,
+					// smsStatus,
+		// userOwner, allGroupId, pageable);
 		pageQuery = initQuery(keyword, startDate, endDate, status, userOwner);
 
 		modelMap.addAttribute("checkedGroup", groupId);
@@ -213,32 +214,20 @@ public class SMSController {
 					throw new SklayException(ErrorCode.ILLEGAL_PARAM, null,
 							"手机号码" + user.getPhone() + "不是系统会员");
 		}
-		Set<SMSLog> smsLogs = Sets.newHashSet();
+		Set<SMS> smsLogs = Sets.newHashSet();
 
 		User session = LoginUserHelper.getLoginUser();
 		Date date = new Date();
 		for (User reciver : reciverList) {
-			SMSLog log = new SMSLog(session, content, date, reciver,
-					date.getTime(), SMSStatus.FAIL);
+			SMS log = new SMS(session.getId(), content, date, reciver.getPhone(),
+					SMSStatus.FAIL, date.getTime());
 			smsLogs.add(log);
 		}
 
-		/** 检查用户手机类型 */
-		Map<OperatorType, Set<SMSLog>> mobileResult = sklayApi
-				.mergeValidateMobile(smsLogs);
+		smsLogs = sklayApi.sendSMS(smsLogs);
 
-		Set<SMSLog> allSMSLog = Sets.newHashSet();
-		Set<OperatorType> keyset = mobileResult.keySet();
-		for (OperatorType key : keyset)
-			allSMSLog.addAll(mobileResult.get(key));
-
-		Map<String, String> recivers = sklayApi.sendSMS(
-				Convert.toSMSPhoneMap(mobileResult), content);
-
-		Set<SMSLog> smsLogSet = Convert.toPhoneSMSLogSet(recivers, allSMSLog);
-
-		if (CollectionUtils.isNotEmpty(smsLogSet))
-			smsLogService.createSMSLog(smsLogSet);
+		if (CollectionUtils.isNotEmpty(smsLogs))
+			smsService.create(smsLogs);
 
 		modelMap.addAttribute("nav", "sms");
 		modelMap.addAttribute("subnav", "sms:job");
@@ -255,11 +244,11 @@ public class SMSController {
 
 		SMSSetting smsSetting = sklayApi.getSMSSetting();
 
-		SMSLoginInfo loginInfo = sklayApi.getSMSLogin();
+		SMSLoginInfo loginInfo = null;// sklayApi.getSMSLogin();
 
-		SMSStockDetail detail = sklayApi.getSMSStockDetail(loginInfo);
+		SMSStockDetail detail = null;// sklayApi.getSMSStockDetail(loginInfo);
 
-		sklayApi.getSMSLogOut(loginInfo);
+		// sklayApi.getSMSLogOut(loginInfo);
 
 		modelMap.addAttribute("smsSetting", smsSetting);
 		modelMap.addAttribute("smsInfo", loginInfo);
@@ -295,6 +284,31 @@ public class SMSController {
 			newSetting.setSos(smsSetting.getSos().trim());
 		}
 
+		if (!oldSetting.getPwd().equals(smsSetting.getPwd())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setPwd(smsSetting.getPwd().trim());
+		}
+
+		if (!oldSetting.getSign().equals(smsSetting.getSign())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setSign(smsSetting.getSign().trim());
+		}
+
+		if (!oldSetting.getAccount().equals(smsSetting.getAccount())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setAccount(smsSetting.getAccount().trim());
+		}
+
+		if (!oldSetting.getPassword().equals(smsSetting.getPassword())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setPassword(smsSetting.getPassword().trim());
+		}
+
+		if (!oldSetting.getSendUrl().equals(smsSetting.getSendUrl())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setSendUrl(smsSetting.getSendUrl().trim());
+		}
+
 		if (null != newSetting) {
 			PropertieUtils.instance(newSetting);
 			sklayApi.setSMSSetting(newSetting);
@@ -313,8 +327,6 @@ public class SMSController {
 				|| StringUtils.isBlank(telecom))
 			throw new SklayException(ErrorCode.FINF_NULL, null, "短信号码段配置");
 
-		PropertieUtils.instance(mobile, unicom, telecom);
-		sklayApi.setMobiles(mobile, unicom, telecom);
 		return new DataView(0, "操作成功");
 	}
 
@@ -326,7 +338,7 @@ public class SMSController {
 
 		if (null == id)
 			throw new SklayException(ErrorCode.FINF_NULL, null, "短信");
-		SMSLog sms = smsLogService.getSMS(id);
+		SMS sms = smsService.getSMS(id);
 		if (null == sms)
 			throw new SklayException(ErrorCode.FINF_NULL, null, "短信");
 		modelMap.addAttribute("model", sms);
@@ -345,7 +357,7 @@ public class SMSController {
 		if (StringUtils.isBlank(content))
 			throw new SklayException(ErrorCode.MISS_PARAM, null, "短信内容");
 
-		SMSLog sms = smsLogService.getSMS(id);
+		SMS sms = smsService.getSMS(id);
 		if (null == sms)
 			throw new SklayException(ErrorCode.FINF_NULL, null, "短信");
 
@@ -353,24 +365,13 @@ public class SMSController {
 		sms.setRemark(remark);
 
 		DataView dataView = new DataView(0, "操作成功");
-		String phones = sms.getReceiver().getPhone() + ";";
-		String type = OperatorType.CHINAMOBILE == sms.getOperator()
-				|| OperatorType.CHINAUNICOM == sms.getOperator() ? Constants.MOBILE2NUICOM
-				: Constants.TELECOM;
+		String phones = sms.getReceiver() + ";";
 		String SMSContent = sms.getContent();
 
-		Map<String, String> call = sklayApi.reSendSMS(phones, type, SMSContent);
+		Set<SMS> call = sklayApi.sendSMS(Sets.newHashSet(sms));
 
-		if (null != call && call.size() > Constants.ZERO) {
-			sms.setStatus(SMSStatus.FAIL);
-			sms.setRemark(sms.getRemark() + ";" + call.get(sms.getReceiver()));
-			dataView.setCode(-1);
-			dataView.setMsg(call.get(sms.getReceiver()));
-		} else {
-			sms.setSendTime(new Date());
-			sms.setStatus(SMSStatus.SUCCESS);
-		}
-		smsLogService.updateSMSLog(sms);
+		//TODO
+//		smsService.update(call);
 
 		return dataView;
 	}

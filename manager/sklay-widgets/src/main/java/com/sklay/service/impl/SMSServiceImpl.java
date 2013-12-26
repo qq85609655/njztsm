@@ -40,4 +40,14 @@ public class SMSServiceImpl implements SMSService {
 	public void removeSMS(User creator) {
 		smsDao.removeSMS(creator);
 	}
+
+	@Override
+	public SMS getSMS(Long id) {
+		return smsDao.findOne(id);
+	}
+
+	@Override
+	public SMS update(SMS sms) {
+		return smsDao.save(sms);
+	}
 }

@@ -9,9 +9,7 @@ public class SMSSetting implements Serializable {
 	 */
 	private static final long serialVersionUID = -8070494530677083776L;
 
-	private String userId;
-
-	private String accountId;
+	private String account;
 
 	private String password;
 
@@ -21,26 +19,20 @@ public class SMSSetting implements Serializable {
 
 	private String physical;
 
-	private String mobile;
+	private String pwd;
 
-	private String unicom;
+	private String sign;
 
-	private String telecom;
+	private String physicalPairs;
 
-	public String getUserId() {
-		return userId;
+	private String pwdPairs;
+
+	public String getAccount() {
+		return account;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public String getAccountId() {
-		return accountId;
-	}
-
-	public void setAccountId(String accountId) {
-		this.accountId = accountId;
+	public void setAccount(String account) {
+		this.account = account;
 	}
 
 	public String getPassword() {
@@ -79,51 +71,51 @@ public class SMSSetting implements Serializable {
 		this.physical = physical;
 	}
 
-	public String getMobile() {
-		return mobile;
-	}
-
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
-	}
-
-	public String getUnicom() {
-		return unicom;
-	}
-
-	public void setUnicom(String unicom) {
-		this.unicom = unicom;
-	}
-
-	public String getTelecom() {
-		return telecom;
-	}
-
-	public void setTelecom(String telecom) {
-		this.telecom = telecom;
-	}
-
-	public SMSSetting(String userId, String accountId, String password,
-			String sendUrl, String physical, String sos, String mobile,
-			String unicom, String telecom) {
+	public SMSSetting(String pwd, String account, String password,
+			String sendUrl, String physical, String sos, String sign,
+			String physicalPairs, String pwdPairs) {
 		super();
-		this.userId = userId;
-		this.accountId = accountId;
+		this.physicalPairs = physicalPairs;
+		this.pwdPairs = pwdPairs;
+		this.sign = sign;
+		this.pwd = pwd;
+		this.account = account;
 		this.password = password;
 		this.sendUrl = sendUrl;
 		this.physical = physical;
 		this.sos = sos;
-		this.mobile = mobile;
-		this.unicom = unicom;
-		this.telecom = telecom;
 
 	}
 
-	public SMSSetting(String mobile, String unicom, String telecom) {
-		super();
-		this.mobile = mobile;
-		this.unicom = unicom;
-		this.telecom = telecom;
+	public String getPwd() {
+		return pwd;
 	}
 
+	public void setPwd(String pwd) {
+		this.pwd = pwd;
+	}
+
+	public String getSign() {
+		return sign;
+	}
+
+	public void setSign(String sign) {
+		this.sign = sign;
+	}
+
+	public String getPhysicalPairs() {
+		return physicalPairs;
+	}
+
+	public void setPhysicalPairs(String physicalPairs) {
+		this.physicalPairs = physicalPairs;
+	}
+
+	public String getPwdPairs() {
+		return pwdPairs;
+	}
+
+	public void setPwdPairs(String pwdPairs) {
+		this.pwdPairs = pwdPairs;
+	}
 }

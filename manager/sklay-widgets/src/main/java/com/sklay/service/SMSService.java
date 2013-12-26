@@ -15,8 +15,12 @@ public interface SMSService {
 
 	public List<SMS> create(Set<SMS> list);
 
-	public Page<SMS> getSMSPage(Application app, SMSStatus status,
+	public SMS update(SMS sms) ;
+	
+ 	public Page<SMS> getSMSPage(Application app, SMSStatus status,
 			User creator, Pageable pageable);
 
 	public void removeSMS(User creator);
+	
+	public SMS getSMS(Long id) ;
 }

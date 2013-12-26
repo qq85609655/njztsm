@@ -31,37 +31,6 @@ public class PropertieUtils {
 	 */
 	private static Properties properties = new Properties();
 
-	public static void instance(String mobile, String unicom, String telecom) {
-
-		String propertyPath = get_WEB_INFO_PATH() + Constants.CONFIG_FILE_NAME;
-
-		FileInputStream ios;
-		try {
-			ios = new FileInputStream(propertyPath);
-			properties.load(ios);
-			ios.close();
-
-			if (StringUtils.isNotBlank(mobile))
-				properties.setProperty(Constants.OPERATOR_MOBILE, mobile);
-
-			if (StringUtils.isNotBlank(unicom))
-				properties.setProperty(Constants.OPERATOR_UNICOM, unicom);
-
-			if (StringUtils.isNotBlank(telecom))
-				properties.setProperty(Constants.OPERATOR_TELECOM, telecom);
-
-			FileOutputStream fos = new FileOutputStream(propertyPath);
-
-			properties.store(fos, "Copyright (c) sklay.net");
-			// 关闭流
-			fos.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public static void instance(SMSSetting smsSetting) {
 
 		LOG.info("PropertieUtils instance smsSetting is {}", smsSetting);
@@ -77,9 +46,9 @@ public class PropertieUtils {
 			properties.load(ios);
 			ios.close();
 
-			if (StringUtils.isNotBlank(smsSetting.getAccountId()))
+			if (StringUtils.isNotBlank(smsSetting.getAccount()))
 				properties.setProperty(Constants.SMS_ACCOUNT, smsSetting
-						.getAccountId().trim());
+						.getAccount().trim());
 
 			if (StringUtils.isNotBlank(smsSetting.getPhysical()))
 				properties.setProperty(Constants.SMS_PHYSICAL, smsSetting
@@ -93,13 +62,17 @@ public class PropertieUtils {
 				properties.setProperty(Constants.SMS_URL, smsSetting
 						.getSendUrl().trim());
 
-			if (StringUtils.isNotBlank(smsSetting.getUserId()))
-				properties.setProperty(Constants.SMS_USER_ID, smsSetting
-						.getUserId().trim());
+			if (StringUtils.isNotBlank(smsSetting.getPwd()))
+				properties.setProperty(Constants.SMS_PWD, smsSetting.getPwd()
+						.trim());
 
 			if (StringUtils.isNotBlank(smsSetting.getPassword()))
 				properties.setProperty(Constants.SMS_PASSWORD, smsSetting
 						.getPassword().trim());
+
+			if (StringUtils.isNotBlank(smsSetting.getSign()))
+				properties.setProperty(Constants.SMS_SIGN, smsSetting.getSign()
+						.trim());
 
 			FileOutputStream fos = new FileOutputStream(propertyPath);
 
@@ -116,7 +89,7 @@ public class PropertieUtils {
 	public static void instance(int verCode, String verName,
 			String downloadUrl, String updateLog) {
 
-		LOG.info(
+		LOG.debug(
 				"PropertieUtils instance android version is verCode {} , verName{},downloadUrl {} ,updateLog {}",
 				verCode, verName, downloadUrl, updateLog);
 

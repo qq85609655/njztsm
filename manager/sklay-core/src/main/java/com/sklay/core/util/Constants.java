@@ -53,21 +53,21 @@ public class Constants {
 
 	public static final String SMS_ACCOUNT = "sms.account";
 
-	public static final String SMS_USER_ID = "sms.userId";
-
 	public static final String SMS_PASSWORD = "sms.password";
 
 	public static final String SMS_PHYSICAL = "sms.physical.template";
 
 	public static final String SMS_SOS = "sms.sos.template";
 
+	public static final String SMS_SOS_PAIRS = "sms.sos.pairs";
+
 	public static final String SMS_JOB = "sms.cronExpression";
 
-	public static final String OPERATOR_MOBILE = "operators.chinaMobile";
+	public static final String SMS_PWD = "sms.pwd.template";
 
-	public static final String OPERATOR_UNICOM = "operators.chinaUnicom";
+	public static final String SMS_PWD_PAIRS = "sms.pwd.pairs";
 
-	public static final String OPERATOR_TELECOM = "operators.chinaTelecom";
+	public static final String SMS_SIGN = "sms.sign.template";
 
 	public static final String ANDROID_VER_CODE = "client.android.ver.code";
 

@@ -137,10 +137,10 @@ public class ManagerController {
 		modelMap.addAttribute("nav", "admin:model");
 		modelMap.addAttribute("subnav", "admin:appList");
 
-		User creator = null;
+		Long creator = null;
 
 		if (!LoginUserHelper.isAdmin()) {
-			creator = LoginUserHelper.getLoginUser();
+			creator = LoginUserHelper.getLoginUser().getId();
 		}
 		Page<Application> page = appService.getPage(keyword, appType, status,
 				creator, pageable);
@@ -248,7 +248,7 @@ public class ManagerController {
 			Application orignal = appService.get(app.getId());
 			if (null != orignal && app.getStatus() != orignal.getStatus()) {
 				orignal.setStatus(app.getStatus());
-				orignal.setUpdator(LoginUserHelper.getLoginUser());
+				orignal.setUpdator(LoginUserHelper.getLoginUser().getId());
 				orignal.setUpdatorTime(new Date());
 				appService.update(orignal);
 			}

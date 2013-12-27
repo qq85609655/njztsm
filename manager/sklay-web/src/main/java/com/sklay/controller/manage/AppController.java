@@ -2,7 +2,6 @@ package com.sklay.controller.manage;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -84,7 +83,7 @@ public class AppController {
 
 		User creator = LoginUserHelper.getLoginUser();
 		Page<Application> page = appService.getPage(keyword, appType, status,
-				creator, pageable);
+				creator.getId(), pageable);
 
 		modelMap.addAttribute("status", status);
 		modelMap.addAttribute("app", appType);
@@ -144,7 +143,7 @@ public class AppController {
 
 		User session = LoginUserHelper.getLoginUser();
 		List<Application> list = appService.getByCreator(AppType.PUSH,
-				AuditStatus.PASS, session);
+				AuditStatus.PASS, session.getId());
 		if (CollectionUtils.isNotEmpty(list))
 			throw new SklayException(ErrorCode.EXIST, null, new Object[] {
 					AuditStatus.PASS.getLable() + "有效申请", "再次申请" });
@@ -192,8 +191,8 @@ public class AppController {
 		app.setUsed(0);
 		app.setStatus(AuditStatus.WAIT);
 		app.setCreateTime(date);
-		app.setCreator(session);
-		app.setUpdator(session);
+		app.setOwner(session.getId());
+		app.setUpdator(session.getId());
 		app.setUpdatorTime(date);
 
 		appService.cerate(app);
@@ -207,7 +206,7 @@ public class AppController {
 		modelMap.addAttribute("nav", "myApp");
 		User session = LoginUserHelper.getLoginUser();
 		List<Application> list = appService.getByCreator(AppType.PUSH,
-				AuditStatus.PASS, session);
+				AuditStatus.PASS, session.getId());
 		String success = "";
 		if (CollectionUtils.isEmpty(list)) {
 			success = "有效的业务审核不存在,无法使用该功能!";
@@ -225,7 +224,7 @@ public class AppController {
 		modelMap.addAttribute("nav", "myApp");
 		User session = LoginUserHelper.getLoginUser();
 		List<Application> list = appService.getByCreator(AppType.PUSH,
-				AuditStatus.PASS, session);
+				AuditStatus.PASS, session.getId());
 		if (CollectionUtils.isEmpty(list))
 			throw new SklayException(ErrorCode.FINF_NULL, null,
 					new Object[] { AuditStatus.PASS.getLable() + "有效申请" });
@@ -265,12 +264,13 @@ public class AppController {
 
 		Date date = new Date();
 		for (String reciver : phoneSet) {
-			SMS sms = new SMS(session.getId(), content, date, reciver, SMSStatus.FAIL,date.getTime());
+			SMS sms = new SMS(session.getId(), content, date, reciver,
+					SMSStatus.FAIL, date.getTime());
 			sms.setApp(app);
 			smsList.add(sms);
 		}
 
-		smsList = sklayApi.sendSMS(smsList);
+		smsList = sklayApi.sms(smsList);
 
 		/**
 		 * TODO

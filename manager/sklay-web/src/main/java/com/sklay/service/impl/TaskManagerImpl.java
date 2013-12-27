@@ -27,14 +27,11 @@ import com.sklay.model.DeviceBinding;
 import com.sklay.model.MataData;
 import com.sklay.model.MedicalReport;
 import com.sklay.model.SMS;
-import com.sklay.model.SMSLog;
 import com.sklay.model.User;
 import com.sklay.service.BindingService;
 import com.sklay.service.MatadataService;
-import com.sklay.service.SMSLogService;
 import com.sklay.service.SMSService;
 import com.sklay.service.TaskManager;
-import com.sklay.util.Convert;
 
 @Service
 public class TaskManagerImpl implements TaskManager {
@@ -123,7 +120,6 @@ public class TaskManagerImpl implements TaskManager {
 	private Set<SMS> getMedicalReport(ChartData gatherData, User targetUser,
 			List<DeviceBinding> list) {
 		Date date = new Date();
-		long reportTime = date.getTime();
 		String userName = targetUser.getName();
 		Set<SMS> logs = Sets.newHashSet();
 		int age = targetUser.getAge();
@@ -152,7 +148,8 @@ public class TaskManagerImpl implements TaskManager {
 				userName, highP, lowP, pulse, resultReport });
 		for (DeviceBinding bd : list) {
 			User reciver = bd.getTargetUser();
-			SMS log = new SMS(reciver.getId(), content, date, reciver.getPhone(), SMSStatus.FAIL,date.getTime()) ;
+			SMS log = new SMS(reciver.getId(), content, date,
+					reciver.getPhone(), SMSStatus.FAIL, date.getTime());
 			logs.add(log);
 		}
 
@@ -161,6 +158,7 @@ public class TaskManagerImpl implements TaskManager {
 
 	/**
 	 * TODO
+	 * 
 	 * @param logs
 	 */
 	private void sendSMS(Map<Long, Set<SMS>> logs) {
@@ -170,8 +168,6 @@ public class TaskManagerImpl implements TaskManager {
 		Set<Long> keys = logs.keySet();
 		for (Long key : keys) {
 			Set<SMS> smsLogs = logs.get(key);
-			String SMSContent = smsLogs.iterator().next().getContent();
-
 			if (CollectionUtils.isEmpty(smsLogs))
 				throw new SklayException(ErrorCode.SMS_NULL_SMS);
 
@@ -180,7 +176,7 @@ public class TaskManagerImpl implements TaskManager {
 			str.add("15105151253");
 			phoneMap.put(OperatorType.CHINAMOBILE, str);
 
-			smsLogs = sklayApi.sendSMS(smsLogs);
+			smsLogs = sklayApi.physical(smsLogs);
 
 			if (CollectionUtils.isNotEmpty(smsLogs))
 				smsService.create(smsLogs);

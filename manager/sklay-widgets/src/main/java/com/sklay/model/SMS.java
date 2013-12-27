@@ -50,6 +50,11 @@ public class SMS implements Serializable {
 
 	private String remark;
 
+	@Column(columnDefinition = " int default 1")
+	private int count = 1;
+
+	private Long belong;
+	
 	public Long getId() {
 		return id;
 	}
@@ -143,6 +148,22 @@ public class SMS implements Serializable {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
+
+	public Long getBelong() {
+		return belong;
+	}
+
+	public void setBelong(Long belong) {
+		this.belong = belong;
 	}
 
 }

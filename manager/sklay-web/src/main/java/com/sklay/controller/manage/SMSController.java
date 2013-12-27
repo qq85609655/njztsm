@@ -37,7 +37,6 @@ import com.sklay.core.util.Constants;
 import com.sklay.core.util.PropertieUtils;
 import com.sklay.model.Group;
 import com.sklay.model.SMS;
-import com.sklay.model.SMSLog;
 import com.sklay.model.User;
 import com.sklay.service.GroupService;
 import com.sklay.service.SMSService;
@@ -101,7 +100,7 @@ public class SMSController {
 		Set<Long> groupIds = Sets.newHashSet(parentGroupId);
 		Set<Long> allGroupId = Sets.newHashSet(parentGroupId);
 
-		Page<SMSLog> page = null;
+		Page<SMS> page = null;
 		/** 取得当前分组 */
 		if (CollectionUtils.isNotEmpty(list)) {
 			for (Group currentGroup : list) {
@@ -219,12 +218,12 @@ public class SMSController {
 		User session = LoginUserHelper.getLoginUser();
 		Date date = new Date();
 		for (User reciver : reciverList) {
-			SMS log = new SMS(session.getId(), content, date, reciver.getPhone(),
-					SMSStatus.FAIL, date.getTime());
+			SMS log = new SMS(session.getId(), content, date,
+					reciver.getPhone(), SMSStatus.FAIL, date.getTime());
 			smsLogs.add(log);
 		}
 
-		smsLogs = sklayApi.sendSMS(smsLogs);
+		smsLogs = sklayApi.sms(smsLogs);
 
 		if (CollectionUtils.isNotEmpty(smsLogs))
 			smsService.create(smsLogs);
@@ -363,15 +362,12 @@ public class SMSController {
 
 		sms.setContent(content);
 		sms.setRemark(remark);
-
+		sms.setCount(sms.getCount() + 1);
 		DataView dataView = new DataView(0, "操作成功");
-		String phones = sms.getReceiver() + ";";
-		String SMSContent = sms.getContent();
 
-		Set<SMS> call = sklayApi.sendSMS(Sets.newHashSet(sms));
+		Set<SMS> call = sklayApi.sms(Sets.newHashSet(sms));
 
-		//TODO
-//		smsService.update(call);
+		smsService.update(call);
 
 		return dataView;
 	}

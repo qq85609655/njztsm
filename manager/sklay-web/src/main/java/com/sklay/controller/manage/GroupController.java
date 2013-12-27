@@ -98,12 +98,18 @@ public class GroupController {
 		User session = LoginUserHelper.getLoginUser();
 
 		Group orginal = new Group();
+		Group parent = session.getGroup();
 
 		orginal.setName(group.getName().trim());
 		orginal.setDescription(group.getDescription());
 		orginal.setMemberCount(0L);
 		orginal.setOwner(session);
-		orginal.setParentGroupId(session.getGroup().getId());
+		orginal.setParentGroupId(parent.getId());
+
+		if (LoginUserHelper.isAdmin())
+			orginal.setBelong(session.getId());
+		else
+			orginal.setBelong(session.getBelong());
 		orginal.setRole(group.getRole());
 		if (null == group.getStatus())
 			orginal.setStatus(AuditStatus.WAIT);

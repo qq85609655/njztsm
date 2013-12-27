@@ -65,6 +65,8 @@ public class User implements Serializable {
 	@JoinColumn(name = "gid", nullable = true)
 	private Group group;
 
+	private Long belong;
+
 	public User() {
 	}
 
@@ -186,6 +188,14 @@ public class User implements Serializable {
 
 	public void setWeight(Integer weight) {
 		this.weight = weight;
+	}
+
+	public Long getBelong() {
+		return belong;
+	}
+
+	public void setBelong(Long belong) {
+		this.belong = belong;
 	}
 
 	public String toString() {

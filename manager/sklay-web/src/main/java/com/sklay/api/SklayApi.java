@@ -1,25 +1,16 @@
 package com.sklay.api;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.lang.StringUtils;
-import org.apache.tiles.request.attribute.Addable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
 import com.sklay.core.sdk.exceptions.JSONException;
@@ -182,31 +173,26 @@ public class SklayApi {
 	}
 
 	/**
-	 * TODO
-	 * 
 	 * @param recivers
 	 * @param SMSContent
 	 * @return
 	 */
-	public List<SMS> physical(Set<SMS> smsList) {
+	public Set<SMS> physical(Set<SMS> smsList) {
 
 		if (CollectionUtils.isNotEmpty(smsList)) {
 			for (SMS sms : smsList) {
 				Map<String, String> pairs = Maps.newHashMap();
 
-				pairs.put("username", "JSMB260200");// 此处填写用户账号
-				pairs.put("scode", "614702");// 此处填写
-				pairs.put("signtag", 1 + "");
-				// pairs.put("username", account);
-				// pairs.put("scode", password);
+				pairs.put("username", account);
+				pairs.put("scode", password);
+				pairs.put("signtag", sign);
 				pairs.put("mobile", sms.getReceiver());
-					pairs.put("content",sms.getContent());
-				// pairs.put("signtag", sign);
-				sendUrl = "http://mssms.cn:8000/msm/sdk/http/sendsmsutf8.jsp";
+				pairs.put("content", sms.getContent());
+
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
-				
-				LOGGER.info(result);
+
+				LOGGER.info("physical result {} " + result);
 
 				try {
 					Thread.sleep(500);
@@ -217,12 +203,44 @@ public class SklayApi {
 			}
 		}
 
-		return null;
+		return smsList;
 	}
 
 	/**
-	 * TODO
-	 * 
+	 * @param recivers
+	 * @param SMSContent
+	 * @return
+	 */
+	public Set<SMS> sms(Set<SMS> smsList) {
+
+		if (CollectionUtils.isNotEmpty(smsList)) {
+			for (SMS sms : smsList) {
+				Map<String, String> pairs = Maps.newHashMap();
+
+				pairs.put("username", account);
+				pairs.put("scode", password);
+				pairs.put("signtag", sign);
+				pairs.put("mobile", sms.getReceiver());
+				pairs.put("content", sms.getContent());
+
+				String result = ApiClient.http_post(sendUrl,
+						ApiClient.splitNameValuePair(pairs));
+
+				LOGGER.info("sms result {} " + result);
+
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					throw new SklayException(e);
+				}
+			}
+		}
+
+		return smsList;
+	}
+
+	/**
 	 * @param recivers
 	 * @param SMSContent
 	 * @return
@@ -236,14 +254,14 @@ public class SklayApi {
 				pairs.put("username", account);
 				pairs.put("scode", password);
 				pairs.put("tempid", pwdPairs);
+				pairs.put("signtag", sign);
 				pairs.put("mobile", sms.getReceiver());
 				pairs.put("content", sms.getContent());
-				pairs.put("signtag", sign);
 
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
 
-				LOGGER.info(result);
+				LOGGER.info("resetPwd result {} " + result);
 
 				try {
 					Thread.sleep(500);
@@ -262,22 +280,18 @@ public class SklayApi {
 		if (CollectionUtils.isNotEmpty(smsList)) {
 			for (SMS sms : smsList) {
 				Map<String, String> pairs = Maps.newHashMap();
-				Date date = new Date();
-				System.out.println(date);
 
 				pairs.put("username", account);
 				pairs.put("scode", password);
 				pairs.put("tempid", sosPairs);
+				pairs.put("signtag", sign);
 				pairs.put("mobile", sms.getReceiver());
 				pairs.put("content", sms.getContent());
-				pairs.put("signtag", sign);
 
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
 
-				LOGGER.info(result);
-				System.out.println(result + "  "
-						+ (new Date().getTime() - date.getTime()));
+				LOGGER.info("sos result {} " + result);
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -285,24 +299,10 @@ public class SklayApi {
 					throw new SklayException(e);
 				}
 
-				System.out.println("sleep time   "
-						+ (new Date().getTime() - date.getTime()));
 			}
 		}
 
-		return null;
-	}
-
-	public Set<SMS> sendSMS(Set<SMS> recivers) {
-
-		Map<String, String> call = Maps.newHashMap();
-		String sendTime = null;
-		String fixNumber = null;
-		if (null == recivers || recivers.size() == 0)
-			throw new SklayException(ErrorCode.SMS_NULL_SMS);
-
-		return recivers;
-
+		return smsList;
 	}
 
 	public boolean setSMSSetting(SMSSetting smsSetting) {

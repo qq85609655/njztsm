@@ -1,6 +1,7 @@
 package com.sklay.service.impl;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,7 +14,6 @@ import com.sklay.core.ex.SklayException;
 import com.sklay.dao.ApplicationDao;
 import com.sklay.dao.SpecificDao;
 import com.sklay.model.Application;
-import com.sklay.model.User;
 import com.sklay.service.ApplicationService;
 
 @Service
@@ -42,9 +42,9 @@ public class ApplicationServiceImpl implements ApplicationService {
 
 	@Override
 	public Page<Application> getPage(String keyword, AppType appType,
-			AuditStatus status, User creator, Pageable pageable)
+			AuditStatus status, Long owner, Pageable pageable)
 			throws SklayException {
-		return specificDao.findAppPage(keyword, appType, status, creator,
+		return specificDao.findAppPage(keyword, appType, status, owner,
 				pageable);
 	}
 
@@ -57,12 +57,24 @@ public class ApplicationServiceImpl implements ApplicationService {
 
 	@Override
 	public List<Application> getByCreator(AppType appType, AuditStatus status,
-			User creator) throws SklayException {
-		return specificDao.getByCreator(appType, status, creator);
+			Long owner) throws SklayException {
+		return specificDao.getByCreator(appType, status, owner);
 	}
 
 	@Override
-	public void remove(User creator) throws SklayException {
-		appDao.remove(creator);
+	public void remove(Long owner) throws SklayException {
+		appDao.remove(owner);
+	}
+
+	@Override
+	public Application getByCreator(AppType appType, Long owner)
+			throws SklayException {
+		return appDao.getByCreator(appType, owner);
+	}
+
+	@Override
+	public List<Application> cerate(List<Application> application)
+			throws SklayException {
+		return appDao.save(application);
 	}
 }

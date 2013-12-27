@@ -31,6 +31,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sklay.core.annotation.Widget;
 import com.sklay.core.annotation.Widgets;
+import com.sklay.core.enums.AppType;
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.BindingMold;
 import com.sklay.core.enums.Level;
@@ -43,6 +44,7 @@ import com.sklay.core.util.BeanUtils;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.DateTimeUtil;
 import com.sklay.core.util.PwdUtils;
+import com.sklay.model.Application;
 import com.sklay.model.ChartData;
 import com.sklay.model.ChartEntity;
 import com.sklay.model.DeviceBinding;
@@ -56,7 +58,6 @@ import com.sklay.service.BindingService;
 import com.sklay.service.GlobalService;
 import com.sklay.service.GroupService;
 import com.sklay.service.MedicalReportService;
-import com.sklay.service.SMSLogService;
 import com.sklay.service.SMSService;
 import com.sklay.service.UserAttrService;
 import com.sklay.service.UserService;
@@ -99,9 +100,6 @@ public class MemberController {
 
 	@Autowired
 	private MedicalReportService reportService;
-
-	@Autowired
-	private SMSLogService smsLogService;
 
 	@Autowired
 	private SMSService smsService;
@@ -183,9 +181,16 @@ public class MemberController {
 			user.setStatus(setting.getUserAudite());
 
 		groupService.update(targetGroup);
+
+		if (LoginUserHelper.isAdmin())
+			user.setBelong(session.getId());
+		else
+			user.setBelong(session.getBelong());
+
 		user = userService.create(user);
 
 		createMemberGroup(user, setting, session);
+		createApplication(user, session);
 
 		DataView dataView = new DataView();
 		dataView.setMsg("操作成功");
@@ -321,7 +326,7 @@ public class MemberController {
 	@ResponseBody
 	public DataView binding(Long userId, String[] devices) {
 
-		User sesson = LoginUserHelper.getLoginUser();
+		User session = LoginUserHelper.getLoginUser();
 		if (null == userId || null == devices
 				|| Constants.ZERO == devices.length)
 			throw new SklayException(ErrorCode.FINF_NULL, null,
@@ -343,11 +348,11 @@ public class MemberController {
 		List<DeviceBinding> bindings = null;
 		Set<Long> owners = Sets.newHashSet(userId);
 		/** 查看此手机号是否已绑定主设备 */
-		if (MemberRole.ADMINSTROTAR == sesson.getGroup().getRole())
+		if (MemberRole.ADMINSTROTAR == session.getGroup().getRole())
 			bindings = bindingService.getUserBinding(owners, Level.FIRST, null);
 		else
 			bindings = bindingService.getUserBinding(owners, Level.FIRST,
-					sesson);
+					session);
 		Set<DeviceBinding> removeSet = Sets.newHashSet();
 		if (CollectionUtils.isNotEmpty(bindings)) {
 			for (DeviceBinding device : bindings) {
@@ -389,11 +394,14 @@ public class MemberController {
 
 			GlobalSetting setting = globalService.getGlobalConfig();
 			Date operateTime = new Date();
-			Long operator = sesson.getId();
+			Long operator = session.getId();
 			DeviceBinding binding = new DeviceBinding(device, member,
 					setting.getDeviceBindingStatus(), Level.FIRST, operateTime,
-					operateTime, sesson, operator, BindingMold.FREE);
-
+					operateTime, session, operator, BindingMold.FREE);
+			if (LoginUserHelper.isAdmin())
+				binding.setBelong(session.getId());
+			else
+				binding.setBelong(session.getBelong());
 			set.add(binding);
 		}
 		if (CollectionUtils.isNotEmpty(removeSet))
@@ -444,7 +452,7 @@ public class MemberController {
 		for (Long id : userId)
 			targetUser.add(id);
 
-		User sesson = LoginUserHelper.getLoginUser();
+		User session = LoginUserHelper.getLoginUser();
 		if (StringUtils.isBlank(sn))
 			throw new SklayException(ErrorCode.MISS_PARAM, null,
 					new Object[] { "需绑定的设备号" });
@@ -484,12 +492,16 @@ public class MemberController {
 		}
 
 		Date operateTime = new Date();
-		Long operator = sesson.getId();
+		Long operator = session.getId();
 		Set<DeviceBinding> bindings = Sets.newHashSet();
 		for (User member : members) {
 			DeviceBinding binding = new DeviceBinding(sn.trim(), member,
-					status, Level.SECOND, operateTime, operateTime, sesson,
+					status, Level.SECOND, operateTime, operateTime, session,
 					operator, mold);
+			if (LoginUserHelper.isAdmin())
+				binding.setBelong(session.getId());
+			else
+				binding.setBelong(session.getBelong());
 			bindings.add(binding);
 		}
 
@@ -682,9 +694,6 @@ public class MemberController {
 		}
 		groupService.update(groups);
 
-		smsLogService.deleteSMSLog(userId);
-		smsLogService.deleteByReceiver(member);
-
 		reportService.deleteMedicalReport(userId);
 		userAttrService.removeAttrByUser(userId);
 
@@ -698,7 +707,7 @@ public class MemberController {
 		bindingService.updateBindingCreator(superUser, superUser.getId(),
 				member);
 		smsService.removeSMS(member);
-		appService.remove(member);
+		// appService.remove(member.getId());
 		userService.delete(member);
 
 		// }
@@ -909,6 +918,25 @@ public class MemberController {
 		return member;
 	}
 
+	private User createApplication(User member, User session) {
+
+		if (null == member || null == member.getGroup()
+				|| null == member.getGroup().getRole())
+			return member;
+
+		MemberRole groupRole = member.getGroup().getRole();
+
+		/** 超级管理员 */
+		if (MemberRole.ADMINSTROTAR == groupRole
+				&& null != member.getGroup().getParentGroupId()) {
+
+			if (MemberRole.AGENT == member.getGroup().getRole())
+				appService.cerate(autoInitApplication(member, session));
+		}
+
+		return member;
+	}
+
 	private static Set<Group> autoInitGroup(User member, User session,
 			AuditStatus groupStatus) {
 
@@ -925,6 +953,21 @@ public class MemberController {
 		groups.add(agentGroup);
 
 		return groups;
+	}
+
+	private static List<Application> autoInitApplication(User member,
+			User session) {
+		Date date = new Date();
+		List<Application> apps = Lists.newArrayList();
+		Application app_physical = new Application(AppType.PHYSICAL,
+				AuditStatus.WAIT, 0, "", member.getId(), date, session.getId(),
+				date);
+		Application app_sos = new Application(AppType.SOS, AuditStatus.WAIT, 0,
+				"", member.getId(), date, session.getId(), date);
+
+		apps.add(app_physical);
+		apps.add(app_sos);
+		return apps;
 	}
 
 	private void checkDeviceBinding(String sn, Set<Long> targetUser, Level level) {

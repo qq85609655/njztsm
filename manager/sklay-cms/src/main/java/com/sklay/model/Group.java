@@ -52,6 +52,8 @@ public class Group implements Serializable {
 	@Column(name = "pgid")
 	private Long parentGroupId;
 
+	private Long belong;
+
 	public Long getId() {
 		return id;
 	}
@@ -122,6 +124,14 @@ public class Group implements Serializable {
 
 	public void setMemberCount(Long memberCount) {
 		this.memberCount = memberCount;
+	}
+
+	public Long getBelong() {
+		return belong;
+	}
+
+	public void setBelong(Long belong) {
+		this.belong = belong;
 	}
 
 	public Group() {

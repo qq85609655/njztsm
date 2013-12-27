@@ -1,6 +1,5 @@
 package com.sklay.dao;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +27,6 @@ import com.sklay.model.MataData;
 import com.sklay.model.MedicalReport;
 import com.sklay.model.Operation;
 import com.sklay.model.SMS;
-import com.sklay.model.SMSLog;
 import com.sklay.model.User;
 
 public interface SpecificDao {
@@ -57,10 +55,6 @@ public interface SpecificDao {
 
 	public List<DeviceBinding> getUserBinding(Set<Long> userId, Level level,
 			User creator);
-
-	public Page<SMSLog> getSMSPage(String keyword, Date startDate,
-			Date endDate, SMSStatus status, Long userOwner, Set<Long> gropuId,
-			Pageable pageable);
 
 	public Page<DeviceBinding> getDeviceBindingPage(String keyword,
 			Level level, BindingMold bindingMold, User creator,
@@ -92,11 +86,11 @@ public interface SpecificDao {
 			Pageable pageable) throws SklayException;
 
 	public Page<Application> findAppPage(String keyword, AppType appType,
-			AuditStatus status, User creator, Pageable pageable)
+			AuditStatus status, Long owner, Pageable pageable)
 			throws SklayException;
 
 	public List<Application> getByCreator(AppType appType, AuditStatus status,
-			User creator) throws SklayException;
+			Long owner) throws SklayException;
 
 	public Page<SMS> getSMSPage(Application app, SMSStatus status,
 			User crteator, Pageable pageable) throws SklayException;

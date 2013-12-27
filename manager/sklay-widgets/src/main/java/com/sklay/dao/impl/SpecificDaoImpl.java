@@ -1,6 +1,5 @@
 package com.sklay.dao.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +38,6 @@ import com.sklay.model.MataData;
 import com.sklay.model.MedicalReport;
 import com.sklay.model.Operation;
 import com.sklay.model.SMS;
-import com.sklay.model.SMSLog;
 import com.sklay.model.User;
 
 @Repository
@@ -379,76 +377,6 @@ public class SpecificDaoImpl implements SpecificDao {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public Page<SMSLog> getSMSPage(String keyword, Date startDate,
-			Date endDate, SMSStatus status, Long userOwner, Set<Long> gropuIds,
-			Pageable pageable) {
-		Query countQuery = initMSMSearch(keyword, startDate, endDate, status,
-				userOwner, gropuIds, true);
-		Query dataQuery = initMSMSearch(keyword, startDate, endDate, status,
-				userOwner, gropuIds, false);
-
-		Long total = (Long) countQuery.getSingleResult();
-		if (!(total > 0))
-			return null;
-		dataQuery.setFirstResult(pageable.getOffset());
-		dataQuery.setMaxResults(pageable.getPageSize());
-
-		List<SMSLog> resultList = dataQuery.getResultList();
-
-		return new PageImpl(resultList, pageable, total);
-	}
-
-	private Query initMSMSearch(String keyword, Date startDate, Date endDate,
-			SMSStatus status, Long userOwner, Set<Long> gropuIds, boolean count) {
-		StringBuffer sb = null;
-
-		if (count)
-			sb = new StringBuffer("select count(s) from SMSLog s where 1=1 ");
-		else
-			sb = new StringBuffer("select s from SMSLog s where 1=1 ");
-
-		if (null != userOwner)
-			sb.append(" and s.user.group.owner.id = :userOwner ");
-
-		if (CollectionUtils.isNotEmpty(gropuIds))
-			sb.append(" and s.receiver.group.id in (:gropuIds) ");
-
-		if (null != startDate && null != endDate)
-			sb.append(" and  s.sendTime >= :startDate and s.sendTime <= :endDate ");
-
-		if (null != status)
-			sb.append(" and s.status = :status ");
-
-		if (StringUtils.isNotBlank(keyword))
-			sb.append(" and s.user.name like :keyword or s.remark like :keyword or s.content  like :keyword or s.receiver.name like :keyword  or s.receiver.phone like :keyword ");
-
-		sb.append(" order by s.reportTime desc ");
-
-		Query query = em.createQuery(sb.toString());
-
-		if (null != userOwner)
-			query.setParameter("userOwner", userOwner);
-
-		if (null != startDate && null != endDate) {
-			query.setParameter("startDate", startDate);
-			query.setParameter("endDate", endDate);
-		}
-
-		if (null != status)
-			query.setParameter("status", status);
-
-		if (CollectionUtils.isNotEmpty(gropuIds))
-			query.setParameter("gropuIds", gropuIds);
-
-		if (StringUtils.isNotBlank(keyword)) {
-			query.setParameter("keyword", "%"
-					+ keyword.replaceAll("%", "").trim() + "%");
-		}
-		return query;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
 	public Page<DeviceBinding> getDeviceBindingPage(String keyword,
 			Level level, BindingMold bindingMold, User creator,
 			Pageable pageable) throws SklayException {
@@ -731,11 +659,11 @@ public class SpecificDaoImpl implements SpecificDao {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Page<Application> findAppPage(String keyword, AppType appType,
-			AuditStatus status, User creator, Pageable pageable)
+			AuditStatus status, Long owner, Pageable pageable)
 			throws SklayException {
 
-		Query queryCount = initAppPage(keyword, appType, status, creator, true);
-		Query queryData = initAppPage(keyword, appType, status, creator, false);
+		Query queryCount = initAppPage(keyword, appType, status, owner, true);
+		Query queryData = initAppPage(keyword, appType, status, owner, false);
 
 		Long total = (Long) queryCount.getSingleResult();
 		if (!(total > 0))
@@ -751,9 +679,9 @@ public class SpecificDaoImpl implements SpecificDao {
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Application> getByCreator(AppType appType, AuditStatus status,
-			User creator) throws SklayException {
+			Long owner) throws SklayException {
 
-		Query queryData = initAppPage(null, appType, status, creator, false);
+		Query queryData = initAppPage(null, appType, status, owner, false);
 
 		List<Application> resultList = queryData.getResultList();
 
@@ -761,7 +689,7 @@ public class SpecificDaoImpl implements SpecificDao {
 	}
 
 	private Query initAppPage(String keyword, AppType appType,
-			AuditStatus status, User creator, boolean isCount) {
+			AuditStatus status, Long creator, boolean isCount) {
 
 		StringBuffer qlString = new StringBuffer(" select ");
 		if (isCount)
@@ -778,7 +706,7 @@ public class SpecificDaoImpl implements SpecificDao {
 			qlString.append(" and a.status = :status  ");
 
 		if (null != creator)
-			qlString.append(" and a.creator = :creator  ");
+			qlString.append(" and a.owner = :creator  ");
 
 		qlString.append(" order by  a.updatorTime desc ");
 

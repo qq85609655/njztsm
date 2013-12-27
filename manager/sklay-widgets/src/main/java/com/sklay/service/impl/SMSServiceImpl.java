@@ -50,4 +50,9 @@ public class SMSServiceImpl implements SMSService {
 	public SMS update(SMS sms) {
 		return smsDao.save(sms);
 	}
+
+	@Override
+	public void update(Set<SMS> sms) {
+		smsDao.save(sms);
+	}
 }

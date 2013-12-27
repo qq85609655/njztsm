@@ -1,7 +1,5 @@
 package com.sklay.api;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -9,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -18,10 +15,6 @@ import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,11 +88,11 @@ public class ApiClient {
 			url.append('&');
 			url.append(name);
 			url.append('=');
-//			url.append(String.valueOf(params.get(name)));
+			// url.append(String.valueOf(params.get(name)));
 			// 不做URLEncoder处理
-			 try {
+			try {
 				url.append(URLEncoder.encode(String.valueOf(params.get(name)),
-				 UTF_8));
+						UTF_8));
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -124,7 +117,7 @@ public class ApiClient {
 			httpClient = getHttpClient();
 			httpPost = getHttpPost(url);
 			httpPost.setRequestBody(pairs);
-			
+
 			int statusCode = httpClient.executeMethod(httpPost);
 			if (statusCode != HttpStatus.SC_OK) {
 				throw new SklayException(ErrorCode.API_RESULT_ERROR);
@@ -223,9 +216,9 @@ public class ApiClient {
 
 		String responseBody = "";
 		try {
-			
-			url = _MakeURL(url, params) ;
-			
+
+			url = _MakeURL(url, params);
+
 			httpClient = getHttpClient();
 			httpPost = getHttpPost(url);
 
@@ -355,25 +348,4 @@ public class ApiClient {
 		}
 	}
 
-	public static void main(String[] args) {
-		String url = "http://mssms.cn:8000/msm/sdk/http/sendsmsutf8.jsp";
-		NameValuePair[] pairs = splitNameValuePair(new HashMap<String, String>() {
-			{
-				put("username", "");
-				put("scode", "");
-				put("tempid", "MB-2013102300");
-				put("mobile", "");
-				put("content", "@name@=地方,@time@=123,@place@=1111");
-			}
-		});
-		http_post(url, pairs);
-
-		// map.put("username", "JSMB260200");// 此处填写用户账号
-		// map.put("scode", "614702");// 此处填写用户密码
-		// map.put("tempid", "MB-2013102300");// 此处填写用户密码
-		// map.put("mobile", "15005151253");// 此处填写发送号码
-		// map.put("content", "@1@=123456");// 此处填写模板短信内容
-		// String temp = HttpPost.doPost(
-		// "http://mssms.cn:8000/msm/sdk/http/sendsmsutf8.jsp", map, "UTF-8");
-	}
 }

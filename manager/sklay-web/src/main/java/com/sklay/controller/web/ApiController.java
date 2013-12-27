@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sklay.api.SklayApi;
+import com.sklay.core.enums.AppType;
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.BindingMold;
 import com.sklay.core.enums.Level;
@@ -34,6 +35,7 @@ import com.sklay.core.message.NLS;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.DateTimeUtil;
 import com.sklay.enums.LogLevelType;
+import com.sklay.model.Application;
 import com.sklay.model.ChartData;
 import com.sklay.model.DeviceBinding;
 import com.sklay.model.GatherData;
@@ -43,9 +45,9 @@ import com.sklay.model.MedicalReport;
 import com.sklay.model.Mold;
 import com.sklay.model.Operation;
 import com.sklay.model.SMS;
-import com.sklay.model.SMSLog;
 import com.sklay.model.User;
 import com.sklay.model.UserAttr;
+import com.sklay.service.ApplicationService;
 import com.sklay.service.BindingService;
 import com.sklay.service.GlobalService;
 import com.sklay.service.MatadataService;
@@ -93,6 +95,9 @@ public class ApiController {
 	@Autowired
 	private SklayApi sklayApi;
 
+	@Autowired
+	private ApplicationService appService;
+
 	@RequestMapping("/physical")
 	@ResponseBody
 	public int physical(GatherData gatherData) throws SklayException {
@@ -113,13 +118,19 @@ public class ApiController {
 		}
 
 		if (null == gatherData) {
-			if (null != operation)
+			if (null != operation) {
+				operation.setDesctiption(operation.getDesctiption()
+						+ " 体检采集的数据 不能为空.");
 				operationService.create(operation);
+			}
 			throw new SklayException(ErrorCode.FINF_NULL, null, "体检采集的数据");
 		}
 		if (StringUtils.isBlank(gatherData.getSimNo())) {
-			if (null != operation)
+			if (null != operation) {
+				operation.setDesctiption(operation.getDesctiption()
+						+ " 采集卡号不能为空!");
 				operationService.create(operation);
+			}
 			throw new SklayException(ErrorCode.SMS_GATHER_SIMNO_EMPTY);
 		}
 		/** 获取绑定主号 */
@@ -127,27 +138,39 @@ public class ApiController {
 				.getDefaultBinding(gatherData.getSimNo().trim());
 
 		if (null == deviceBinding) {
-			if (null != operation)
+			if (null != operation) {
+				operation.setDesctiption(operation.getDesctiption()
+						+ " 采集数据转化异常!");
 				operationService.create(operation);
+			}
 			throw new SklayException(ErrorCode.SMS_GATHER_ERROR);
 		}
 		if (null == deviceBinding.getTargetUser()) {
-			if (null != operation)
+			if (null != operation) {
+				operation.setDesctiption(operation.getDesctiption() + " 设备号【"
+						+ gatherData.getSimNo() + "】还未绑定主帐号");
 				operationService.create(operation);
+			}
 			throw new SklayException(ErrorCode.SMS_GATHER_NOBANDING, null,
 					gatherData.getSimNo());
 		}
 		if (AuditStatus.PASS != deviceBinding.getStatus()) {
-			if (null != operation)
+			if (null != operation) {
+				operation.setDesctiption(operation.getDesctiption()
+						+ " 设备绑定信息审核未完成,无法发送短信");
 				operationService.create(operation);
+			}
 			throw new SklayException(ErrorCode.AUTIT_ERROR, null, new Object[] {
 					"设备绑定信息", "发送短信" });
 		}
 		User targetUser = deviceBinding.getTargetUser();
 
 		if (AuditStatus.PASS != targetUser.getStatus()) {
-			if (null != operation)
+			if (null != operation) {
+				operation.setDesctiption(operation.getDesctiption()
+						+ " 用户信息审核未完成,无法发送短信");
 				operationService.create(operation);
+			}
 			throw new SklayException(ErrorCode.AUTIT_ERROR, null, new Object[] {
 					"用户信息", "发送短信" });
 		}
@@ -161,8 +184,11 @@ public class ApiController {
 			long visitCount = medicalReportService.countDayReport(targetUserId,
 					timeStart, timeEnd, SMSType.PHYSICAL);
 			if (allowCount <= visitCount) {
-				if (null != operation)
+				if (null != operation) {
+					operation.setDesctiption(operation.getDesctiption()
+							+ " 每天的体检次数已达到上线");
 					operationService.create(operation);
+				}
 				throw new SklayException(ErrorCode.MORE_COUNT);
 			}
 		}
@@ -174,34 +200,53 @@ public class ApiController {
 				sklayApi.getPhysical(), SMSType.PHYSICAL, dataTime);
 
 		/** 短信內容 */
-		String SMSContent = medicalReport.getSmsContent();
+		String content = medicalReport.getSmsContent();
 		Long reportTime = medicalReport.getReportTime();
 		Date reportDate = new Date(reportTime);
 		SwitchStatus switchStatus = setting.getSmsFetch();
 		Set<SMS> smsLogs = Sets.newHashSet();
+		Long belong = targetUser.getBelong();
 
-		/** 全部发送 */
-		if (SwitchStatus.OPEN == switchStatus) {
-			/** 获取已绑定的审核通过的用户 */
-			List<User> freeList = initUser(gatherData);
+		Application app = appService.getByCreator(AppType.PHYSICAL, belong);
 
-			if (CollectionUtils.isNotEmpty(freeList)) {
-				for (User reciver : freeList) {
-					SMS log = new SMS(targetUser.getId(), SMSContent, reportDate,
-							reciver.getPhone(), SMSStatus.FAIL, reportTime);
-					smsLogs.add(log);
+		if (null == app || AuditStatus.PASS != app.getStatus()){
+			if (null != operation) {
+				operation.setDesctiption(operation.getDesctiption()
+						+ " 体检短信应用【"+belong+"】 不存在或未完成审核");
+				operationService.create(operation);
+			}
+			throw new SklayException(ErrorCode.AUTIT_ERROR , null, new Object[] {
+					"应用信息不存在或", "发送短信" }) ;
+		}
+			/** 全部发送 */
+			if (SwitchStatus.OPEN == switchStatus) {
+				/** 获取已绑定的审核通过的用户 */
+				List<User> freeList = initUser(gatherData);
+
+				if (CollectionUtils.isNotEmpty(freeList)) {
+					for (User reciver : freeList) {
+						SMS log = new SMS(targetUser.getId(), content,
+								reportDate, reciver.getPhone(), SMSStatus.FAIL,
+								reportTime);
+						log.setBelong(belong);
+						log.setApp(app);
+						smsLogs.add(log);
+					}
 				}
 			}
-		}
-		/** 只发送给主机号 */
-		else {
-			SMS log = new SMS(targetUser.getId(), SMSContent, reportDate,
-					targetUser.getPhone(), SMSStatus.FAIL, reportTime);
-			smsLogs.add(log);
-		}
+			/** 只发送给主机号 */
+			else {
+				SMS log = new SMS(targetUser.getId(), content, reportDate,
+						targetUser.getPhone(), SMSStatus.FAIL, reportTime);
+				log.setBelong(targetUser.getBelong());
+				smsLogs.add(log);
+			}
 
 		/** 发送短信 */
-		sendSMS(smsLogs, SMSContent);
+		if (CollectionUtils.isNotEmpty(smsLogs)) {
+			smsLogs = sklayApi.physical(smsLogs);
+			smsService.create(smsLogs);
+		}
 
 		return 0;
 
@@ -211,7 +256,7 @@ public class ApiController {
 	@ResponseBody
 	@Async
 	public void asyncPhysicalc(GatherData gatherData) throws SklayException {
-		taskManager.doDayJob() ;
+		taskManager.doDayJob();
 	}
 
 	@RequestMapping("/sos")
@@ -257,12 +302,15 @@ public class ApiController {
 			throw new SklayException(ErrorCode.SMS_GATHER_NOBANDING, null,
 					new Object[] { gatherData.getSimNo() });
 		}
+
 		long userId = deviceBinding.getTargetUser().getId();
+		long belong = deviceBinding.getBelong();
 
-		User user = userService.getUser(userId);
+		User creator = userService.getUser(userId);
 		Date dataTime = new Date();
+		Long creatorId = creator.getId();
 
-		MedicalReport medicalReport = getMedicalReport(gatherData, user,
+		MedicalReport medicalReport = getMedicalReport(gatherData, creator,
 				sklayApi.getSos(), SMSType.LOCATION, dataTime);
 
 		/** 短信內容 */
@@ -274,15 +322,19 @@ public class ApiController {
 		List<User> freeList = initUser(gatherData);
 		if (CollectionUtils.isNotEmpty(freeList)) {
 			for (User reciver : freeList) {
-				SMS log = new SMS(user.getId(), content, new Date(
-						medicalReport.getReportTime()), reciver.getPhone(), SMSStatus.FAIL,
-						medicalReport.getReportTime());
+				SMS log = new SMS(creatorId, content, new Date(
+						medicalReport.getReportTime()), reciver.getPhone(),
+						SMSStatus.FAIL, medicalReport.getReportTime());
+				log.setBelong(belong);
 				smsLogs.add(log);
 			}
 		}
 
 		/** 发送短信 */
-		sendSMS(smsLogs, content);
+		if (CollectionUtils.isNotEmpty(smsLogs)) {
+			smsLogs = sklayApi.sos(smsLogs);
+			smsService.create(smsLogs);
+		}
 
 		return 0;
 	}
@@ -389,18 +441,6 @@ public class ApiController {
 		}
 
 		return report;
-	}
-
-	//TODO
-	private void sendSMS(Set<SMS> smsLogs, String content) {
-
-		if (CollectionUtils.isEmpty(smsLogs))
-			throw new SklayException(ErrorCode.SMS_NULL_SMS);
-
-		smsLogs = sklayApi.sendSMS(smsLogs);
-
-		if (CollectionUtils.isNotEmpty(smsLogs))
-			smsService.create(smsLogs);
 	}
 
 	private static SwitchStatus filterPhysicalSetting(GlobalSetting setting) {

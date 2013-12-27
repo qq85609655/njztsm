@@ -50,17 +50,15 @@ public class Application implements Serializable {
 
 	private int used;
 
-	@ManyToOne
-	@JoinColumn(name = "creator", nullable = false)
-	private User creator;
+	@Column(name = "owner", nullable = false)
+	private Long owner;
 
 	@Column(name = "create_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createTime;
 
-	@ManyToOne
-	@JoinColumn(name = "updator", nullable = false)
-	private User updator;
+	@Column(name = "updator", nullable = false)
+	private Long updator;
 
 	@Column(name = "updator_time")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -106,12 +104,12 @@ public class Application implements Serializable {
 		this.remark = remark;
 	}
 
-	public User getCreator() {
-		return creator;
+	public Long getOwner() {
+		return owner;
 	}
 
-	public void setCreator(User creator) {
-		this.creator = creator;
+	public void setOwner(Long owner) {
+		this.owner = owner;
 	}
 
 	public Date getCreateTime() {
@@ -122,11 +120,11 @@ public class Application implements Serializable {
 		this.createTime = createTime;
 	}
 
-	public User getUpdator() {
+	public Long getUpdator() {
 		return updator;
 	}
 
-	public void setUpdator(User updator) {
+	public void setUpdator(Long updator) {
 		this.updator = updator;
 	}
 
@@ -167,15 +165,29 @@ public class Application implements Serializable {
 	}
 
 	public Application(Long id, AppType appType, AuditStatus status,
-			Integer cost, String remark, User creator, Date createTime,
-			User updator, Date updatorTime) {
+			Integer cost, String remark, Long owner, Date createTime,
+			Long updator, Date updatorTime) {
 		super();
 		this.id = id;
 		this.appType = appType;
 		this.status = status;
 		this.cost = cost;
 		this.remark = remark;
-		this.creator = creator;
+		this.owner = owner;
+		this.createTime = createTime;
+		this.updator = updator;
+		this.updatorTime = updatorTime;
+	}
+
+	public Application(AppType appType, AuditStatus status, Integer cost,
+			String remark, Long owner, Date createTime, Long updator,
+			Date updatorTime) {
+		super();
+		this.appType = appType;
+		this.status = status;
+		this.cost = cost;
+		this.remark = remark;
+		this.owner = owner;
 		this.createTime = createTime;
 		this.updator = updator;
 		this.updatorTime = updatorTime;
@@ -184,9 +196,9 @@ public class Application implements Serializable {
 	@Override
 	public String toString() {
 		return "Application [id=" + id + ", appType=" + appType + ", status="
-				+ status + ", cost=" + cost + ", remark=" + remark
-				+ ", creator=" + creator + ", createTime=" + createTime
-				+ ", updator=" + updator + ", updatorTime=" + updatorTime + "]";
+				+ status + ", cost=" + cost + ", remark=" + remark + ", owner="
+				+ owner + ", createTime=" + createTime + ", updator=" + updator
+				+ ", updatorTime=" + updatorTime + "]";
 	}
 
 }

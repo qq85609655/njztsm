@@ -60,6 +60,8 @@ public class DeviceBinding implements Serializable {
 
 	private Long updator;
 
+	private Long belong;
+
 	public String getSerialNumber() {
 		return serialNumber;
 	}
@@ -146,6 +148,14 @@ public class DeviceBinding implements Serializable {
 
 	public void setMold(BindingMold mold) {
 		this.mold = mold;
+	}
+
+	public Long getBelong() {
+		return belong;
+	}
+
+	public void setBelong(Long belong) {
+		this.belong = belong;
 	}
 
 	public DeviceBinding(String serialNumber, User targetUser,

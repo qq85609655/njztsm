@@ -2,6 +2,7 @@ package com.sklay.controller.manage;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.Valid;
@@ -11,6 +12,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefaults;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sklay.api.SklayApi;
 import com.sklay.core.enums.AppType;
@@ -29,14 +33,17 @@ import com.sklay.core.enums.DelStatus;
 import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
+import com.sklay.core.util.BeanUtils;
 import com.sklay.core.util.Constants;
 import com.sklay.model.Application;
+import com.sklay.model.ApplicationView;
 import com.sklay.model.Product;
 import com.sklay.model.SMS;
 import com.sklay.model.User;
 import com.sklay.service.ApplicationService;
 import com.sklay.service.ProductService;
 import com.sklay.service.SMSService;
+import com.sklay.service.UserService;
 import com.sklay.util.LoginUserHelper;
 import com.sklay.util.MobileUtil;
 import com.sklay.vo.DataView;
@@ -50,6 +57,9 @@ public class AppController {
 
 	@Autowired
 	private ApplicationService appService;
+
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private SMSService smsService;
@@ -85,9 +95,31 @@ public class AppController {
 		Page<Application> page = appService.getPage(keyword, appType, status,
 				creator.getId(), pageable);
 
+		List<Application> list = page.getContent();
+		List<ApplicationView> result = Lists.newArrayList();
+		Map<Long, User> mapUser = Maps.newHashMap();
+		if (CollectionUtils.isNotEmpty(list))
+			for (Application app : list) {
+				Long creatorId = app.getOwner();
+				User user;
+				if (mapUser.containsKey(creatorId))
+					user = mapUser.get(creatorId);
+				else {
+					user = userService.getUser(creatorId);
+					mapUser.put(creatorId, user);
+				}
+				ApplicationView av = new ApplicationView();
+				BeanUtils.copyProperties(app, av);
+
+				av.setCreatorUser(user);
+
+				result.add(av);
+			}
+
 		modelMap.addAttribute("status", status);
 		modelMap.addAttribute("app", appType);
-		modelMap.addAttribute("pageModel", page);
+		modelMap.addAttribute("pageModel", new PageImpl<ApplicationView>(
+				result, pageable, page.getTotalElements()));
 		modelMap.addAttribute("pageQuery", initQuery(keyword, status, appType));
 		modelMap.addAttribute("keyword", keyword);
 
@@ -104,7 +136,16 @@ public class AppController {
 		Application app = appService.get(appId);
 
 		User creator = LoginUserHelper.getLoginUser();
-		Page<SMS> page = smsService.getSMSPage(app, status, creator, pageable);
+		Long belong = null;
+		if (LoginUserHelper.isSuperAdmin()) {
+			belong = null;
+			creator = null;
+		} else if (LoginUserHelper.isAdmin())
+			belong = creator.getId();
+		else
+			belong = null;
+		Page<SMS> page = smsService.getSMSPage(app, status, creator, belong,
+				pageable);
 
 		modelMap.addAttribute("status", status);
 		modelMap.addAttribute("appId", appId);
@@ -118,9 +159,24 @@ public class AppController {
 	@RequiresUser
 	public String reApply(@PathVariable Long appId, ModelMap modelMap) {
 
-		Application model = appService.get(appId);
+		Application app = appService.get(appId);
+		ApplicationView av = null;
+		if (null != app) {
+			Long creatorId = app.getOwner();
+			Long updator = app.getUpdator();
+			User user = userService.getUser(creatorId);
 
-		modelMap.addAttribute("model", model);
+			av = new ApplicationView();
+			BeanUtils.copyProperties(app, av);
+
+			av.setCreatorUser(user);
+			if (creatorId != updator)
+				user = userService.getUser(updator);
+
+			av.setUpdatorUser(user);
+		}
+
+		modelMap.addAttribute("model", av);
 
 		return "modal:app.reApply";
 	}
@@ -264,8 +320,8 @@ public class AppController {
 
 		Date date = new Date();
 		for (String reciver : phoneSet) {
-			SMS sms = new SMS(session.getId(), content, date, reciver,
-					SMSStatus.FAIL, date.getTime());
+			SMS sms = new SMS(session.getId(), content, date, session.getId(),
+					reciver, SMSStatus.SUCCESS);
 			sms.setApp(app);
 			smsList.add(sms);
 		}

@@ -147,9 +147,10 @@ public class TaskManagerImpl implements TaskManager {
 		String content = NLS.getMsg(sklayApi.getPhysical(), new Object[] {
 				userName, highP, lowP, pulse, resultReport });
 		for (DeviceBinding bd : list) {
+			User creator = bd.getCreator();
 			User reciver = bd.getTargetUser();
-			SMS log = new SMS(reciver.getId(), content, date,
-					reciver.getPhone(), SMSStatus.FAIL, date.getTime());
+			SMS log = new SMS(creator.getId(), content, date, reciver.getId(),
+					reciver.getPhone(), SMSStatus.SUCCESS);
 			logs.add(log);
 		}
 

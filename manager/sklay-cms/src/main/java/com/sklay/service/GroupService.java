@@ -32,6 +32,8 @@ public interface GroupService {
 
 	public List<Group> getGroupByParentId(Set<Long> parentId) throws SklayException;
 
+	public List<Group> getBelongGroup(Long belong) throws SklayException;
+ 	
 	public Page<Group> getGroupPage(String keyword, User owner,
 			Pageable pageable) throws SklayException;
 

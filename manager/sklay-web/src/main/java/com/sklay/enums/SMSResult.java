@@ -17,7 +17,7 @@ public enum SMSResult implements LabeledEnum {
 	 * 修改成功
 	 */
 	SUCCESS("修改成功", 0),
-	
+
 	/**
 	 * 查询余额失败
 	 */
@@ -147,6 +147,44 @@ public enum SMSResult implements LabeledEnum {
 		default:
 			return null;
 		}
+	}
+
+	public static SMSResult findByLable(String result) {
+		if (result.startsWith("0#"))
+			return SUCCESS;
+		if (result.startsWith("100"))
+			return FAILD_BALANCE;
+		if (result.startsWith("101"))
+			return ERROR_COUNNT_PWD;
+		if (result.startsWith("102"))
+			return DISABLE_COUNT;
+		if (result.startsWith("103"))
+			return ERROR_PARAM;
+		if (result.startsWith("104"))
+			return ERROE_OFTEN;
+		if (result.startsWith("105"))
+			return ERROE_CONTENT;
+		if (result.startsWith("106"))
+			return ERROE_PHONE;
+		if (result.startsWith("107"))
+			return ERROE_COUNNT_SUPPORT;
+		if (result.startsWith("108"))
+			return ERROE_MONEY;
+		if (result.startsWith("109"))
+			return ERROE_IP;
+		if (result.startsWith("110"))
+			return ERROE_WORD;
+		if (result.startsWith("111"))
+			return ERROE_DAY_LIMIT;
+		if (result.startsWith("112"))
+			return ERROE_TIME_FORMAT;
+		if (result.startsWith("113"))
+			return ERROE_SIGN;
+		if (result.startsWith("114"))
+			return ERROE_TEMPLATE;
+		if (result.startsWith("115"))
+			return ERROE_SIGN_NO;
+		return null;
 	}
 
 	@Override

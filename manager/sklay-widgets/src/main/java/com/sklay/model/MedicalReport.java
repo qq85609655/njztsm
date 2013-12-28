@@ -17,7 +17,7 @@ import com.sklay.core.enums.SMSType;
 import com.sklay.core.enums.TipType;
 
 @Entity
-@Table(name = "sklay_user_medical_report")
+@Table(name = "sklay_physical")
 public class MedicalReport implements Serializable {
 
 	/**

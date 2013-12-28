@@ -32,8 +32,8 @@ public class SMSServiceImpl implements SMSService {
 
 	@Override
 	public Page<SMS> getSMSPage(Application app, SMSStatus status,
-			User creator, Pageable pageable) {
-		return specificDao.getSMSPage(app, status, creator, pageable);
+			User creator, Long belong, Pageable pageable) {
+		return specificDao.getSMSPage(app, status, creator, belong, pageable);
 	}
 
 	@Override

@@ -123,10 +123,16 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public List<Group> getGroupByParentId(Set<Long> parentId) throws SklayException {
+	public List<Group> getGroupByParentId(Set<Long> parentId)
+			throws SklayException {
 		if (CollectionUtils.isNotEmpty(parentId))
 			return groupDao.findGroupByParentId(parentId);
 		return null;
+	}
+
+	@Override
+	public List<Group> getBelongGroup(Long belong) throws SklayException {
+		return groupDao.getBelongGroup(belong);
 	}
 
 }

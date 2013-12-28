@@ -20,7 +20,7 @@ public interface SMSService {
 	public void update(Set<SMS> sms);
 
 	public Page<SMS> getSMSPage(Application app, SMSStatus status,
-			User creator, Pageable pageable);
+			User creator, Long belong, Pageable pageable);
 
 	public void removeSMS(User creator);
 

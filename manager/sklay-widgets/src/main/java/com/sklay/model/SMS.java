@@ -41,20 +41,23 @@ public class SMS implements Serializable {
 	@Column(name = "send_time", nullable = false)
 	private Date sendTime;
 
-	private String receiver;
+	private Long receiver;
 
 	@Column(columnDefinition = " int default 0")
 	private SMSStatus status;
 
-	private Long reportTime;
+	private String result;
 
+	private String mobile;
+
+	@Lob
 	private String remark;
 
 	@Column(columnDefinition = " int default 1")
 	private int count = 1;
 
 	private Long belong;
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -87,11 +90,11 @@ public class SMS implements Serializable {
 		this.sendTime = sendTime;
 	}
 
-	public String getReceiver() {
+	public Long getReceiver() {
 		return receiver;
 	}
 
-	public void setReceiver(String receiver) {
+	public void setReceiver(Long receiver) {
 		this.receiver = receiver;
 	}
 
@@ -107,23 +110,15 @@ public class SMS implements Serializable {
 		super();
 	}
 
-	public SMS(Long creator, String content, Date sendTime, String receiver,
-			SMSStatus status, Long reportTime) {
+	public SMS(Long creator, String content, Date sendTime, Long receiver,
+			String mobile, SMSStatus status) {
 		super();
-		this.reportTime = reportTime;
 		this.creator = creator;
 		this.content = content;
 		this.sendTime = sendTime;
 		this.receiver = receiver;
+		this.mobile = mobile;
 		this.status = status;
-	}
-
-	@Override
-	public String toString() {
-		return "SMS [id=" + id + ", creator=" + creator + ", app=" + app
-				+ ", content=" + content + ", sendTime=" + sendTime
-				+ ", receiver=" + receiver + ", status=" + status
-				+ ", reportTime=" + reportTime + ", remark=" + remark + "]";
 	}
 
 	public Application getApp() {
@@ -132,14 +127,6 @@ public class SMS implements Serializable {
 
 	public void setApp(Application app) {
 		this.app = app;
-	}
-
-	public Long getReportTime() {
-		return reportTime;
-	}
-
-	public void setReportTime(Long reportTime) {
-		this.reportTime = reportTime;
 	}
 
 	public String getRemark() {
@@ -164,6 +151,31 @@ public class SMS implements Serializable {
 
 	public void setBelong(Long belong) {
 		this.belong = belong;
+	}
+
+	public String getResult() {
+		return result;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+
+	@Override
+	public String toString() {
+		return "SMS [id=" + id + ", creator=" + creator + ", app=" + app
+				+ ", content=" + content + ", sendTime=" + sendTime
+				+ ", receiver=" + receiver + ", status=" + status + ", result="
+				+ result + ", remark=" + remark + ", count=" + count
+				+ ", belong=" + belong + "]";
 	}
 
 }

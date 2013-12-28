@@ -727,10 +727,11 @@ public class SpecificDaoImpl implements SpecificDao {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public Page<SMS> getSMSPage(Application app, SMSStatus status,
-			User crteator, Pageable pageable) throws SklayException {
+			User crteator, Long belong, Pageable pageable)
+			throws SklayException {
 
-		Query queryCount = initSMSPage(app, status, crteator, true);
-		Query queryData = initSMSPage(app, status, crteator, false);
+		Query queryCount = initSMSPage(app, status, crteator, belong, true);
+		Query queryData = initSMSPage(app, status, crteator, belong, false);
 
 		Long total = (Long) queryCount.getSingleResult();
 		if (!(total > 0))
@@ -744,7 +745,7 @@ public class SpecificDaoImpl implements SpecificDao {
 	}
 
 	private Query initSMSPage(Application app, SMSStatus status, User creator,
-			boolean isCount) {
+			Long belong, boolean isCount) {
 
 		StringBuffer qlString = new StringBuffer(" select ");
 		if (isCount)
@@ -760,8 +761,13 @@ public class SpecificDaoImpl implements SpecificDao {
 		if (null != app)
 			qlString.append(" and m.app = :app  ");
 
-		if (null != creator)
-			qlString.append(" and m.creator = :creator  ");
+		if (null != belong) {
+			if (null != creator)
+				qlString.append(" and ( m.creator = :creator or  m.belong = :belong )");
+			else
+				qlString.append(" and m.belong = :belong  ");
+		} else if (null != creator)
+			qlString.append(" and m.creator = :creator )");
 
 		qlString.append(" order by  m.sendTime desc ");
 
@@ -773,7 +779,13 @@ public class SpecificDaoImpl implements SpecificDao {
 		if (null != app)
 			query.setParameter("app", app);
 
-		if (null != creator)
+		if (null != belong) {
+			if (null != creator) {
+				query.setParameter("creator", creator);
+				query.setParameter("belong", belong);
+			} else
+				query.setParameter("belong", belong);
+		} else if (null != creator)
 			query.setParameter("creator", creator);
 
 		return query;

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefaults;
 import org.springframework.stereotype.Controller;
@@ -43,6 +45,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sklay.api.SklayApi;
 import com.sklay.core.annotation.AvoidDuplicateSubmission;
@@ -63,6 +66,7 @@ import com.sklay.dao.SpecificDao;
 import com.sklay.enums.LogLevelType;
 import com.sklay.mobile.Update;
 import com.sklay.model.Application;
+import com.sklay.model.ApplicationView;
 import com.sklay.model.GlobalSetting;
 import com.sklay.model.Group;
 import com.sklay.model.MedicalReport;
@@ -72,6 +76,7 @@ import com.sklay.service.ApplicationService;
 import com.sklay.service.GlobalService;
 import com.sklay.service.GroupService;
 import com.sklay.service.MedicalReportService;
+import com.sklay.service.UserService;
 import com.sklay.util.LoginUserHelper;
 import com.sklay.vo.DataView;
 
@@ -97,6 +102,9 @@ public class ManagerController {
 
 	@Autowired
 	private ApplicationService appService;
+
+	@Autowired
+	private UserService userService;
 
 	@Autowired
 	private GroupService groupService;
@@ -145,9 +153,31 @@ public class ManagerController {
 		Page<Application> page = appService.getPage(keyword, appType, status,
 				creator, pageable);
 
+		List<Application> list = page.getContent();
+		List<ApplicationView> result = Lists.newArrayList();
+		Map<Long, User> mapUser = Maps.newHashMap();
+		if (CollectionUtils.isNotEmpty(list))
+			for (Application app : list) {
+				Long creatorId = app.getOwner();
+				User user;
+				if (mapUser.containsKey(creatorId))
+					user = mapUser.get(creatorId);
+				else {
+					user = userService.getUser(creatorId);
+					mapUser.put(creatorId, user);
+				}
+				ApplicationView av = new ApplicationView();
+				BeanUtils.copyProperties(app, av);
+
+				av.setCreatorUser(user);
+
+				result.add(av);
+			}
+
 		modelMap.addAttribute("status", status);
 		modelMap.addAttribute("app", appType);
-		modelMap.addAttribute("pageModel", page);
+		modelMap.addAttribute("pageModel", new PageImpl<ApplicationView>(
+				result, pageable, page.getTotalElements()));
 		modelMap.addAttribute("pageQuery", initQuery(keyword, status, appType));
 		modelMap.addAttribute("keyword", keyword);
 
@@ -230,12 +260,25 @@ public class ManagerController {
 	@Widget(name = ":appAudit", description = "应用审核", level = WidgetLevel.THIRD)
 	public String initAppAudit(@PathVariable Long id, ModelMap modelMap) {
 
-		Application app = null;
+		ApplicationView appView = null;
 
-		if (null != id)
-			app = appService.get(id);
+		if (null != id){
+			Application	application = appService.get(id);
+			
+			Long creatorId = application.getOwner();
+			Long updator = application.getUpdator();
+			User user = userService.getUser(creatorId);
 
-		modelMap.addAttribute("model", app);
+			appView = new ApplicationView();
+			BeanUtils.copyProperties(application, appView);
+
+			appView.setCreatorUser(user);
+			if (creatorId != updator)
+				user = userService.getUser(updator);
+
+			appView.setUpdatorUser(user);
+		}
+		modelMap.addAttribute("model", appView);
 		return "modal:app.audit";
 	}
 
@@ -262,12 +305,25 @@ public class ManagerController {
 	@Widget(name = ":detail", description = "应用详情", level = WidgetLevel.THIRD)
 	public String initAppDetail(@PathVariable Long id, ModelMap modelMap) {
 
-		Application app = null;
+		ApplicationView appView = null;
 
-		if (null != id)
-			app = appService.get(id);
+		if (null != id){
+			Application	application = appService.get(id);
+			
+			Long creatorId = application.getOwner();
+			Long updator = application.getUpdator();
+			User user = userService.getUser(creatorId);
 
-		modelMap.addAttribute("model", app);
+			appView = new ApplicationView();
+			BeanUtils.copyProperties(application, appView);
+
+			appView.setCreatorUser(user);
+			if (creatorId != updator)
+				user = userService.getUser(updator);
+
+			appView.setUpdatorUser(user);
+		}
+		modelMap.addAttribute("model", appView);
 		return "modal:app.detail";
 	}
 

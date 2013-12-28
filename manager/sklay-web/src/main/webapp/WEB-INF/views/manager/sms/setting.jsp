@@ -18,37 +18,48 @@
 		      <div class="control-group">
 		        <label class="control-label" for="inputAccountId">短信帐号</label>
 		        <div class="controls">
-		          <input class="span3" type="text" name="accountId" id="inputAccountId" placeholder="短信帐号" value="${smsSetting.account }">
+		          <input class="span5" type="text" name="accountId" id="inputAccountId" placeholder="短信帐号" value="${smsSetting.account }">
 		        </div>
 		      </div>
 		      <div class="control-group">
 		        <label class="control-label" for="inputPassword">短信帐号密码</label>
 		        <div class="controls">
-		          <input class="span3" type="text" name="password" id="inputPassword" placeholder="短信帐号密码" value="${smsSetting.password }">
+		          <input class="span5" type="text" name="password" id="inputPassword" placeholder="短信帐号密码" value="${smsSetting.password }">
 		        </div>
 		      </div>
 		      
 		      <div class="control-group">
-		        <label class="control-label" for="inputPhysical">体检短信模版</label>
+		        <label class="control-label" for="inputSOS">定位短信模版</label>
 		        <div class="controls">
-		        	<textarea rows="4" cols="4" class="span3" name="physical" id="inputPhysical" placeholder="体检短信模版">${smsSetting.physical }</textarea>
+		        	<input class="span5" name="sos" id="inputSOS" placeholder="定位短信模版" value="${smsSetting.sos }"/>
 		        </div>
 		      </div>
-		      
 		      <div class="control-group">
-		        <label class="control-label" for="inputUserId">定位短信模版</label>
+		        <label class="control-label" for="inputSosPairs">定位短信参数</label>
 		        <div class="controls">
-		        	<input class="span3" name="sos" id="inputSOS" placeholder="定位短信模版" value="${smsSetting.sos }"/>
+		        	<textarea rows="4" cols="4" class="span5" name="sos" id="inputSosPairs" placeholder="定位短信参数">${smsSetting.sosPairs }</textarea>
 		        </div>
 		      </div>
 		      
 		      <div class="control-group">
 		        <label class="control-label" for="inputUserId">重置密码模版</label>
 		        <div class="controls">
-		        	<input class="span3" name="sos" id="inputPwd" placeholder="定位短信模版" value="${smsSetting.pwd }"/>
+		        	<input class="span5" name="sos" id="inputPwd" placeholder="定位短信模版" value="${smsSetting.pwd }"/>
+		        </div>
+		      </div>
+		      <div class="control-group">
+		        <label class="control-label" for="inputPwdPairs">重置密码参数</label>
+		        <div class="controls">
+		        	<textarea rows="4" cols="4" class="span5" name="sos" id="inputPwdPairs" placeholder="定位短信参数">${smsSetting.pwdPairs }</textarea>
 		        </div>
 		      </div>
 		      
+		      <div class="control-group">
+		        <label class="control-label" for="inputPhysical">体检短信模版</label>
+		        <div class="controls">
+		        	<textarea rows="4" cols="4" class="span5" name="physical" id="inputPhysical" placeholder="体检短信模版">${smsSetting.physical }</textarea>
+		        </div>
+		      </div>
 		      <div class="control-group">
 		        <div class="controls">
 		          <button type="button" class="btn btn-primary"  title="" data-delay="5" data-html="true" data-href='${ctx}/admin/sms/initSetting' data-original-title="消息...">提交</button>

@@ -2,6 +2,8 @@ package com.sklay.api;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
 import com.sklay.core.sdk.exceptions.JSONException;
@@ -20,6 +23,7 @@ import com.sklay.core.sdk.model.Verb;
 import com.sklay.core.sdk.model.vo.LocationDetail;
 import com.sklay.core.sdk.model.vo.SMSSetting;
 import com.sklay.core.util.Constants;
+import com.sklay.enums.SMSResult;
 import com.sklay.mobile.Update;
 import com.sklay.model.SMS;
 
@@ -178,6 +182,7 @@ public class SklayApi {
 	 * @return
 	 */
 	public Set<SMS> physical(Set<SMS> smsList) {
+		Set<SMS> smsResult = Sets.newHashSet();
 
 		if (CollectionUtils.isNotEmpty(smsList)) {
 			for (SMS sms : smsList) {
@@ -186,14 +191,19 @@ public class SklayApi {
 				pairs.put("username", account);
 				pairs.put("scode", password);
 				pairs.put("signtag", sign);
-				pairs.put("mobile", sms.getReceiver());
+				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
+				sms.setResult(result);
 
+				SMSResult sRslt = SMSResult.findByLable(result);
+				if (null != sRslt)
+					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
+							+ "】");
 				LOGGER.info("physical result {} " + result);
-
+				smsResult.add(sms);
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -203,7 +213,7 @@ public class SklayApi {
 			}
 		}
 
-		return smsList;
+		return smsResult;
 	}
 
 	/**
@@ -212,7 +222,7 @@ public class SklayApi {
 	 * @return
 	 */
 	public Set<SMS> sms(Set<SMS> smsList) {
-
+		Set<SMS> smsResult = Sets.newHashSet();
 		if (CollectionUtils.isNotEmpty(smsList)) {
 			for (SMS sms : smsList) {
 				Map<String, String> pairs = Maps.newHashMap();
@@ -220,14 +230,19 @@ public class SklayApi {
 				pairs.put("username", account);
 				pairs.put("scode", password);
 				pairs.put("signtag", sign);
-				pairs.put("mobile", sms.getReceiver());
+				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
+				sms.setResult(result);
 
+				SMSResult sRslt = SMSResult.findByLable(result);
+				if (null != sRslt)
+					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
+							+ "】");
 				LOGGER.info("sms result {} " + result);
-
+				smsResult.add(sms);
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -237,7 +252,7 @@ public class SklayApi {
 			}
 		}
 
-		return smsList;
+		return smsResult;
 	}
 
 	/**
@@ -246,23 +261,28 @@ public class SklayApi {
 	 * @return
 	 */
 	public Set<SMS> resetPwd(Set<SMS> smsList) {
-
+		Set<SMS> smsResult = Sets.newHashSet();
 		if (CollectionUtils.isNotEmpty(smsList)) {
 			for (SMS sms : smsList) {
 				Map<String, String> pairs = Maps.newHashMap();
 
 				pairs.put("username", account);
 				pairs.put("scode", password);
-				pairs.put("tempid", pwdPairs);
+				pairs.put("tempid", pwd);
 				pairs.put("signtag", sign);
-				pairs.put("mobile", sms.getReceiver());
+				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
-
+				sms.setResult(result);
+				sms.setRemark(pwd);
+				SMSResult sRslt = SMSResult.findByLable(result);
+				if (null != sRslt)
+					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
+							+ "】");
 				LOGGER.info("resetPwd result {} " + result);
-
+				smsResult.add(sms);
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -272,24 +292,31 @@ public class SklayApi {
 			}
 		}
 
-		return smsList;
+		return smsResult;
 	}
 
 	public Set<SMS> sos(Set<SMS> smsList) {
-
+		Set<SMS> smsResult = Sets.newHashSet();
 		if (CollectionUtils.isNotEmpty(smsList)) {
 			for (SMS sms : smsList) {
 				Map<String, String> pairs = Maps.newHashMap();
 
 				pairs.put("username", account);
 				pairs.put("scode", password);
-				pairs.put("tempid", sosPairs);
+				pairs.put("tempid", sos);
 				pairs.put("signtag", sign);
-				pairs.put("mobile", sms.getReceiver());
+				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
+				sms.setResult(result);
+				sms.setRemark(sos);
+				SMSResult sRslt = SMSResult.findByLable(result);
+				if (null != sRslt)
+					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
+							+ "】");
+				smsResult.add(sms);
 
 				LOGGER.info("sos result {} " + result);
 				try {
@@ -302,7 +329,13 @@ public class SklayApi {
 			}
 		}
 
-		return smsList;
+		return smsResult;
+	}
+
+	public static boolean isNumeric(String str) {
+		Pattern pattern = Pattern.compile("[0-9]+");
+		Matcher matcher = pattern.matcher((CharSequence) str);
+		return matcher.matches();
 	}
 
 	public boolean setSMSSetting(SMSSetting smsSetting) {
@@ -331,6 +364,14 @@ public class SklayApi {
 
 	public void setPhysical(String physical) {
 		this.physical = physical;
+	}
+
+	public String getSosPairs() {
+		return sosPairs;
+	}
+
+	public String getPwdPairs() {
+		return pwdPairs;
 	}
 
 	public String getSos() {
@@ -371,6 +412,10 @@ public class SklayApi {
 
 	public void setUpdateLog(String updateLog) {
 		this.updateLog = updateLog;
+	}
+
+	public static void main(String[] args) {
+		System.out.println(isNumeric("32ee"));
 	}
 
 }

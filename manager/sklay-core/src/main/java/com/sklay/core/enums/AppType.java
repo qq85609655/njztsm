@@ -13,9 +13,14 @@ public enum AppType implements LabeledEnum {
 	PHYSICAL("体检业务", 1),
 
 	/**
-	 * 求救业务
+	 * 定位业务
 	 */
-	SOS("求救业务", 2);
+	SOS("定位业务", 2),
+
+	/**
+	 * 重置密码
+	 */
+	PWD("重置密码业务", 3);
 
 	/**
 	 * 成员变量

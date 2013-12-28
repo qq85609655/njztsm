@@ -136,8 +136,8 @@ public class ApiClient {
 			httpPost.releaseConnection();
 			httpClient = null;
 		}
-
-		return responseBody;
+		responseBody = responseBody.replaceAll("\\p{Cntrl}", "");
+		return responseBody.trim();
 	}
 
 	/**

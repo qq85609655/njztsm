@@ -93,7 +93,8 @@ public interface SpecificDao {
 			Long owner) throws SklayException;
 
 	public Page<SMS> getSMSPage(Application app, SMSStatus status,
-			User crteator, Pageable pageable) throws SklayException;
+			User crteator, Long belong, Pageable pageable)
+			throws SklayException;
 
 	public List<DeviceBinding> findTargetBinding(String phone, Level level);
 

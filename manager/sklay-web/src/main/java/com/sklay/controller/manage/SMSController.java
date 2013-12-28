@@ -2,6 +2,7 @@ package com.sklay.controller.manage;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefaults;
 import org.springframework.stereotype.Controller;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sklay.api.SklayApi;
 import com.sklay.core.annotation.Widget;
@@ -30,15 +33,14 @@ import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.enums.WidgetLevel;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
-import com.sklay.core.sdk.model.vo.SMSLoginInfo;
 import com.sklay.core.sdk.model.vo.SMSSetting;
-import com.sklay.core.sdk.model.vo.SMSStockDetail;
+import com.sklay.core.util.BeanUtils;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.PropertieUtils;
-import com.sklay.model.Group;
+import com.sklay.model.Application;
 import com.sklay.model.SMS;
+import com.sklay.model.SMSView;
 import com.sklay.model.User;
-import com.sklay.service.GroupService;
 import com.sklay.service.SMSService;
 import com.sklay.service.UserService;
 import com.sklay.util.LoginUserHelper;
@@ -68,9 +70,6 @@ public class SMSController {
 	@Autowired
 	private UserService userService;
 
-	@Autowired
-	private GroupService groupService;
-
 	@ModelAttribute
 	public void populateModel(Model model) {
 		model.addAttribute("nav", "sms:model");
@@ -84,83 +83,64 @@ public class SMSController {
 			Integer status, Long groupId,
 			@PageableDefaults(value = 20) Pageable pageable, ModelMap modelMap) {
 
-		SMSStatus smsStatus = null == status ? null : SMSStatus
-				.findByValue(status);
+		// SMSStatus smsStatus = null == status ? null : SMSStatus
+		// .findByValue(status);
 
 		User session = LoginUserHelper.getLoginUser();
 		Long userOwner = session.getId();
 
-		Group parentGroup = session.getGroup();
-		Long parentGroupId = parentGroup.getId();
+		// List<Group> list = Lists.newArrayList();
+		//
+		// if (LoginUserHelper.isSuperAdmin())
+		// list = groupService.getGroupAll();
+		// else if (LoginUserHelper.isAdmin())
+		// list = groupService.getBelongGroup(session.getId());
+		// else
+		// list = groupService.getGroupByOwner(session);
 
-		List<Group> list = LoginUserHelper.isSuperAdmin() ? groupService
-				.getGroupAll() : groupService.getGroupByOwner(session);
+		Long belong = null;
+		if (LoginUserHelper.isSuperAdmin()) {
+			belong = null;
+			session = null;
+		} else if (LoginUserHelper.isAdmin())
+			belong = session.getId();
+		else
+			belong = null;
 
 		String pageQuery = "";
-		Set<Long> groupIds = Sets.newHashSet(parentGroupId);
-		Set<Long> allGroupId = Sets.newHashSet(parentGroupId);
+		Application app = null;
+		Page<SMS> page = smsService.getSMSPage(app, null, session, belong,
+				pageable);
 
-		Page<SMS> page = null;
-		/** 取得当前分组 */
+		List<SMSView> result = Lists.newArrayList();
+		List<SMS> list = page.getContent();
+		Map<Long, User> userMap = Maps.newHashMap();
 		if (CollectionUtils.isNotEmpty(list)) {
-			for (Group currentGroup : list) {
-				Long currentGroupId = currentGroup.getId();
-				groupIds.add(currentGroupId);
+			for (SMS sms : list) {
+				Long rec = sms.getReceiver();
+				User rc;
+				if (userMap.containsKey(rec))
+					rc = userMap.get(rec);
+				else {
+					rc = userService.getUser(rec);
+					userMap.put(rec, rc);
+				}
+				SMSView temp = new SMSView();
+				BeanUtils.copyProperties(sms, temp);
+				temp.setReciverUser(rc.getName());
+
+				result.add(temp);
 			}
 		}
-		allGroupId.addAll(groupIds);
 
-		boolean hasNext = (!LoginUserHelper.isSuperAdmin() && LoginUserHelper
-				.isAdmin());
-
-		while (hasNext) {
-			List<Group> nextGroups = groupService.getGroupByParentId(groupIds);
-
-			groupIds = Sets.newHashSet();
-
-			if (CollectionUtils.isEmpty(nextGroups)) {
-				hasNext = false;
-				break;
-			}
-			if (CollectionUtils.isEmpty(list))
-				list = Lists.newArrayList();
-
-			list.addAll(nextGroups);
-
-			for (Group currentGroup : nextGroups) {
-				Long currentGroupId = currentGroup.getId();
-				groupIds.add(currentGroupId);
-			}
-			allGroupId.addAll(groupIds);
-		}
-
-		if (LoginUserHelper.isSuperAdmin()) {
-			userOwner = null;
-			allGroupId.clear();
-			if (null != groupId) {
-				allGroupId.add(groupId);
-			}
-		} else {
-			if (null != groupId) {
-				allGroupId.clear();
-				allGroupId.add(groupId);
-			}
-			if (CollectionUtils.isNotEmpty(allGroupId))
-				userOwner = null;
-		}
-
-		// TODO
-		page = null;// smsLogService.getSMSPage(keyword, startDate, endDate,
-					// smsStatus,
-		// userOwner, allGroupId, pageable);
 		pageQuery = initQuery(keyword, startDate, endDate, status, userOwner);
 
 		modelMap.addAttribute("checkedGroup", groupId);
-		modelMap.addAttribute("groups", list);
-		modelMap.addAttribute("pageModel", page);
+		// modelMap.addAttribute("groups", list);
+		modelMap.addAttribute("pageModel", new PageImpl<SMSView>(result,
+				pageable, page.getTotalElements()));
 		modelMap.addAttribute("pageQuery", pageQuery);
 		modelMap.addAttribute("keyword", keyword);
-		modelMap.addAttribute("checkedStatus", smsStatus);
 
 		return "manager.sms.list";
 	}
@@ -218,8 +198,8 @@ public class SMSController {
 		User session = LoginUserHelper.getLoginUser();
 		Date date = new Date();
 		for (User reciver : reciverList) {
-			SMS log = new SMS(session.getId(), content, date,
-					reciver.getPhone(), SMSStatus.FAIL, date.getTime());
+			SMS log = new SMS(session.getId(), content, date, reciver.getId(),
+					reciver.getPhone(), SMSStatus.SUCCESS);
 			smsLogs.add(log);
 		}
 
@@ -243,15 +223,9 @@ public class SMSController {
 
 		SMSSetting smsSetting = sklayApi.getSMSSetting();
 
-		SMSLoginInfo loginInfo = null;// sklayApi.getSMSLogin();
-
-		SMSStockDetail detail = null;// sklayApi.getSMSStockDetail(loginInfo);
-
 		// sklayApi.getSMSLogOut(loginInfo);
 
 		modelMap.addAttribute("smsSetting", smsSetting);
-		modelMap.addAttribute("smsInfo", loginInfo);
-		modelMap.addAttribute("smsDetail", detail);
 
 		modelMap.addAttribute("readonly", "readonly='readonly'");
 

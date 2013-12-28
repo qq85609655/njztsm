@@ -18,7 +18,7 @@
 <div class="widget-content tab-content">
 	
 	<form action="${ctx }/admin/sms/list" method="post">
-		<div class="input-prepend">
+		<%-- <div class="input-prepend">
 		  	<span class="add-on">分组:</span>
 		    <select class="span2" name="groupId">
 			  <option value="" <c:if test="${empty checkedGroup}"> selected="selected" </c:if>>所有分组</option>
@@ -54,7 +54,7 @@
 				<option value="<%=SMSStatus.FAIL.getValue() %>" <c:if test="${checkedStatus.value eq 0}"> selected="selected" </c:if>><%=SMSStatus.FAIL.getLable() %></option>
 				<option value="<%=SMSStatus.SUCCESS.getValue() %>" <c:if test="${checkedStatus.value eq 1}"> selected="selected" </c:if>><%=SMSStatus.SUCCESS.getLable() %></option>
 			</select>
-		</div>
+		</div> --%>
 		<div class=" input-prepend">
 		  	<span class="add-on" data-name="tooltip" data-toggle="tooltip" data-original-title="【收信姓名、手机号、备注】">关键字</span>
 		    <input type="text" name="keyword" class="span3" value='${keyword }'>
@@ -66,7 +66,6 @@
 			<thead>
 				<tr>
 					<th>编号</th>
-					<th class="span2">体检者</th>
 					<th class="span2">接收者</th>
 					<th class="span2">收信人手机</th>
 					<th class="span1">发送状态</th>
@@ -88,10 +87,9 @@
 						<c:forEach items="${pageModel.content}" var="model">
 							<tr>
 								<td><label class="checkbox hiden" for="checkbox_${model.id}"><input id="checkbox_${model.id}" type="checkbox" name="checkbox" value="${model.id}">  ${model.id}</label></td>
-								<td>${model.user.name} </td>
-								<td>${model.receiver.name}</td>
-								<td>${model.receiver.phone}</td>
-								<td>${model.status.lable}</td>
+								<td>${model.reciverUser}</td>
+								<td>${model.mobile}</td>
+								<td>${model.result}</td>
 								<td> <fmt:formatDate type="both" dateStyle="default" timeStyle="default" value="${model.sendTime}" /></td>
 								<td>${model.content} </td>
 								<td>${model.remark}</td>

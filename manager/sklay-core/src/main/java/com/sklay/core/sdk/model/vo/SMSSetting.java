@@ -23,7 +23,7 @@ public class SMSSetting implements Serializable {
 
 	private String sign;
 
-	private String physicalPairs;
+	private String sosPairs;
 
 	private String pwdPairs;
 
@@ -73,9 +73,9 @@ public class SMSSetting implements Serializable {
 
 	public SMSSetting(String pwd, String account, String password,
 			String sendUrl, String physical, String sos, String sign,
-			String physicalPairs, String pwdPairs) {
+			String sosPairs, String pwdPairs) {
 		super();
-		this.physicalPairs = physicalPairs;
+		this.sosPairs = sosPairs;
 		this.pwdPairs = pwdPairs;
 		this.sign = sign;
 		this.pwd = pwd;
@@ -103,12 +103,12 @@ public class SMSSetting implements Serializable {
 		this.sign = sign;
 	}
 
-	public String getPhysicalPairs() {
-		return physicalPairs;
+	public String getSosPairs() {
+		return sosPairs;
 	}
 
-	public void setPhysicalPairs(String physicalPairs) {
-		this.physicalPairs = physicalPairs;
+	public void setSosPairs(String sosPairs) {
+		this.sosPairs = sosPairs;
 	}
 
 	public String getPwdPairs() {

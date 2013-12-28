@@ -6,11 +6,11 @@
 <form class="form-horizontal" action="${ctx}/admin/app/audit" method="post">
      <div class="control-group">
        <label class="control-label" for="inputName">申请者姓名</label>
-       <div class="control-label"><label class="inline info"><strong>${model.creator.name }</strong></label></div>
+       <div class="control-label"><label class="inline info"><strong>${model.creatorUser.name }</strong></label></div>
      </div>
      <div class="control-group">
        <label class="control-label" for="inputPhone">申请者手机</label>
-       <div class="control-label success"><label class="inline"><strong>${model.creator.phone }</strong></label></div>
+       <div class="control-label success"><label class="inline"><strong>${model.creatorUser.phone }</strong></label></div>
      </div>
      <div class="control-group">
        <label class="control-label" for="inputStatus">审核状态</label>

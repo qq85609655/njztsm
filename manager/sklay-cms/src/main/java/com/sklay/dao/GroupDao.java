@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.MemberRole;
+import com.sklay.core.ex.SklayException;
 import com.sklay.model.Group;
 import com.sklay.model.User;
 
@@ -37,4 +38,7 @@ public interface GroupDao extends JpaRepository<Group, Long> {
 	@Modifying
 	@Query(" delete from Group g where g.owner = ?1 ")
 	void deleteByUser(User user);
+
+	@Query("select g from Group g where  g.owner.id = ?1 or g.belong = ?1 ")
+	List<Group> getBelongGroup(Long belong) throws SklayException;
 }

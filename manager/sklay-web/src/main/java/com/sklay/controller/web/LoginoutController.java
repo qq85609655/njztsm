@@ -17,17 +17,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.sklay.api.SklayApi;
+import com.sklay.core.enums.AppType;
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
+import com.sklay.core.message.NLS;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.PwdUtils;
+import com.sklay.model.Application;
 import com.sklay.model.SMS;
 import com.sklay.model.User;
+import com.sklay.service.ApplicationService;
 import com.sklay.service.SMSService;
 import com.sklay.service.UserService;
 import com.sklay.util.LoginUserHelper;
@@ -46,6 +49,9 @@ public class LoginoutController {
 	@Autowired
 	private SMSService smsService;
 
+	@Autowired
+	private ApplicationService appService ;
+	
 	@RequestMapping(value = "/regist", method = RequestMethod.GET)
 	public String regist() {
 		return "alone:core.regist";
@@ -113,17 +119,37 @@ public class LoginoutController {
 		if (CollectionUtils.isEmpty(users))
 			throw new SklayException(ErrorCode.FINF_NULL, null, "手机号码[" + phone
 					+ "]用户信息");
-		User user = users.get(Constants.ZERO);
-		if (AuditStatus.PASS != user.getStatus())
+		User reciver = users.get(Constants.ZERO);
+		if (AuditStatus.PASS != reciver.getStatus())
 			throw new SklayException(ErrorCode.AUTIT_ERROR, null, new Object[] {
 					"手机号码[" + phone + "]用户信息", "重置密码" });
+		Long belong = reciver.getBelong() ;
+		Application app = appService.getByCreator(AppType.PWD, belong) ;
+		if(null == app || AuditStatus.PASS != app.getStatus())
+			throw new SklayException(ErrorCode.AUTIT_ERROR, null, new Object[] {
+					"密码业务", "重置密码" });
+		
 		String pwd = PwdUtils.genRandomNum(6);
-		user.setPassword(PwdUtils.MD256Pws(pwd.trim()));
-		userService.update(user);
-		String content = "亲 ，" + user.getName() + "，您本次重置的新密码为:" + pwd.trim()
-				+ "请及时登录修改!确保您的账户安全。【安全中心】";
-		sendSMS(Lists.newArrayList(user), content);
-		modelMap.addAttribute("model", user);
+		reciver.setPassword(PwdUtils.MD256Pws(pwd.trim()));
+		userService.update(reciver);
+		String content = NLS.getMsg(sklayApi.getPwdPairs(), new Object[] {
+				reciver.getName(), pwd.trim() });
+
+		Set<SMS> smsLogs = Sets.newHashSet();
+
+		Date date = new Date();
+		SMS log = new SMS(reciver.getId(), content, date, reciver.getId(),
+				reciver.getPhone(), SMSStatus.SUCCESS);
+		log.setBelong(belong) ;
+		log.setApp(app) ;
+		smsLogs.add(log);
+
+		smsLogs = sklayApi.resetPwd(smsLogs);
+
+		if (CollectionUtils.isNotEmpty(smsLogs))
+			smsService.create(smsLogs);
+
+		modelMap.addAttribute("model", reciver);
 
 		return "alone:core.reset";
 	}
@@ -134,20 +160,4 @@ public class LoginoutController {
 		return "redirect:/";
 	}
 
-	private void sendSMS(List<User> reciverList, String content) {
-		Set<SMS> smsLogs = Sets.newHashSet();
-
-		User session = reciverList.get(Constants.ZERO);
-		Date date = new Date();
-		for (User reciver : reciverList) {
-			SMS log = new SMS(session.getId(), content, date, reciver.getPhone(), SMSStatus.FAIL,
-					date.getTime());
-			smsLogs.add(log);
-		}
-
-		smsLogs = sklayApi.resetPwd(smsLogs) ;
-
-		if (CollectionUtils.isNotEmpty(smsLogs))
-			smsService.create(smsLogs);
-	}
 }

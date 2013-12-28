@@ -56,7 +56,6 @@ import com.sklay.service.OperationService;
 import com.sklay.service.SMSService;
 import com.sklay.service.TaskManager;
 import com.sklay.service.UserAttrService;
-import com.sklay.service.UserService;
 import com.sklay.util.DateUtils;
 
 @Controller
@@ -82,9 +81,6 @@ public class ApiController {
 
 	@Autowired
 	private UserAttrService attrService;
-
-	@Autowired
-	private UserService userService;
 
 	@Autowired
 	private TaskManager taskManager;
@@ -164,6 +160,7 @@ public class ApiController {
 					"设备绑定信息", "发送短信" });
 		}
 		User targetUser = deviceBinding.getTargetUser();
+		User creator = deviceBinding.getCreator();
 
 		if (AuditStatus.PASS != targetUser.getStatus()) {
 			if (null != operation) {
@@ -175,7 +172,7 @@ public class ApiController {
 					"用户信息", "发送短信" });
 		}
 		long targetUserId = targetUser.getId();
-
+		long creatorId = creator.getId();
 		long timeStart = DateTimeUtil.getCurrentDay().getTime();
 		long timeEnd = DateTimeUtil.getNextDay().getTime();
 		/** 检查系统配置 */
@@ -209,38 +206,38 @@ public class ApiController {
 
 		Application app = appService.getByCreator(AppType.PHYSICAL, belong);
 
-		if (null == app || AuditStatus.PASS != app.getStatus()){
+		if (null == app || AuditStatus.PASS != app.getStatus()) {
 			if (null != operation) {
 				operation.setDesctiption(operation.getDesctiption()
-						+ " 体检短信应用【"+belong+"】 不存在或未完成审核");
+						+ " 体检短信应用【" + belong + "】 不存在或未完成审核");
 				operationService.create(operation);
 			}
-			throw new SklayException(ErrorCode.AUTIT_ERROR , null, new Object[] {
-					"应用信息不存在或", "发送短信" }) ;
+			throw new SklayException(ErrorCode.AUTIT_ERROR, null, new Object[] {
+					"应用信息不存在或", "发送短信" });
 		}
-			/** 全部发送 */
-			if (SwitchStatus.OPEN == switchStatus) {
-				/** 获取已绑定的审核通过的用户 */
-				List<User> freeList = initUser(gatherData);
+		/** 全部发送 */
+		if (SwitchStatus.OPEN == switchStatus) {
+			/** 获取已绑定的审核通过的用户 */
+			List<User> freeList = initUser(gatherData);
 
-				if (CollectionUtils.isNotEmpty(freeList)) {
-					for (User reciver : freeList) {
-						SMS log = new SMS(targetUser.getId(), content,
-								reportDate, reciver.getPhone(), SMSStatus.FAIL,
-								reportTime);
-						log.setBelong(belong);
-						log.setApp(app);
-						smsLogs.add(log);
-					}
+			if (CollectionUtils.isNotEmpty(freeList)) {
+				for (User reciver : freeList) {
+					SMS log = new SMS(creatorId, content, reportDate,
+							reciver.getId(), reciver.getPhone(),
+							SMSStatus.SUCCESS);
+					log.setBelong(belong);
+					log.setApp(app);
+					smsLogs.add(log);
 				}
 			}
-			/** 只发送给主机号 */
-			else {
-				SMS log = new SMS(targetUser.getId(), content, reportDate,
-						targetUser.getPhone(), SMSStatus.FAIL, reportTime);
-				log.setBelong(targetUser.getBelong());
-				smsLogs.add(log);
-			}
+		}
+		/** 只发送给主机号 */
+		else {
+			SMS log = new SMS(creator.getId(), content, reportDate,
+					targetUser.getId(), targetUser.getPhone(), SMSStatus.FAIL);
+			log.setBelong(targetUser.getBelong());
+			smsLogs.add(log);
+		}
 
 		/** 发送短信 */
 		if (CollectionUtils.isNotEmpty(smsLogs)) {
@@ -296,22 +293,44 @@ public class ApiController {
 		DeviceBinding deviceBinding = bindingService
 				.getDefaultBinding(gatherData.getSimNo().trim());
 
-		if (null == deviceBinding) {
+		if (null == deviceBinding
+				|| AuditStatus.PASS != deviceBinding.getStatus()) {
 			if (null != operation)
 				operationService.create(operation);
 			throw new SklayException(ErrorCode.SMS_GATHER_NOBANDING, null,
 					new Object[] { gatherData.getSimNo() });
 		}
 
-		long userId = deviceBinding.getTargetUser().getId();
+		if (null == deviceBinding.getTargetUser()
+				|| AuditStatus.PASS != deviceBinding.getTargetUser()
+						.getStatus()) {
+			if (null != operation) {
+				operation.setDesctiption(operation.getDesctiption()
+						+ " 用户信息审核未完成,无法发送短信");
+				operationService.create(operation);
+			}
+			throw new SklayException(ErrorCode.AUTIT_ERROR, null, new Object[] {
+					"用户信息", "发送短信" });
+		}
+		User creator = deviceBinding.getCreator();
 		long belong = deviceBinding.getBelong();
-
-		User creator = userService.getUser(userId);
+		long creatorId = creator.getId();
 		Date dataTime = new Date();
-		Long creatorId = creator.getId();
+
+		Application app = appService.getByCreator(AppType.PHYSICAL, belong);
+
+		if (null == app || AuditStatus.PASS != app.getStatus()) {
+			if (null != operation) {
+				operation.setDesctiption(operation.getDesctiption()
+						+ " 体检短信应用【" + belong + "】 不存在或未完成审核");
+				operationService.create(operation);
+			}
+			throw new SklayException(ErrorCode.AUTIT_ERROR, null, new Object[] {
+					"应用信息不存在或", "发送短信" });
+		}
 
 		MedicalReport medicalReport = getMedicalReport(gatherData, creator,
-				sklayApi.getSos(), SMSType.LOCATION, dataTime);
+				sklayApi.getSosPairs(), SMSType.LOCATION, dataTime);
 
 		/** 短信內容 */
 		String content = medicalReport.getSmsContent();
@@ -320,11 +339,14 @@ public class ApiController {
 
 		/** 获取已绑定的审核通过的用户 */
 		List<User> freeList = initUser(gatherData);
+
 		if (CollectionUtils.isNotEmpty(freeList)) {
-			for (User reciver : freeList) {
+			for (User targetUser : freeList) {
 				SMS log = new SMS(creatorId, content, new Date(
-						medicalReport.getReportTime()), reciver.getPhone(),
-						SMSStatus.FAIL, medicalReport.getReportTime());
+						medicalReport.getReportTime()), targetUser.getId(),
+						targetUser.getPhone(), SMSStatus.SUCCESS);
+
+				log.setApp(app);
 				log.setBelong(belong);
 				smsLogs.add(log);
 			}

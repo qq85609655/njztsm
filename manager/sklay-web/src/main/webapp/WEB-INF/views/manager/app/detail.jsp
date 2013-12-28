@@ -7,11 +7,11 @@
      <div class="control-group">
        <label class="control-label">申请者姓名</label>
        <div class="control-label">
-       <label class="inline info"><strong>${model.creator.name }</strong></label></div>
+       <label class="inline info"><strong>${model.creatorUser.name }</strong></label></div>
      </div>
      <div class="control-group">
        <label class="control-label">申请者手机</label>
-       <div class="control-label inline"><strong>${model.creator.phone }</strong></div>
+       <div class="control-label inline"><strong>${model.creatorUser.phone }</strong></div>
      </div>
      <div class="control-group">
        <label class="control-label">应用名称</label>
@@ -39,7 +39,7 @@
      
      <div class="control-group">
        <label class="control-label">最后更新人</label>
-       <div class="control-label success"><label class="inline"><strong>${model.updator.name}</strong></label></div>
+       <div class="control-label success"><label class="inline"><strong>${model.updatorUser.name}</strong></label></div>
      </div>
      
      <div class="control-group">

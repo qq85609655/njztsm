@@ -14,7 +14,9 @@
 			  <span class="add-on">应用类型</span>
 			    <select class="span2" name="appType">
 				  <option value="" <c:if test="${empty app}"> selected="selected" </c:if>>所有</option>
-				  <option value="<%=AppType.SMS %>" <c:if test="${app.value eq 0}"> selected="selected" </c:if>><%=AppType.SMS.getLable() %></option>
+				  <option value="<%=AppType.PUSH %>" <c:if test="${app.value eq 0}"> selected="selected" </c:if>><%=AppType.PUSH.getLable() %></option>
+				  <option value="<%=AppType.PHYSICAL %>" <c:if test="${app.value eq 1}"> selected="selected" </c:if>><%=AppType.PHYSICAL.getLable() %></option>
+				  <option value="<%=AppType.SOS %>" <c:if test="${app.value eq 2}"> selected="selected" </c:if>><%=AppType.SOS.getLable() %></option>
 				</select>
 			</div>
 			
@@ -40,6 +42,7 @@
 					<tr>
 						<th>编号</th>
 						<th>应用名称</th>
+						<th>应用类型</th>
 						<th>单价</th>
 						<th>申请者</th>
 						<th>付费金额</th>
@@ -60,8 +63,9 @@
 								<tr>
 									<td><label class="checkbox" for="checkbox_${model.id}"><input id="checkbox_${model.id}" type="checkbox" name="checkbox" value="${model.id}">  ${model.id}</label></td>
 									<td>${model.product.title}</td>
+									<td>${model.appType.lable}</td>
 									<td>${model.product.price}</td>
-									<td>${model.creator.name}</td>
+									<td>${model.creatorUser.name}</td>
 									<td>${model.cost}</td>
 									<td>${model.status.lable}</td>
 									<td>${model.remark}</td>

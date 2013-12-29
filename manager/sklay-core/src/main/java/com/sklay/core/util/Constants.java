@@ -55,19 +55,23 @@ public class Constants {
 
 	public static final String SMS_PASSWORD = "sms.password";
 
-	public static final String SMS_PHYSICAL = "sms.physical.template";
+	public static final String SMS_CHANGE_PWD = "sms.changepwd";
 
-	public static final String SMS_SOS = "sms.sos.template";
+	public static final String SMS_BALANCE = "sms.balance";
+
+	public static final String SMS_TEMPLATE_PHYSICAL = "sms.physical.template";
+
+	public static final String SMS_TEMPLATE_SOS = "sms.sos.template";
 
 	public static final String SMS_SOS_PAIRS = "sms.sos.pairs";
 
 	public static final String SMS_JOB = "sms.cronExpression";
 
-	public static final String SMS_PWD = "sms.pwd.template";
+	public static final String SMS_TEMPLATE_PWD = "sms.pwd.template";
 
 	public static final String SMS_PWD_PAIRS = "sms.pwd.pairs";
 
-	public static final String SMS_SIGN = "sms.sign.template";
+	public static final String SMS_TEMPLATE_SIGN = "sms.sign.template";
 
 	public static final String ANDROID_VER_CODE = "client.android.ver.code";
 

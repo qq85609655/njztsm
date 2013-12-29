@@ -46,33 +46,45 @@ public class PropertieUtils {
 			properties.load(ios);
 			ios.close();
 
-			if (StringUtils.isNotBlank(smsSetting.getAccount()))
-				properties.setProperty(Constants.SMS_ACCOUNT, smsSetting
-						.getAccount().trim());
-
-			if (StringUtils.isNotBlank(smsSetting.getPhysical()))
-				properties.setProperty(Constants.SMS_PHYSICAL, smsSetting
-						.getPhysical().trim());
-
-			if (StringUtils.isNotBlank(smsSetting.getSos()))
-				properties.setProperty(Constants.SMS_SOS, smsSetting.getSos()
-						.trim());
-
 			if (StringUtils.isNotBlank(smsSetting.getSendUrl()))
 				properties.setProperty(Constants.SMS_URL, smsSetting
 						.getSendUrl().trim());
 
-			if (StringUtils.isNotBlank(smsSetting.getPwd()))
-				properties.setProperty(Constants.SMS_PWD, smsSetting.getPwd()
-						.trim());
+			if (StringUtils.isNotBlank(smsSetting.getChangePwd()))
+				properties.setProperty(Constants.SMS_CHANGE_PWD, smsSetting
+						.getChangePwd().trim());
+
+			if (StringUtils.isNotBlank(smsSetting.getBalance()))
+				properties.setProperty(Constants.SMS_BALANCE, smsSetting
+						.getBalance().trim());
 
 			if (StringUtils.isNotBlank(smsSetting.getPassword()))
 				properties.setProperty(Constants.SMS_PASSWORD, smsSetting
 						.getPassword().trim());
 
-			if (StringUtils.isNotBlank(smsSetting.getSign()))
-				properties.setProperty(Constants.SMS_SIGN, smsSetting.getSign()
-						.trim());
+			if (StringUtils.isNotBlank(smsSetting.getAccount()))
+				properties.setProperty(Constants.SMS_ACCOUNT, smsSetting
+						.getAccount().trim());
+
+			if (StringUtils.isNotBlank(smsSetting.getPhysicalTpl()))
+				properties.setProperty(Constants.SMS_TEMPLATE_PHYSICAL,
+						smsSetting.getPhysicalTpl().trim());
+
+			if (StringUtils.isNotBlank(smsSetting.getSosTpl()))
+				properties.setProperty(Constants.SMS_TEMPLATE_SOS, smsSetting
+						.getSosTpl().trim());
+
+			if (StringUtils.isNotBlank(smsSetting.getSosPairs()))
+				properties.setProperty(Constants.SMS_SOS_PAIRS, smsSetting
+						.getSosPairs().trim());
+
+			if (StringUtils.isNotBlank(smsSetting.getPwdPairs()))
+				properties.setProperty(Constants.SMS_PWD_PAIRS, smsSetting
+						.getPwdPairs().trim());
+
+			if (StringUtils.isNotBlank(smsSetting.getSignTpl()))
+				properties.setProperty(Constants.SMS_TEMPLATE_SIGN, smsSetting
+						.getSignTpl().trim());
 
 			FileOutputStream fos = new FileOutputStream(propertyPath);
 

@@ -1,5 +1,6 @@
 package com.sklay.api;
 
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -23,8 +24,10 @@ import com.sklay.core.sdk.model.Verb;
 import com.sklay.core.sdk.model.vo.LocationDetail;
 import com.sklay.core.sdk.model.vo.SMSSetting;
 import com.sklay.core.util.Constants;
+import com.sklay.enums.LogLevelType;
 import com.sklay.enums.SMSResult;
 import com.sklay.mobile.Update;
+import com.sklay.model.Operation;
 import com.sklay.model.SMS;
 
 /**
@@ -61,23 +64,29 @@ public class SklayApi {
 	@Value("${" + Constants.SMS_URL + "}")
 	private String sendUrl;
 
-	@Value("${" + Constants.SMS_PHYSICAL + "}")
-	private String physical;
+	@Value("${" + Constants.SMS_TEMPLATE_PHYSICAL + "}")
+	private String physical_tpl;
 
-	@Value("${" + Constants.SMS_SOS + "}")
-	private String sos;
+	@Value("${" + Constants.SMS_TEMPLATE_SOS + "}")
+	private String sos_tpl;
 
-	@Value("${" + Constants.SMS_PWD + "}")
-	private String pwd;
+	@Value("${" + Constants.SMS_TEMPLATE_PWD + "}")
+	private String pwd_tpl;
 
-	@Value("${" + Constants.SMS_SIGN + "}")
-	private String sign;
+	@Value("${" + Constants.SMS_TEMPLATE_SIGN + "}")
+	private String sign_tpl;
 
 	@Value("${" + Constants.SMS_SOS_PAIRS + "}")
 	private String sosPairs;
 
 	@Value("${" + Constants.SMS_PWD_PAIRS + "}")
 	private String pwdPairs;
+
+	@Value("${" + Constants.SMS_CHANGE_PWD + "}")
+	private String changePwd;
+
+	@Value("${" + Constants.SMS_BALANCE + "}")
+	private String balance;
 
 	// 版本号
 	@Value("${" + Constants.ANDROID_VER_CODE + "}")
@@ -190,7 +199,7 @@ public class SklayApi {
 
 				pairs.put("username", account);
 				pairs.put("scode", password);
-				pairs.put("signtag", sign);
+				pairs.put("signtag", sign_tpl);
 				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
@@ -217,6 +226,71 @@ public class SklayApi {
 	}
 
 	/**
+	 * 修改短信密码
+	 * 
+	 * @param newPwd
+	 * @return
+	 */
+	public SMSResult changePwd(String newPwd) {
+
+		if (StringUtils.isNotBlank(newPwd)) {
+			Map<String, String> pairs = Maps.newHashMap();
+
+			pairs.put("username", account);
+			pairs.put("scode", password);
+			pairs.put("newscode", newPwd);
+
+			String result = ApiClient.http_post(changePwd,
+					ApiClient.splitNameValuePair(pairs));
+
+			Operation operation = new Operation();
+
+			operation.setType(LogLevelType.API);
+			operation.setCreateTime(new Date());
+			operation.setName("修改短信平台密码");
+			operation.setContent("旧密码为：" + password + "新密码为【" + newPwd + "】");
+			operation.setDesctiption(result);
+
+			SMSResult sRslt = SMSResult.findByLable(result);
+			if (null != sRslt)
+				operation.setDesctiption(operation.getDesctiption() + "【"
+						+ sRslt.getLable() + "】");
+			LOGGER.info("change password result {} " + result);
+			return sRslt;
+		}
+
+		return null;
+	}
+
+	/**
+	 * 查询余额： 0# 数字查询成功，格式：返回值#短信余额条数 余额条数
+	 */
+	public Operation balance() {
+		Map<String, String> pairs = Maps.newHashMap();
+
+		pairs.put("username", account);
+		pairs.put("scode", password);
+
+		String result = ApiClient.http_post(balance,
+				ApiClient.splitNameValuePair(pairs));
+
+		Operation operation = new Operation();
+
+		operation.setName("查询短信剩余量");
+		operation.setContent(result);
+
+		SMSResult sRslt = SMSResult.findByLable(result);
+		if (null != sRslt) {
+			operation.setDesctiption("【" + sRslt.getLable() + "】");
+			if (SMSResult.SUCCESS == sRslt)
+				operation.setContent(result.replaceFirst("0#", ""));
+		}
+		LOGGER.info("change password result {} " + result);
+		return operation;
+
+	}
+
+	/**
 	 * @param recivers
 	 * @param SMSContent
 	 * @return
@@ -229,7 +303,7 @@ public class SklayApi {
 
 				pairs.put("username", account);
 				pairs.put("scode", password);
-				pairs.put("signtag", sign);
+				pairs.put("signtag", sign_tpl);
 				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
@@ -268,15 +342,15 @@ public class SklayApi {
 
 				pairs.put("username", account);
 				pairs.put("scode", password);
-				pairs.put("tempid", pwd);
-				pairs.put("signtag", sign);
+				pairs.put("tempid", pwd_tpl);
+				pairs.put("signtag", sign_tpl);
 				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
 				sms.setResult(result);
-				sms.setRemark(pwd);
+				sms.setRemark(pwd_tpl);
 				SMSResult sRslt = SMSResult.findByLable(result);
 				if (null != sRslt)
 					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
@@ -303,15 +377,15 @@ public class SklayApi {
 
 				pairs.put("username", account);
 				pairs.put("scode", password);
-				pairs.put("tempid", sos);
-				pairs.put("signtag", sign);
+				pairs.put("tempid", sos_tpl);
+				pairs.put("signtag", sign_tpl);
 				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
 				sms.setResult(result);
-				sms.setRemark(sos);
+				sms.setRemark(sos_tpl);
 				SMSResult sRslt = SMSResult.findByLable(result);
 				if (null != sRslt)
 					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
@@ -341,29 +415,54 @@ public class SklayApi {
 	public boolean setSMSSetting(SMSSetting smsSetting) {
 		boolean bRslt = true;
 
-		if (StringUtils.isNotBlank(smsSetting.getPhysical()))
-			this.setPhysical(smsSetting.getPhysical().trim());
+		if (StringUtils.isNotBlank(smsSetting.getPhysicalTpl()))
+			this.setPhysical_tpl(smsSetting.getPhysicalTpl().trim());
 
-		if (StringUtils.isNotBlank(smsSetting.getSos()))
-			this.setSos(smsSetting.getSos().trim());
+		if (StringUtils.isNotBlank(smsSetting.getSosTpl()))
+			this.setSos_tpl(smsSetting.getSosTpl().trim());
 
-		if (StringUtils.isNotBlank(smsSetting.getSign()))
-			this.setSos(smsSetting.getSign().trim());
+		if (StringUtils.isNotBlank(smsSetting.getSignTpl()))
+			this.setSos_tpl(smsSetting.getSignTpl().trim());
+
+		if (StringUtils.isNotBlank(smsSetting.getAccount()))
+			this.setAccount(smsSetting.getAccount().trim());
+
+		if (StringUtils.isNotBlank(smsSetting.getBalance()))
+			this.setBalance(smsSetting.getBalance().trim());
+
+		if (StringUtils.isNotBlank(smsSetting.getChangePwd()))
+			this.setChangePwd(smsSetting.getChangePwd().trim());
+
+		if (StringUtils.isNotBlank(smsSetting.getPassword()))
+			this.setPassword(smsSetting.getPassword().trim());
+
+		if (StringUtils.isNotBlank(smsSetting.getPwdTpl()))
+			this.setPwd(smsSetting.getPwdTpl().trim());
+
+		if (StringUtils.isNotBlank(smsSetting.getPwdPairs()))
+			this.setPwdPairs(smsSetting.getPwdPairs().trim());
+
+		if (StringUtils.isNotBlank(smsSetting.getSendUrl()))
+			this.setSendUrl(smsSetting.getSendUrl().trim());
+
+		if (StringUtils.isNotBlank(smsSetting.getSosPairs()))
+			this.setSosPairs(smsSetting.getSosPairs().trim());
 
 		return bRslt;
 	}
 
 	public SMSSetting getSMSSetting() {
-		return new SMSSetting(pwd, account, password, sendUrl, physical, sos,
-				sign, sosPairs, pwdPairs);
+		return new SMSSetting(pwd_tpl, account, password, sendUrl,
+				physical_tpl, sos_tpl, sign_tpl, sosPairs, pwdPairs, changePwd,
+				balance);
 	}
 
-	public String getPhysical() {
-		return physical;
+	public String getPhysical_tpl() {
+		return physical_tpl;
 	}
 
-	public void setPhysical(String physical) {
-		this.physical = physical;
+	public void setPhysical_tpl(String physical_tpl) {
+		this.physical_tpl = physical_tpl;
 	}
 
 	public String getSosPairs() {
@@ -374,12 +473,12 @@ public class SklayApi {
 		return pwdPairs;
 	}
 
-	public String getSos() {
-		return sos;
+	public String getSos_tpl() {
+		return sos_tpl;
 	}
 
-	public void setSos(String sos) {
-		this.sos = sos;
+	public void setSos_tpl(String sos_tpl) {
+		this.sos_tpl = sos_tpl;
 	}
 
 	public int getVersionCode() {
@@ -414,8 +513,89 @@ public class SklayApi {
 		this.updateLog = updateLog;
 	}
 
+	public String getSearchURL() {
+		return searchURL;
+	}
+
+	public void setSearchURL(String searchURL) {
+		this.searchURL = searchURL;
+	}
+
+	public String getSearchKey() {
+		return searchKey;
+	}
+
+	public void setSearchKey(String searchKey) {
+		this.searchKey = searchKey;
+	}
+
+	public String getAccount() {
+		return account;
+	}
+
+	public void setAccount(String account) {
+		this.account = account;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getSendUrl() {
+		return sendUrl;
+	}
+
+	public void setSendUrl(String sendUrl) {
+		this.sendUrl = sendUrl;
+	}
+
+	public String getPwd_tpl() {
+		return pwd_tpl;
+	}
+
+	public void setPwd(String pwd_tpl) {
+		this.pwd_tpl = pwd_tpl;
+	}
+
+	public String getSign_tpl() {
+		return sign_tpl;
+	}
+
+	public void setSign_tpl(String sign_tpl) {
+		this.sign_tpl = sign_tpl;
+	}
+
+	public String getChangePwd() {
+		return changePwd;
+	}
+
+	public void setChangePwd(String changePwd) {
+		this.changePwd = changePwd;
+	}
+
+	public String getBalance() {
+		return balance;
+	}
+
+	public void setBalance(String balance) {
+		this.balance = balance;
+	}
+
+	public void setSosPairs(String sosPairs) {
+		this.sosPairs = sosPairs;
+	}
+
+	public void setPwdPairs(String pwdPairs) {
+		this.pwdPairs = pwdPairs;
+	}
+
 	public static void main(String[] args) {
-		System.out.println(isNumeric("32ee"));
+		String str = "0#1230#";
+		System.out.println(str.replaceFirst("0#", ""));
 	}
 
 }

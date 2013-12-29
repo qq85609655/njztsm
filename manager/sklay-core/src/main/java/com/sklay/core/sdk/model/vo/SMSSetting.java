@@ -15,17 +15,21 @@ public class SMSSetting implements Serializable {
 
 	private String sendUrl;
 
-	private String sos;
+	private String sosTpl;
 
-	private String physical;
+	private String physicalTpl;
 
-	private String pwd;
+	private String pwdTpl;
 
-	private String sign;
+	private String signTpl;
 
 	private String sosPairs;
 
 	private String pwdPairs;
+
+	private String changePwd;
+
+	private String balance;
 
 	public String getAccount() {
 		return account;
@@ -55,52 +59,54 @@ public class SMSSetting implements Serializable {
 		super();
 	}
 
-	public String getSos() {
-		return sos;
+	public String getSosTpl() {
+		return sosTpl;
 	}
 
-	public void setSos(String sos) {
-		this.sos = sos;
+	public void setSosTpl(String sosTpl) {
+		this.sosTpl = sosTpl;
 	}
 
-	public String getPhysical() {
-		return physical;
+	public String getPhysicalTpl() {
+		return physicalTpl;
 	}
 
-	public void setPhysical(String physical) {
-		this.physical = physical;
+	public void setPhysicalTpl(String physicalTpl) {
+		this.physicalTpl = physicalTpl;
 	}
 
-	public SMSSetting(String pwd, String account, String password,
-			String sendUrl, String physical, String sos, String sign,
-			String sosPairs, String pwdPairs) {
+	public SMSSetting(String pwdTpl, String account, String password,
+			String sendUrl, String physicalTpl, String sosTpl, String signTpl,
+			String sosPairs, String pwdPairs, String changePwd, String balance) {
 		super();
 		this.sosPairs = sosPairs;
 		this.pwdPairs = pwdPairs;
-		this.sign = sign;
-		this.pwd = pwd;
+		this.signTpl = signTpl;
+		this.pwdTpl = pwdTpl;
 		this.account = account;
 		this.password = password;
 		this.sendUrl = sendUrl;
-		this.physical = physical;
-		this.sos = sos;
+		this.physicalTpl = physicalTpl;
+		this.sosTpl = sosTpl;
+		this.changePwd = changePwd;
+		this.balance = balance;
 
 	}
 
-	public String getPwd() {
-		return pwd;
+	public String getPwdTpl() {
+		return pwdTpl;
 	}
 
-	public void setPwd(String pwd) {
-		this.pwd = pwd;
+	public void setPwdTpl(String pwdTpl) {
+		this.pwdTpl = pwdTpl;
 	}
 
-	public String getSign() {
-		return sign;
+	public String getSignTpl() {
+		return signTpl;
 	}
 
-	public void setSign(String sign) {
-		this.sign = sign;
+	public void setSign(String signTpl) {
+		this.signTpl = signTpl;
 	}
 
 	public String getSosPairs() {
@@ -117,5 +123,21 @@ public class SMSSetting implements Serializable {
 
 	public void setPwdPairs(String pwdPairs) {
 		this.pwdPairs = pwdPairs;
+	}
+
+	public String getChangePwd() {
+		return changePwd;
+	}
+
+	public void setChangePwd(String changePwd) {
+		this.changePwd = changePwd;
+	}
+
+	public String getBalance() {
+		return balance;
+	}
+
+	public void setBalance(String balance) {
+		this.balance = balance;
 	}
 }

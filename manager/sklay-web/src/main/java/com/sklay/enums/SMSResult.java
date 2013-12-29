@@ -14,9 +14,9 @@ import com.sklay.core.enums.LabeledEnum;
 public enum SMSResult implements LabeledEnum {
 
 	/**
-	 * 修改成功
+	 * 成功
 	 */
-	SUCCESS("修改成功", 0),
+	SUCCESS("成功", 0),
 
 	/**
 	 * 查询余额失败

@@ -9,10 +9,24 @@
 		<div class="tab-pane <c:if test="${'api' eq active}"> active </c:if>" id="widget-api">
 			<form class="form-horizontal" action="${ctx }/admin/sms/setting?active=api" method="post">
 		      <div class="control-group">
-		        <label class="control-label" for="inputSendUrl">短信API地址</label>
+		        <label class="control-label" for="inputSendUrl">短信发送API地址</label>
 		        <div class="controls">
 		          <input name="active" type="hidden" value="widget-api">
 		          <input class="span5" type="text" name="sendUrl" id="inputSendUrl" placeholder="短信API地址" value="${smsSetting.sendUrl }">
+		        </div>
+		      </div>
+		      <div class="control-group">
+		        <label class="control-label" for="inputChangePwd">短信修改密码API地址</label>
+		        <div class="controls">
+		          <input name="active" type="hidden" value="widget-api">
+		          <input class="span5" type="text" name="changePwd" id="inputChangePwd" placeholder="短信修改密码API地址" value="${smsSetting.changePwd }">
+		        </div>
+		      </div>
+		      <div class="control-group">
+		        <label class="control-label" for="inputBalance">短信剩余量API地址</label>
+		        <div class="controls">
+		          <input name="active" type="hidden" value="widget-api">
+		          <input class="span5" type="text" name="balance" id="inputBalance" placeholder="短信API地址" value="${smsSetting.balance }">
 		        </div>
 		      </div>
 		      <div class="control-group">
@@ -31,33 +45,33 @@
 		      <div class="control-group">
 		        <label class="control-label" for="inputSOS">定位短信模版</label>
 		        <div class="controls">
-		        	<input class="span5" name="sos" id="inputSOS" placeholder="定位短信模版" value="${smsSetting.sos }"/>
+		        	<input class="span5" name="sos" id="inputSOS" placeholder="定位短信模版" value="${smsSetting.sosTpl }"/>
 		        </div>
 		      </div>
 		      <div class="control-group">
 		        <label class="control-label" for="inputSosPairs">定位短信参数</label>
 		        <div class="controls">
-		        	<textarea rows="4" cols="4" class="span5" name="sos" id="inputSosPairs" placeholder="定位短信参数">${smsSetting.sosPairs }</textarea>
+		        	<textarea rows="4" cols="4" class="span5" name="sosTpl" id="inputSosPairs" placeholder="定位短信参数">${smsSetting.sosPairs }</textarea>
 		        </div>
 		      </div>
 		      
 		      <div class="control-group">
 		        <label class="control-label" for="inputUserId">重置密码模版</label>
 		        <div class="controls">
-		        	<input class="span5" name="sos" id="inputPwd" placeholder="定位短信模版" value="${smsSetting.pwd }"/>
+		        	<input class="span5" name="sos" id="inputPwd" placeholder="定位短信模版" value="${smsSetting.pwdTpl }"/>
 		        </div>
 		      </div>
 		      <div class="control-group">
 		        <label class="control-label" for="inputPwdPairs">重置密码参数</label>
 		        <div class="controls">
-		        	<textarea rows="4" cols="4" class="span5" name="sos" id="inputPwdPairs" placeholder="定位短信参数">${smsSetting.pwdPairs }</textarea>
+		        	<textarea rows="4" cols="4" class="span5" name="sosTpl" id="inputPwdPairs" placeholder="定位短信参数">${smsSetting.pwdPairs }</textarea>
 		        </div>
 		      </div>
 		      
 		      <div class="control-group">
 		        <label class="control-label" for="inputPhysical">体检短信模版</label>
 		        <div class="controls">
-		        	<textarea rows="4" cols="4" class="span5" name="physical" id="inputPhysical" placeholder="体检短信模版">${smsSetting.physical }</textarea>
+		        	<textarea rows="4" cols="4" class="span5" name="physicalTpl" id="inputPhysical" placeholder="体检短信模版">${smsSetting.physicalTpl }</textarea>
 		        </div>
 		      </div>
 		      <div class="control-group">
@@ -71,7 +85,7 @@
 	    <div class="tab-pane" id="widget-info">
 			<div class="row-fluid">
 				<div class="column span6">
-				  <div class="control-group">
+				  <%-- <div class="control-group">
 			        <label class="control-label" for="inputRetCode">登入状态 : <strong>${smsInfo.retCode }</strong></label>
 			      </div>
 			      <div class="control-group">
@@ -97,12 +111,12 @@
 			      </div>
 			      <div class="control-group">
 			        <label class="control-label" for="inputShortSmsLen">小灵通短信长度: <strong>${smsInfo.shortSmsLen}</strong></label>
-			      </div>
+			      </div> --%>
 			      <div class="control-group">
-			        <label class="control-label" for="inputSmsStock">短信库余量: <strong>${smsInfo.smsStock}</strong></label>
+			        <label class="control-label" for="inputSmsStock">短信库余量: <strong>${operation.content}</strong> ${operation.desctiption}</label>
 			      </div>
 				</div>
-				<div class="column span6">
+				<%-- <div class="column span6">
 				  <div class="control-group">
 			        <label class="control-label" for="inputDetailRetCode">登入状态: <strong>${smsDetail.retCode }</strong></label>
 			      </div>
@@ -124,7 +138,7 @@
 			      <div class="control-group">
 			        <label class="control-label" for="inputCurDaySend">今天已发送数量: <strong>${smsDetail.curDaySend}</strong></label>
 			      </div>
-				</div>
+				</div> --%>
 			</div>
 		</div>
 	</div>

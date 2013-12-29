@@ -29,6 +29,7 @@ import com.google.common.collect.Sets;
 import com.sklay.api.SklayApi;
 import com.sklay.core.annotation.Widget;
 import com.sklay.core.annotation.Widgets;
+import com.sklay.core.enums.AppType;
 import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.enums.WidgetLevel;
 import com.sklay.core.ex.ErrorCode;
@@ -37,10 +38,13 @@ import com.sklay.core.sdk.model.vo.SMSSetting;
 import com.sklay.core.util.BeanUtils;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.PropertieUtils;
+import com.sklay.enums.SMSResult;
 import com.sklay.model.Application;
+import com.sklay.model.Operation;
 import com.sklay.model.SMS;
 import com.sklay.model.SMSView;
 import com.sklay.model.User;
+import com.sklay.service.ApplicationService;
 import com.sklay.service.SMSService;
 import com.sklay.service.UserService;
 import com.sklay.util.LoginUserHelper;
@@ -69,6 +73,9 @@ public class SMSController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ApplicationService applicationService;
 
 	@ModelAttribute
 	public void populateModel(Model model) {
@@ -182,10 +189,27 @@ public class SMSController {
 		Set<SMS> smsLogs = Sets.newHashSet();
 
 		User session = LoginUserHelper.getLoginUser();
+		Long belong = null;
+		if (LoginUserHelper.isSuperAdmin())
+			belong = session.getBelong();
+		else if (LoginUserHelper.isAdmin())
+			belong = session.getId();
+		else
+			belong = session.getBelong();
+		Application app = applicationService.getByCreator(AppType.PUSH, belong);
+
+		if (null == app)
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { AppType.PUSH.getLable() });
+
 		Date date = new Date();
+
 		for (User reciver : reciverList) {
 			SMS log = new SMS(session.getId(), content, date, reciver.getId(),
 					reciver.getPhone(), SMSStatus.SUCCESS);
+			log.setApp(app);
+			log.setBelong(belong);
+
 			smsLogs.add(log);
 		}
 
@@ -208,10 +232,11 @@ public class SMSController {
 		modelMap.addAttribute("active", "api");
 
 		SMSSetting smsSetting = sklayApi.getSMSSetting();
-
+		Operation operation = sklayApi.balance();
 		// sklayApi.getSMSLogOut(loginInfo);
 
 		modelMap.addAttribute("smsSetting", smsSetting);
+		modelMap.addAttribute("operation", operation);
 
 		modelMap.addAttribute("readonly", "readonly='readonly'");
 
@@ -233,24 +258,24 @@ public class SMSController {
 
 		SMSSetting newSetting = null;
 
-		if (!oldSetting.getPhysical().equals(smsSetting.getPhysical())) {
+		if (!oldSetting.getPhysicalTpl().equals(smsSetting.getPhysicalTpl())) {
 			newSetting = new SMSSetting();
-			newSetting.setPhysical(smsSetting.getPhysical().trim());
+			newSetting.setPhysicalTpl(smsSetting.getPhysicalTpl().trim());
 		}
 
-		if (!oldSetting.getSos().equals(smsSetting.getSos())) {
+		if (!oldSetting.getSosTpl().equals(smsSetting.getSosTpl())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
-			newSetting.setSos(smsSetting.getSos().trim());
+			newSetting.setSosTpl(smsSetting.getSosTpl().trim());
 		}
 
-		if (!oldSetting.getPwd().equals(smsSetting.getPwd())) {
+		if (!oldSetting.getPwdTpl().equals(smsSetting.getPwdTpl())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
-			newSetting.setPwd(smsSetting.getPwd().trim());
+			newSetting.setPwdTpl(smsSetting.getPwdTpl().trim());
 		}
 
-		if (!oldSetting.getSign().equals(smsSetting.getSign())) {
+		if (!oldSetting.getSignTpl().equals(smsSetting.getSignTpl())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
-			newSetting.setSign(smsSetting.getSign().trim());
+			newSetting.setSign(smsSetting.getSignTpl().trim());
 		}
 
 		if (!oldSetting.getAccount().equals(smsSetting.getAccount())) {
@@ -261,6 +286,11 @@ public class SMSController {
 		if (!oldSetting.getPassword().equals(smsSetting.getPassword())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setPassword(smsSetting.getPassword().trim());
+
+			SMSResult result = sklayApi.changePwd(smsSetting.getPassword()
+					.trim());
+			if (SMSResult.SUCCESS != result)
+				throw new SklayException("密码修改失败!");
 		}
 
 		if (!oldSetting.getSendUrl().equals(smsSetting.getSendUrl())) {
@@ -268,24 +298,30 @@ public class SMSController {
 			newSetting.setSendUrl(smsSetting.getSendUrl().trim());
 		}
 
+		if (!oldSetting.getBalance().equals(smsSetting.getBalance())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setBalance(smsSetting.getBalance().trim());
+		}
+
+		if (!oldSetting.getChangePwd().equals(smsSetting.getChangePwd())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setChangePwd(smsSetting.getChangePwd().trim());
+		}
+
+		if (!oldSetting.getPwdPairs().equals(smsSetting.getPwdPairs())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setPwdPairs(smsSetting.getPwdPairs().trim());
+		}
+
+		if (!oldSetting.getSosPairs().equals(smsSetting.getSosPairs())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setSosPairs(smsSetting.getSosPairs().trim());
+		}
+
 		if (null != newSetting) {
 			PropertieUtils.instance(newSetting);
 			sklayApi.setSMSSetting(newSetting);
 		}
-		return new DataView(0, "操作成功");
-	}
-
-	@RequestMapping("/paragraph")
-	@RequiresPermissions("sms:setting")
-	@ResponseBody
-	public DataView paragraph(String mobile, String unicom, String telecom,
-			ModelMap modelMap) {
-		modelMap.addAttribute("subnav", "sms:setting");
-		modelMap.addAttribute("active", "phone");
-		if (StringUtils.isBlank(mobile) || StringUtils.isBlank(unicom)
-				|| StringUtils.isBlank(telecom))
-			throw new SklayException(ErrorCode.FINF_NULL, null, "短信号码段配置");
-
 		return new DataView(0, "操作成功");
 	}
 

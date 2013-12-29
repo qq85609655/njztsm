@@ -194,7 +194,7 @@ public class ApiController {
 
 		/** 创建体检报告 */
 		MedicalReport medicalReport = getMedicalReport(gatherData, targetUser,
-				sklayApi.getPhysical(), SMSType.PHYSICAL, dataTime);
+				sklayApi.getPhysical_tpl(), SMSType.PHYSICAL, dataTime);
 
 		/** 短信內容 */
 		String content = medicalReport.getSmsContent();

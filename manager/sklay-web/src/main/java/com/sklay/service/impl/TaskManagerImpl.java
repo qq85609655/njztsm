@@ -144,7 +144,7 @@ public class TaskManagerImpl implements TaskManager {
 			resultReport = result.getResult();
 		}
 
-		String content = NLS.getMsg(sklayApi.getPhysical(), new Object[] {
+		String content = NLS.getMsg(sklayApi.getPhysical_tpl(), new Object[] {
 				userName, highP, lowP, pulse, resultReport });
 		for (DeviceBinding bd : list) {
 			User creator = bd.getCreator();

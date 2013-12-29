@@ -18,7 +18,6 @@ import com.sklay.core.ex.SklayException;
 import com.sklay.dao.DeviceBindingDao;
 import com.sklay.dao.SpecificDao;
 import com.sklay.model.DeviceBinding;
-import com.sklay.model.Group;
 import com.sklay.model.User;
 import com.sklay.service.BindingService;
 
@@ -90,21 +89,13 @@ public class BindingServiceImpl implements BindingService {
 	}
 
 	@Override
-	public Page<DeviceBinding> getDeviceBindingPage(String keyword,
-			Level level, BindingMold bindingMold, User creator,
-			Pageable pageable) throws SklayException {
-		return specificDao.getDeviceBindingPage(keyword, level, bindingMold,
-				creator, pageable);
-	}
-
-	@Override
-	public Page<DeviceBinding> getDeviceBindingPage(Set<Group> groups,
+	public Page<DeviceBinding> getDeviceBindingPage(Long groups,
 			String keyword, Level level, BindingMold bindingMold, User creator,
-			AuditStatus status, AuditStatus moldStatus, Pageable pageable)
-			throws SklayException {
+			AuditStatus status, AuditStatus moldStatus, Long belong,
+			Pageable pageable) throws SklayException {
 
 		return specificDao.getDeviceBindingPage(groups, keyword, level,
-				bindingMold, status, moldStatus, creator, pageable);
+				bindingMold, creator, status, moldStatus, belong, pageable);
 	}
 
 	@Override

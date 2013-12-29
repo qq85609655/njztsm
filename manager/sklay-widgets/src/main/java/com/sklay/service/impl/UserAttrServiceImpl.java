@@ -24,12 +24,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.sklay.core.enums.MemberRole;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
 import com.sklay.dao.SpecificDao;
 import com.sklay.dao.UserAttrDao;
-import com.sklay.model.Group;
 import com.sklay.model.User;
 import com.sklay.model.UserAttr;
 import com.sklay.service.UserAttrService;
@@ -56,25 +54,15 @@ public class UserAttrServiceImpl implements UserAttrService {
 	}
 
 	@Override
-	public Page<User> getUserPage(Group group, String keyword, User user,
-			MemberRole memberRole, Pageable pageable) throws SklayException {
+	public Page<User> getUserPage(Long group, String keyword, User user,
+			Long belong, Pageable pageable) throws SklayException {
 		if (null == pageable)
 			throw new SklayException(ErrorCode.ILLEGAL_PARAM);
 
-		return specificDao.findMemberPage(group, keyword, pageable, user,
-				memberRole);
+		return specificDao.findMemberPage(group, keyword, user, belong,
+				pageable);
 	}
 
-	@Override
-	public Page<User> getUserPage(Set<Group> groups, String keyword, User user,
-			MemberRole memberRole, Pageable pageable) throws SklayException {
-		if (null == pageable)
-			throw new SklayException(ErrorCode.ILLEGAL_PARAM);
-
-		return specificDao.findMemberPage(groups, keyword, pageable, user,
-				memberRole);
-	}
-	
 	@Override
 	public void removeAttrByUser(Long userId) throws SklayException {
 		userAttrDao.removeAttrByUser(userId);
@@ -99,7 +87,6 @@ public class UserAttrServiceImpl implements UserAttrService {
 
 	}
 
-	
 	@Override
 	public List<UserAttr> findUserPaidAttrByKey(String key, Set<Long> userIds) {
 		return userAttrDao.findUserPaidAttrByKey(key, userIds);

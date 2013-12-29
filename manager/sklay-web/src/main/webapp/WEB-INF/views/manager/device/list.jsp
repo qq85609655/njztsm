@@ -42,10 +42,10 @@
 		
 			<div class="input-prepend">
 			  <span class="add-on">等级</span>
-			    <select class="span2" name="levelValue">
+			    <select class="span2" name="level">
 				  <option value="" <c:if test="${empty checkedOption}"> selected="selected" </c:if>>所有等级</option>
-					<option value="<%=Level.FIRST.getValue() %>" <c:if test="${ checkedOption.value eq 0}"> selected="selected" </c:if>><%=Level.FIRST.getLable() %></option>
-					<option value="<%=Level.SECOND.getValue() %>" <c:if test="${ checkedOption.value eq 1}"> selected="selected" </c:if>><%=Level.SECOND.getLable() %></option>
+					<option value="<%=Level.FIRST %>" <c:if test="${ checkedOption.value eq 0}"> selected="selected" </c:if>><%=Level.FIRST.getLable() %></option>
+					<option value="<%=Level.SECOND %>" <c:if test="${ checkedOption.value eq 1}"> selected="selected" </c:if>><%=Level.SECOND.getLable() %></option>
 				</select>
 			</div>
 			

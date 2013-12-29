@@ -153,7 +153,7 @@ public class ManagerController {
 		Page<Application> page = appService.getPage(keyword, appType, status,
 				creator, pageable);
 
-		List<Application> list = page.getContent();
+		List<Application> list = page != null ? page.getContent() : null;
 		List<ApplicationView> result = Lists.newArrayList();
 		Map<Long, User> mapUser = Maps.newHashMap();
 		if (CollectionUtils.isNotEmpty(list))
@@ -173,11 +173,11 @@ public class ManagerController {
 
 				result.add(av);
 			}
-
+		long total = null != page ? page.getTotalElements() : 0;
 		modelMap.addAttribute("status", status);
 		modelMap.addAttribute("app", appType);
 		modelMap.addAttribute("pageModel", new PageImpl<ApplicationView>(
-				result, pageable, page.getTotalElements()));
+				result, pageable, total));
 		modelMap.addAttribute("pageQuery", initQuery(keyword, status, appType));
 		modelMap.addAttribute("keyword", keyword);
 
@@ -262,9 +262,9 @@ public class ManagerController {
 
 		ApplicationView appView = null;
 
-		if (null != id){
-			Application	application = appService.get(id);
-			
+		if (null != id) {
+			Application application = appService.get(id);
+
 			Long creatorId = application.getOwner();
 			Long updator = application.getUpdator();
 			User user = userService.getUser(creatorId);
@@ -307,9 +307,9 @@ public class ManagerController {
 
 		ApplicationView appView = null;
 
-		if (null != id){
-			Application	application = appService.get(id);
-			
+		if (null != id) {
+			Application application = appService.get(id);
+
 			Long creatorId = application.getOwner();
 			Long updator = application.getUpdator();
 			User user = userService.getUser(creatorId);

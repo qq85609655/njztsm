@@ -102,8 +102,8 @@
 	         	<label class="radio inline span1" for="inputPhysicalSMS2">
 				  <input onclick="javascript:$('.time-switch').hide() ;" type="radio" name="physicalSMS" id="inputPhysicalSMS2" value="<%=SwitchStatus.CLOSE %>" <c:if test="${setting.physicalSMS.value eq 0}">checked</c:if> title="(不发送)"><%=SwitchStatus.CLOSE.getLable() %>
 				</label>
-	          	<label class="radio inline span1 hide" for="inputPhysicalSMS1">
-				  <input type="radio" name="physicalSMS" id="inputPhysicalSMS1" value="<%=SwitchStatus.OPEN %>" <c:if test="${setting.physicalSMS.value eq 1}">checked</c:if> title="(全程发送)">全程发送
+	          	<label class="radio inline span1" for="inputPhysicalSMS1">
+				  <input onclick="javascript:$('.time-switch').hide() ;" type="radio" name="physicalSMS" id="inputPhysicalSMS1" value="<%=SwitchStatus.OPEN %>" <c:if test="${setting.physicalSMS.value eq 1}">checked</c:if> title="(全程发送)">全程发送
 				</label>
 				<label onclick="javascript:$('.time-switch').show() ;" class="radio inline span1" for="inputPhysicalSMS3">
 				  <input type="radio" name="physicalSMS" id="inputPhysicalSMS3" value="<%=SwitchStatus.PERIOD %>" <c:if test="${setting.physicalSMS.value eq 2}">checked</c:if> title="(时段发送)"><%=SwitchStatus.PERIOD.getLable() %>

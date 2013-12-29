@@ -83,20 +83,8 @@ public class SMSController {
 			Integer status, Long groupId,
 			@PageableDefaults(value = 20) Pageable pageable, ModelMap modelMap) {
 
-		// SMSStatus smsStatus = null == status ? null : SMSStatus
-		// .findByValue(status);
-
 		User session = LoginUserHelper.getLoginUser();
 		Long userOwner = session.getId();
-
-		// List<Group> list = Lists.newArrayList();
-		//
-		// if (LoginUserHelper.isSuperAdmin())
-		// list = groupService.getGroupAll();
-		// else if (LoginUserHelper.isAdmin())
-		// list = groupService.getBelongGroup(session.getId());
-		// else
-		// list = groupService.getGroupByOwner(session);
 
 		Long belong = null;
 		if (LoginUserHelper.isSuperAdmin()) {
@@ -104,8 +92,6 @@ public class SMSController {
 			session = null;
 		} else if (LoginUserHelper.isAdmin())
 			belong = session.getId();
-		else
-			belong = null;
 
 		String pageQuery = "";
 		Application app = null;
@@ -113,7 +99,7 @@ public class SMSController {
 				pageable);
 
 		List<SMSView> result = Lists.newArrayList();
-		List<SMS> list = page.getContent();
+		List<SMS> list = page != null ? page.getContent() : null;
 		Map<Long, User> userMap = Maps.newHashMap();
 		if (CollectionUtils.isNotEmpty(list)) {
 			for (SMS sms : list) {
@@ -135,10 +121,10 @@ public class SMSController {
 
 		pageQuery = initQuery(keyword, startDate, endDate, status, userOwner);
 
+		long total = null != page ? page.getTotalElements() : 0;
 		modelMap.addAttribute("checkedGroup", groupId);
-		// modelMap.addAttribute("groups", list);
 		modelMap.addAttribute("pageModel", new PageImpl<SMSView>(result,
-				pageable, page.getTotalElements()));
+				pageable, total));
 		modelMap.addAttribute("pageQuery", pageQuery);
 		modelMap.addAttribute("keyword", keyword);
 

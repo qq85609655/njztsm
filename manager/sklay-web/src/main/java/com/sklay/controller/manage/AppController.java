@@ -95,7 +95,7 @@ public class AppController {
 		Page<Application> page = appService.getPage(keyword, appType, status,
 				creator.getId(), pageable);
 
-		List<Application> list = page.getContent();
+		List<Application> list = page != null ? page.getContent() : null;
 		List<ApplicationView> result = Lists.newArrayList();
 		Map<Long, User> mapUser = Maps.newHashMap();
 		if (CollectionUtils.isNotEmpty(list))
@@ -116,10 +116,11 @@ public class AppController {
 				result.add(av);
 			}
 
+		long total = null != page ? page.getTotalElements() : 0;
 		modelMap.addAttribute("status", status);
 		modelMap.addAttribute("app", appType);
 		modelMap.addAttribute("pageModel", new PageImpl<ApplicationView>(
-				result, pageable, page.getTotalElements()));
+				result, pageable, total));
 		modelMap.addAttribute("pageQuery", initQuery(keyword, status, appType));
 		modelMap.addAttribute("keyword", keyword);
 

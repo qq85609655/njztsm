@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -17,6 +16,7 @@ import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
 import com.sklay.core.util.Constants;
 import com.sklay.dao.GroupDao;
+import com.sklay.dao.SpecificGroupDao;
 import com.sklay.model.Group;
 import com.sklay.model.User;
 import com.sklay.service.GroupService;
@@ -26,6 +26,9 @@ public class GroupServiceImpl implements GroupService {
 
 	@Autowired
 	private GroupDao groupDao;
+
+	@Autowired
+	private SpecificGroupDao specificGroupDao;
 
 	@Override
 	public Group create(Group group) throws SklayException {
@@ -53,20 +56,9 @@ public class GroupServiceImpl implements GroupService {
 	}
 
 	@Override
-	public Page<Group> getGroupPage(String keyword, User owner,
+	public Page<Group> getGroupPage(String keyword, User owner, Long belong,
 			Pageable pageable) throws SklayException {
-		if (null == pageable)
-			throw new SklayException(ErrorCode.ILLEGAL_PARAM);
-		if (StringUtils.isBlank(keyword)) {
-			if (null == owner)
-				return groupDao.findAll(pageable);
-			else
-				return groupDao.findGroupByOwner(owner, pageable);
-		}
-		if (null == owner)
-			return groupDao.findKeywordAll(keyword, pageable);
-		else
-			return groupDao.findKeywordAll(owner, keyword, pageable);
+		return specificGroupDao.page(keyword, owner, belong, pageable);
 
 	}
 

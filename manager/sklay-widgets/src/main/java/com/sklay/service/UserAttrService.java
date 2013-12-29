@@ -21,9 +21,7 @@ import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.sklay.core.enums.MemberRole;
 import com.sklay.core.ex.SklayException;
-import com.sklay.model.Group;
 import com.sklay.model.User;
 import com.sklay.model.UserAttr;
 
@@ -50,9 +48,7 @@ public interface UserAttrService {
 
 	public List<UserAttr> findUserPaidAttrByKey(String key, Set<Long> userIds);
 
-	public Page<User> getUserPage(Group group, String keyword, User user,
-			MemberRole memberRole, Pageable pageable) throws SklayException;
+	public Page<User> getUserPage(Long group, String keyword, User user,
+			Long belong, Pageable pageable) throws SklayException;
 
-	public Page<User> getUserPage(Set<Group> groups, String keyword, User user,
-			MemberRole memberRole, Pageable pageable) throws SklayException;
 }

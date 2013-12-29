@@ -120,15 +120,37 @@ public class MemberController {
 	public String list(Long groupId, String keyword,
 			@PageableDefaults(value = 20) Pageable pageable, ModelMap modelMap) {
 
-		User user = LoginUserHelper.getLoginUser();
-		if (MemberRole.ADMINSTROTAR == user.getGroup().getRole()
-				&& user.getGroup().getParentGroupId() == null) {
-			modelMap = getUserPage(pageable, groupId, keyword, user,
-					MemberRole.ADMINSTROTAR, modelMap);
-		} else {
-			modelMap = getUserPage(pageable, groupId, keyword, user,
-					MemberRole.AGENT, modelMap);
+		User session = LoginUserHelper.getLoginUser();
+		String pageQuery = "";
+		Long belong = null;
+		List<Group> list = null;
+		if (LoginUserHelper.isSuperAdmin()) {
+			belong = null;
+			session = null;
+			list = groupService.getGroupAll();
+		} else if (LoginUserHelper.isAdmin()) {
+			belong = session.getId();
+			list = groupService.getBelongGroup(belong);
+		} else if (LoginUserHelper.isAgent()) {
+			list = groupService.getGroupByOwner(session);
 		}
+
+		Page<User> page = userAttrService.getUserPage(groupId, keyword,
+				session, belong, pageable);
+
+		if (StringUtils.isNotBlank(keyword)) {
+			pageQuery = "keyword=" + keyword + "&";
+			if (null != groupId)
+				pageQuery += "groupId=" + groupId + "&";
+		} else {
+			if (null != groupId)
+				pageQuery = "groupId=" + groupId + "&";
+		}
+		modelMap.addAttribute("groups", list);
+		modelMap.addAttribute("checkedGroup", groupId);
+		modelMap.addAttribute("pageModel", page);
+		modelMap.addAttribute("pageQuery", pageQuery);
+		modelMap.addAttribute("keyword", keyword);
 
 		return "manager.member.list";
 	}
@@ -760,98 +782,6 @@ public class MemberController {
 		userService.update(user);
 
 		return new DataView(0, "操作成功!");
-	}
-
-	private ModelMap getUserPage(Pageable pageable, Long groupId,
-			String keyword, User owner, MemberRole memberRole, ModelMap modelMap) {
-
-		Group parentGroup = owner.getGroup();
-		Long parentGroupId = parentGroup.getId();
-
-		List<Group> list = LoginUserHelper.isSuperAdmin() ? groupService
-				.getGroupAll() : groupService.getGroupByOwner(owner);
-
-		Group group = null;
-		modelMap.addAttribute("groups", list);
-		Page<User> userPage = null;
-		String pageQuery = "";
-
-		Set<Long> groupIds = Sets.newHashSet(parentGroupId);
-
-		/** 取得当前分组 */
-		if (CollectionUtils.isNotEmpty(list)) {
-			for (Group currentGroup : list) {
-				Long currentGroupId = currentGroup.getId();
-				groupIds.add(currentGroupId);
-			}
-		}
-
-		boolean agentAdmin = (!LoginUserHelper.isSuperAdmin() && LoginUserHelper
-				.isAdmin());
-		boolean hasNext = agentAdmin;
-
-		while (hasNext) {
-
-			List<Group> nextGroups = groupService.getGroupByParentId(groupIds);
-
-			groupIds = Sets.newHashSet();
-
-			if (CollectionUtils.isEmpty(nextGroups)) {
-				hasNext = false;
-				break;
-			}
-			if (CollectionUtils.isEmpty(list))
-				list = Lists.newArrayList();
-
-			list.addAll(nextGroups);
-
-			for (Group currentGroup : nextGroups) {
-				Long currentGroupId = currentGroup.getId();
-				groupIds.add(currentGroupId);
-			}
-		}
-
-		/** 取得当前分组 */
-		if (CollectionUtils.isNotEmpty(list) && groupId != null) {
-			for (Group currentGroup : list) {
-				Long currentGroupId = currentGroup.getId();
-				groupIds.add(currentGroupId);
-
-				if (currentGroupId == groupId)
-					group = currentGroup;
-			}
-		}
-
-		if (agentAdmin) {
-
-			Set<Group> groups = Sets.newHashSet();
-
-			if (null != group)
-				groups.add(group);
-			else if (CollectionUtils.isNotEmpty(list))
-				groups.addAll(list);
-			owner = null;
-			userPage = userAttrService.getUserPage(groups, keyword, owner,
-					memberRole, pageable);
-		} else
-			userPage = userAttrService.getUserPage(group, keyword, owner,
-					memberRole, pageable);
-
-		if (StringUtils.isNotBlank(keyword)) {
-			pageQuery = "keyword=" + keyword + "&";
-			if (null != groupId)
-				pageQuery += "groupId=" + groupId + "&";
-		} else {
-			if (null != groupId)
-				pageQuery = "groupId=" + groupId + "&";
-		}
-
-		modelMap.addAttribute("checkedGroup", group);
-		modelMap.addAttribute("pageModel", userPage);
-		modelMap.addAttribute("pageQuery", pageQuery);
-		modelMap.addAttribute("keyword", keyword);
-
-		return modelMap;
 	}
 
 	private static User checkUser(User user, boolean checkGroup) {

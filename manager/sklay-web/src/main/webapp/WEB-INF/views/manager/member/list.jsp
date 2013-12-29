@@ -37,7 +37,7 @@
 			    <select class="span2" name="groupId">
 				  <option value="" <c:if test="${empty checkedGroup}"> selected="selected" </c:if>>所有分组</option>
 				  <c:forEach items="${groups}" var="group">
-					<option value="${group.id}" <c:if test="${group.id eq checkedGroup.id}"> selected="selected" </c:if>>${group.name}</option>
+					<option value="${group.id}" <c:if test="${group.id eq checkedGroup}"> selected="selected" </c:if>>${group.name}</option>
 				  </c:forEach>
 				</select>
 			</div>

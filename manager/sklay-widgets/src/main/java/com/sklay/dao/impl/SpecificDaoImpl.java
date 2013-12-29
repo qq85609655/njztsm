@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.sklay.core.enums.AppType;
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.BindingMold;
@@ -377,36 +376,15 @@ public class SpecificDaoImpl implements SpecificDao {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public Page<DeviceBinding> getDeviceBindingPage(String keyword,
-			Level level, BindingMold bindingMold, User creator,
-			Pageable pageable) throws SklayException {
-		Query countQuery = initDevicePage(null, keyword, level, bindingMold,
-				null, null, creator, true);
-		Query dataQuery = initDevicePage(null, keyword, level, bindingMold,
-				null, null, creator, false);
-
-		Long total = (Long) countQuery.getSingleResult();
-		if (!(total > 0))
-			return null;
-		dataQuery.setFirstResult(pageable.getOffset());
-		dataQuery.setMaxResults(pageable.getPageSize());
-
-		List<DeviceBinding> resultList = dataQuery.getResultList();
-
-		return new PageImpl(resultList, pageable, total);
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public Page<DeviceBinding> getDeviceBindingPage(Set<Group> groups,
-			String keyword, Level level, BindingMold bindingMold,
-			AuditStatus status, AuditStatus moldStatus, User creator,
+	public Page<DeviceBinding> getDeviceBindingPage(Long groups,
+			String keyword, Level level, BindingMold bindingMold, User creator,
+			AuditStatus status, AuditStatus moldStatus, Long belong,
 			Pageable pageable) throws SklayException {
 
 		Query countQuery = initDevicePage(groups, keyword, level, bindingMold,
-				status, moldStatus, creator, true);
+				creator, status, moldStatus, belong, true);
 		Query dataQuery = initDevicePage(groups, keyword, level, bindingMold,
-				status, moldStatus, creator, false);
+				creator, status, moldStatus, belong, false);
 
 		Long total = (Long) countQuery.getSingleResult();
 		if (!(total > 0))
@@ -420,9 +398,9 @@ public class SpecificDaoImpl implements SpecificDao {
 
 	}
 
-	private Query initDevicePage(Set<Group> groups, String keyword,
-			Level level, BindingMold bindingMold, AuditStatus status,
-			AuditStatus moldStatus, User creator, boolean count) {
+	private Query initDevicePage(Long group, String keyword, Level level,
+			BindingMold bindingMold, User creator, AuditStatus status,
+			AuditStatus moldStatus, Long belong, boolean count) {
 
 		StringBuffer sb = null;
 		if (count)
@@ -437,17 +415,23 @@ public class SpecificDaoImpl implements SpecificDao {
 		if (null != bindingMold)
 			sb.append(" and d.mold = :bindingMold ");
 
-		if (null != moldStatus)
+		if (null != moldStatus) {
 			sb.append(" and d.moldStatus = :moldStatus ");
-
+			sb.append(" and d.mold = :bindingMold ");
+		}
 		if (null != status)
 			sb.append(" and d.status = :status ");
 
-		if (null != creator)
-			sb.append(" and d.creator = :creator ");
+		if (null != belong) {
+			if (null != creator)
+				sb.append(" and ( d.creator = :creator or  d.belong = :belong )");
+			else
+				sb.append(" and d.belong = :belong  ");
+		} else if (null != creator)
+			sb.append(" and d.creator = :creator )");
 
-		if (CollectionUtils.isNotEmpty(groups))
-			sb.append(" and d.targetUser.group in (:groups) ");
+		if (null != group)
+			sb.append(" and d.targetUser.group.id = :group ");
 
 		if (StringUtils.isNotBlank(keyword))
 			sb.append(" and ( d.targetUser.name like :keyword or d.serialNumber like :keyword ) ");
@@ -460,17 +444,22 @@ public class SpecificDaoImpl implements SpecificDao {
 		if (null != bindingMold)
 			query.setParameter("bindingMold", bindingMold);
 
-		if (null != moldStatus)
+		if (null != moldStatus) {
 			query.setParameter("moldStatus", moldStatus);
-
+			query.setParameter("bindingMold", BindingMold.PAID);
+		}
 		if (null != status)
 			query.setParameter("status", status);
 
-		if (null != creator)
+		if (null != belong) {
+			query.setParameter("belong", belong);
+			if (null != creator)
+				query.setParameter("creator", creator);
+		} else if (null != creator)
 			query.setParameter("creator", creator);
 
-		if (CollectionUtils.isNotEmpty(groups))
-			query.setParameter("groups", groups);
+		if (null != group)
+			query.setParameter("group", group);
 
 		if (StringUtils.isNotBlank(keyword))
 			query.setParameter("keyword", "%"
@@ -527,16 +516,12 @@ public class SpecificDaoImpl implements SpecificDao {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public Page<User> findMemberPage(Group group, String keyword,
-			Pageable pageable, User user, MemberRole memberRole) {
+	public Page<User> findMemberPage(Long group, String keyword, User creator,
+			Long belong, Pageable pageable) {
 
-		Set<Group> groups = Sets.newHashSet();
-		if (null != group)
-			groups.add(group);
-
-		Query countQuery = initFindMemberPage(groups, keyword, user,
-				memberRole, true);
-		Query dataQuery = initFindMemberPage(groups, keyword, user, memberRole,
+		Query countQuery = initFindMemberPage(group, keyword, creator, belong,
+				true);
+		Query dataQuery = initFindMemberPage(group, keyword, creator, belong,
 				false);
 
 		Long total = (Long) countQuery.getSingleResult();
@@ -550,60 +535,42 @@ public class SpecificDaoImpl implements SpecificDao {
 		return new PageImpl(resultList, pageable, total);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	@Override
-	public Page<User> findMemberPage(Set<Group> groups, String keyword,
-			Pageable pageable, User user, MemberRole memberRole) {
-
-		Query countQuery = initFindMemberPage(groups, keyword, user,
-				memberRole, true);
-		Query dataQuery = initFindMemberPage(groups, keyword, user, memberRole,
-				false);
-
-		Long total = (Long) countQuery.getSingleResult();
-		if (!(total > 0))
-			return null;
-		dataQuery.setFirstResult(pageable.getOffset());
-		dataQuery.setMaxResults(pageable.getPageSize());
-
-		List<User> resultList = dataQuery.getResultList();
-
-		return new PageImpl(resultList, pageable, total);
-	}
-
-	private Query initFindMemberPage(Set<Group> groups, String keyword,
-			User user, MemberRole memberRole, boolean isCount) {
+	private Query initFindMemberPage(Long group, String keyword, User creator,
+			Long belong, boolean isCount) {
 		StringBuffer qlString = new StringBuffer(" select ");
 		if (isCount)
 			qlString.append(" count( DISTINCT u) ");
 		else
 			qlString.append(" DISTINCT u ");
 
-		qlString.append(" from User u ,Group g where u.group.id=g.id  ");
+		qlString.append(" from User u where 1=1 ");
 
-		if (CollectionUtils.isNotEmpty(groups))
-			qlString.append(" and u.group in ( :group ) ");
+		if (null != group)
+			qlString.append(" and u.group.id = :group ");
 
-		if (null != user) {
-			if (MemberRole.ADMINSTROTAR != memberRole)
-				qlString.append(" and g.owner = :owner  ");
+		if (null != belong) {
+			if (null != creator) {
+				qlString.append(" and u.group.owner = :owner  ");
+			} else
+				qlString.append(" and u.belong = :belong  ");
+		} else if (null != creator)
+			qlString.append(" and u.creator = :creator )");
 
-			if (MemberRole.ADMINSTROTAR == memberRole)
-				qlString.append(" and u.id <> :userId  ");
-		}
 		if (StringUtils.isNotBlank(keyword))
 			qlString.append(" and ( u.phone like :keyword or u.name like :keyword or u.area like :keyword  or u.address like :keyword  or u.description like :keyword  ) ");
 
 		Query query = em.createQuery(qlString.toString());
-		if (null != user) {
-			if (MemberRole.ADMINSTROTAR != memberRole)
-				query.setParameter("owner", user);
 
-			if (MemberRole.ADMINSTROTAR == memberRole)
-				query.setParameter("userId", user.getId());
-		}
-		if (CollectionUtils.isNotEmpty(groups))
-			query.setParameter("group", groups);
+		if (null != group)
+			query.setParameter("group", group);
+
+		if (null != belong) {
+			if (null != creator)
+				query.setParameter("owner", creator);
+			else
+				query.setParameter("belong", belong);
+		} else if (null != creator)
+			query.setParameter("owner", creator);
 
 		if (StringUtils.isNotBlank(keyword))
 			query.setParameter("keyword",
@@ -763,11 +730,11 @@ public class SpecificDaoImpl implements SpecificDao {
 
 		if (null != belong) {
 			if (null != creator)
-				qlString.append(" and ( m.creator = :creator or  m.belong = :belong )");
+				qlString.append(" and ( m.creator.id = :creator or  m.belong = :belong )");
 			else
 				qlString.append(" and m.belong = :belong  ");
 		} else if (null != creator)
-			qlString.append(" and m.creator = :creator )");
+			qlString.append(" and m.creator.id = :creator )");
 
 		qlString.append(" order by  m.sendTime desc ");
 
@@ -781,7 +748,7 @@ public class SpecificDaoImpl implements SpecificDao {
 
 		if (null != belong) {
 			if (null != creator) {
-				query.setParameter("creator", creator);
+				query.setParameter("creator", creator.getId());
 				query.setParameter("belong", belong);
 			} else
 				query.setParameter("belong", belong);

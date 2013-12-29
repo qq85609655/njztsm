@@ -2,7 +2,6 @@ package com.sklay.controller.manage;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -20,14 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.alibaba.fastjson.JSONObject;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.sklay.core.annotation.Widget;
 import com.sklay.core.annotation.Widgets;
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.BindingMold;
 import com.sklay.core.enums.Level;
-import com.sklay.core.enums.MemberRole;
 import com.sklay.core.enums.MoldType;
 import com.sklay.core.enums.WidgetLevel;
 import com.sklay.core.ex.ErrorCode;
@@ -84,92 +80,31 @@ public class DeviceController {
 	@RequestMapping("/list")
 	@RequiresPermissions("device:list")
 	@Widget(name = ":list", description = "查看设备列表")
-	public String list(Integer levelValue, Long groupId,
-			BindingMold bindingMold, String keyword, AuditStatus status,
-			AuditStatus moldStatus,
+	public String list(Level level, Long groupId, BindingMold bindingMold,
+			String keyword, AuditStatus status, AuditStatus moldStatus,
 			@PageableDefaults(value = 20) Pageable pageable, ModelMap modelMap) {
-		Level level = null;
-		if (null != levelValue)
-			level = Level.findByValue(levelValue);
+
 		if (StringUtils.isNotBlank(keyword))
 			keyword = keyword.trim();
 
-		User user = LoginUserHelper.getLoginUser();
-		Page<DeviceBinding> page = null;
+		User session = LoginUserHelper.getLoginUser();
+		Long belong = null;
 		List<Group> groups = null;
-		Set<Group> groupSet = Sets.newHashSet();
-		Group current = null;
-		if (null != groupId) {
-			current = groupService.get(groupId);
-		}
+		if (LoginUserHelper.isSuperAdmin()) {
+			session = null;
+			groups = groupService.getGroupAll();
+		} else if (LoginUserHelper.isAdmin()) {
+			belong = session.getId();
+			groups = groupService.getGroupByOwner(session);
+		} else
+			groups = groupService.getBelongGroup(belong);
 
-		if (MemberRole.ADMINSTROTAR == user.getGroup().getRole()) {
+		Page<DeviceBinding> page = bindingService.getDeviceBindingPage(groupId,
+				keyword, level, bindingMold, session, status, moldStatus,
+				belong, pageable);
 
-			if (null == user.getGroup().getParentGroupId()) {
-				user = null;
-
-				if (null != current)
-					groupSet.add(current);
-				page = bindingService.getDeviceBindingPage(groupSet, keyword,
-						level, bindingMold, user, status, moldStatus, pageable);
-				groups = groupService.getGroupAll();
-			} else {
-
-				Group parentGroup = user.getGroup();
-				Long parentGroupId = parentGroup.getId();
-
-				groups = groupService.getGroupByOwner(user);
-				Set<Long> groupIds = Sets.newHashSet(parentGroupId);
-
-				/** 取得当前分组 */
-				if (CollectionUtils.isNotEmpty(groups)) {
-					for (Group currentGroup : groups) {
-						Long currentGroupId = currentGroup.getId();
-						groupIds.add(currentGroupId);
-					}
-				}
-
-				boolean hasNext = true;
-
-				while (hasNext) {
-
-					List<Group> nextGroups = groupService
-							.getGroupByParentId(groupIds);
-
-					groupIds = Sets.newHashSet();
-
-					if (CollectionUtils.isEmpty(nextGroups)) {
-						hasNext = false;
-						break;
-					}
-					if (CollectionUtils.isEmpty(groups))
-						groups = Lists.newArrayList();
-
-					groups.addAll(nextGroups);
-
-					for (Group currentGroup : nextGroups) {
-						Long currentGroupId = currentGroup.getId();
-						groupIds.add(currentGroupId);
-					}
-				}
-				if (null != current) {
-					groupSet.add(current);
-					user = null;
-				} else if (CollectionUtils.isNotEmpty(groups)) {
-					groupSet.addAll(groups);
-					user = null;
-				}
-				page = bindingService.getDeviceBindingPage(groupSet, keyword,
-						level, bindingMold, user, status, moldStatus, pageable);
-			}
-		} else {
-			if (null != current)
-				groupSet.add(current);
-			page = bindingService.getDeviceBindingPage(groupSet, keyword,
-					level, bindingMold, user, status, moldStatus, pageable);
-			groups = groupService.getGroupByOwner(user);
-		}
 		modelMap.addAttribute("checkedOption", level);
+		modelMap.addAttribute("checkedType", bindingMold);
 		modelMap.addAttribute("checkedStatus", status);
 		modelMap.addAttribute("checkedMoldStatus", moldStatus);
 		modelMap.addAttribute("groups", groups);
@@ -177,7 +112,7 @@ public class DeviceController {
 		modelMap.addAttribute("pageModel", page);
 		modelMap.addAttribute(
 				"pageQuery",
-				initQuery(levelValue, groupId, bindingMold, keyword, status,
+				initQuery(level, groupId, bindingMold, keyword, status,
 						moldStatus));
 		modelMap.addAttribute("keyword", keyword);
 
@@ -262,7 +197,7 @@ public class DeviceController {
 			orginal.setMold(BindingMold.FREE);
 		}
 		BeanUtils.copyProperties(device, orginal, new String[] { "id",
-				"creator", "createTime", "status", "level" });
+				"creator", "createTime", "status", "level", "belong" });
 		orginal.setStatus(AuditStatus.WAIT);
 		bindingService.update(orginal);
 
@@ -464,7 +399,7 @@ public class DeviceController {
 		return operation;
 	}
 
-	private static String initQuery(Integer levelValue, Long groupId,
+	private static String initQuery(Level levelValue, Long groupId,
 			BindingMold bindingMold, String keyword, AuditStatus status,
 			AuditStatus moldStatus) {
 
@@ -482,7 +417,7 @@ public class DeviceController {
 			query += "moldStatus=" + moldStatus + "&";
 		if (StringUtils.isNotBlank(keyword))
 			query += "keyword=" + keyword.trim().replaceAll("%", "") + "&";
-		
+
 		return query;
 	}
 }

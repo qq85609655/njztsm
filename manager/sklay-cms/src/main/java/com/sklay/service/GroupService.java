@@ -30,11 +30,12 @@ public interface GroupService {
 
 	public List<Group> getGroupByOwner(User owner) throws SklayException;
 
-	public List<Group> getGroupByParentId(Set<Long> parentId) throws SklayException;
+	public List<Group> getGroupByParentId(Set<Long> parentId)
+			throws SklayException;
 
 	public List<Group> getBelongGroup(Long belong) throws SklayException;
- 	
-	public Page<Group> getGroupPage(String keyword, User owner,
+
+	public Page<Group> getGroupPage(String keyword, User owner, Long belong,
 			Pageable pageable) throws SklayException;
 
 	public void edit(Group group) throws SklayException;

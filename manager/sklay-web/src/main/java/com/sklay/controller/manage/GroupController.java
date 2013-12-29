@@ -28,7 +28,6 @@ import com.google.common.collect.Sets;
 import com.sklay.core.annotation.Widget;
 import com.sklay.core.annotation.Widgets;
 import com.sklay.core.enums.AuditStatus;
-import com.sklay.core.enums.MemberRole;
 import com.sklay.core.enums.WidgetLevel;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
@@ -71,8 +70,24 @@ public class GroupController {
 			@PageableDefaults(value = 20) Pageable pageable, ModelMap modelMap) {
 
 		User session = LoginUserHelper.getLoginUser();
+		Long belong = null;
+		if (LoginUserHelper.isSuperAdmin()) {
+			session = null;
+		} else if (LoginUserHelper.isAdmin()) {
+			belong = session.getId();
+		}
 
-		modelMap = getUserPage(keyword, pageable, session, modelMap);
+		Page<Group> groupPage = groupService.getGroupPage(keyword, session,
+				belong, pageable);
+		modelMap.addAttribute("pageModel", groupPage);
+		String pageQuery = "";
+
+		if (StringUtils.isNotBlank(keyword))
+			pageQuery = "keyword=" + keyword;
+
+		modelMap.addAttribute("pageQuery", pageQuery);
+		modelMap.addAttribute("keyword", keyword);
+
 		return "manager.group.list";
 	}
 
@@ -359,27 +374,6 @@ public class GroupController {
 		groupService.update(group);
 
 		return new DataView(0, "操作成功!");
-	}
-
-	private ModelMap getUserPage(String keyword, Pageable pageable,
-			User session, ModelMap modelMap) {
-
-		session = (null != session.getGroup()
-				&& MemberRole.ADMINSTROTAR == session.getGroup().getRole() && session
-				.getGroup().getParentGroupId() == null) ? null : session;
-
-		Page<Group> groupPage = groupService.getGroupPage(keyword, session,
-				pageable);
-		modelMap.addAttribute("pageModel", groupPage);
-		String pageQuery = "";
-
-		if (StringUtils.isNotBlank(keyword))
-			pageQuery = "keyword=" + keyword;
-
-		modelMap.addAttribute("pageQuery", pageQuery);
-		modelMap.addAttribute("keyword", keyword);
-
-		return modelMap;
 	}
 
 	private AuthorEntity splitAthor(AuthorEntity authorEntity,

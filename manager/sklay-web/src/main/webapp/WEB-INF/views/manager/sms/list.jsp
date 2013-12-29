@@ -68,7 +68,7 @@
 					<th>编号</th>
 					<th class="span2">接收者</th>
 					<th class="span2">收信人手机</th>
-					<th class="span1">发送状态</th>
+					<th class="span1">发送结果</th>
 					<th class="span3">发送时间</th>
 					<th class="span4">短信内容</th>
 					<th class="span3">备注</th>
@@ -79,8 +79,7 @@
 				<c:choose>
 					<c:when test="${pageModel.totalElements==0}">
 						<tr>
-							<td colspan="5">还未添加过相关记录 , <a href="${ctx}/admin/member/initCreate">加一个</a> ?
-							</td>
+							<td colspan="5">还未添加过相关记录 </td>
 						</tr>
 					</c:when>
 					<c:otherwise>

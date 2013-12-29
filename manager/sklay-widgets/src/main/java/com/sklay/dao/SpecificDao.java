@@ -11,7 +11,6 @@ import com.sklay.core.enums.AppType;
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.BindingMold;
 import com.sklay.core.enums.Level;
-import com.sklay.core.enums.MemberRole;
 import com.sklay.core.enums.ReadType;
 import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.enums.SMSType;
@@ -56,24 +55,17 @@ public interface SpecificDao {
 	public List<DeviceBinding> getUserBinding(Set<Long> userId, Level level,
 			User creator);
 
-	public Page<DeviceBinding> getDeviceBindingPage(String keyword,
-			Level level, BindingMold bindingMold, User creator,
-			Pageable pageable) throws SklayException;
-
-	public Page<DeviceBinding> getDeviceBindingPage(Set<Group> groups,
-			String keyword, Level level, BindingMold bindingMold,
-			AuditStatus status, AuditStatus moldStatus, User creator,
+	public Page<DeviceBinding> getDeviceBindingPage(Long groups,
+			String keyword, Level level, BindingMold bindingMold, User creator,
+			AuditStatus status, AuditStatus moldStatus, Long belong,
 			Pageable pageable) throws SklayException;
 
 	public List<User> findAgent(User owner);
 
 	public Map<Long, Long> findMemberCount(Set<User> owner);
 
-	public Page<User> findMemberPage(Group group, String keyword,
-			Pageable pageable, User user, MemberRole memberRole);
-
-	public Page<User> findMemberPage(Set<Group> groups, String keyword,
-			Pageable pageable, User user, MemberRole memberRole);
+	public Page<User> findMemberPage(Long group, String keyword, User user,
+			Long belong, Pageable pageable);
 
 	public Page<Operation> getOperationPage(LogLevelType levelType,
 			Pageable pageable) throws SklayException;

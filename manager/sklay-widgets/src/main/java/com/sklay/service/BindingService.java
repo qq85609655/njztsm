@@ -11,7 +11,6 @@ import com.sklay.core.enums.BindingMold;
 import com.sklay.core.enums.Level;
 import com.sklay.core.ex.SklayException;
 import com.sklay.model.DeviceBinding;
-import com.sklay.model.Group;
 import com.sklay.model.User;
 
 public interface BindingService {
@@ -55,14 +54,10 @@ public interface BindingService {
 
 	public void delete(Set<DeviceBinding> bindings) throws SklayException;
 
-	public Page<DeviceBinding> getDeviceBindingPage(String keyword,
-			Level level, BindingMold bindingMold, User creator,
-			Pageable pageable) throws SklayException;
-
-	public Page<DeviceBinding> getDeviceBindingPage(Set<Group> groups,
+	public Page<DeviceBinding> getDeviceBindingPage(Long groups,
 			String keyword, Level level, BindingMold bindingMold, User creator,
-			AuditStatus status, AuditStatus moldStatus, Pageable pageable)
-			throws SklayException;
+			AuditStatus status, AuditStatus moldStatus, Long belong,
+			Pageable pageable) throws SklayException;
 
 	public void deleteTargetBinding(Long userId);
 

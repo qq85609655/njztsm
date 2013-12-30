@@ -273,20 +273,18 @@ public class ApiController {
 		}
 
 		if (null == gatherData) {
-			if (null != operation)
+			if (null != operation) {
+				operation.setDesctiption("定位数据采集为空") ;
 				operationService.create(operation);
+			}
 			throw new SklayException(ErrorCode.FINF_NULL, null, "定位的数据");
 		}
 		if (StringUtils.isBlank(gatherData.getSimNo())) {
-			if (null != operation)
+			if (null != operation) {
+				operation.setDesctiption("采集卡号不能为空!") ;
 				operationService.create(operation);
+			}
 			throw new SklayException(ErrorCode.SMS_GATHER_SIMNO_EMPTY);
-		}
-		if (StringUtils.isBlank(gatherData.getSimNo())) {
-			if (null != operation)
-				operationService.create(operation);
-			throw new SklayException(ErrorCode.SMS_GATHER_SIMNO_EMPTY);
-
 		}
 
 		DeviceBinding deviceBinding = bindingService
@@ -294,8 +292,10 @@ public class ApiController {
 
 		if (null == deviceBinding
 				|| AuditStatus.PASS != deviceBinding.getStatus()) {
-			if (null != operation)
+			if (null != operation) {
+				operation.setDesctiption("设备:"+gatherData.getSimNo()+"还未绑定主用户") ;
 				operationService.create(operation);
+			}
 			throw new SklayException(ErrorCode.SMS_GATHER_NOBANDING, null,
 					new Object[] { gatherData.getSimNo() });
 		}
@@ -312,6 +312,7 @@ public class ApiController {
 					"用户信息", "发送短信" });
 		}
 		User creator = deviceBinding.getCreator();
+		User bandingor = deviceBinding.getTargetUser() ;
 		long belong = deviceBinding.getBelong();
 		long creatorId = creator.getId();
 		Date dataTime = new Date();
@@ -328,7 +329,7 @@ public class ApiController {
 					"应用信息不存在或", "发送短信" });
 		}
 
-		MedicalReport medicalReport = getMedicalReport(gatherData, creator,
+		MedicalReport medicalReport = getMedicalReport(gatherData, bandingor,
 				sklayApi.getSosPairs(), SMSType.LOCATION, dataTime);
 
 		/** 短信內容 */

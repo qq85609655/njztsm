@@ -58,7 +58,6 @@ import com.sklay.service.BindingService;
 import com.sklay.service.GlobalService;
 import com.sklay.service.GroupService;
 import com.sklay.service.MedicalReportService;
-import com.sklay.service.SMSService;
 import com.sklay.service.UserAttrService;
 import com.sklay.service.UserService;
 import com.sklay.util.LoginUserHelper;
@@ -100,9 +99,6 @@ public class MemberController {
 
 	@Autowired
 	private MedicalReportService reportService;
-
-	@Autowired
-	private SMSService smsService;
 
 	@Autowired
 	private ApplicationService appService;

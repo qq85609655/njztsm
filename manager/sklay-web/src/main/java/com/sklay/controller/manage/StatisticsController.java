@@ -55,60 +55,54 @@ public class StatisticsController {
 		TreeView parentView = new TreeView(Constants.NODE_AGENT + parentId,
 				owner.getName());
 
-		if (null != owner.getGroup()) {
-			Group group = owner.getGroup();
-			if (null != group.getRole()
-					&& (MemberRole.ADMINSTROTAR == group.getRole() || MemberRole.AGENT == group
-							.getRole())) {
-				agents = specificDao.findAgent(owner);
+		if (LoginUserHelper.isAdmin() || LoginUserHelper.isAgent()) {
+			agents = specificDao.findAgent(owner);
 
-				Set<User> userSet = Sets.newHashSet(owner);
-				if (CollectionUtils.isNotEmpty(agents))
-					userSet.addAll(agents);
+			Set<User> userSet = Sets.newHashSet(owner);
+			if (CollectionUtils.isNotEmpty(agents))
+				userSet.addAll(agents);
 
-				Map<Long, Long> memberCountMap = specificDao
-						.findMemberCount(userSet);
+			Map<Long, Long> memberCountMap = specificDao
+					.findMemberCount(userSet);
 
-				List<TreeView> childList = Lists.newArrayList();
+			List<TreeView> childList = Lists.newArrayList();
 
-				TreeView memberView = new TreeView(Constants.NODE_MEMBER
-						+ UUIDUtils.randomNum(20), "普通会员");
+			TreeView memberView = new TreeView(Constants.NODE_MEMBER
+					+ UUIDUtils.randomNum(20), "普通会员");
 
-				long agentCount = CollectionUtils.isNotEmpty(agents) ? agents
-						.size() : 0;
-				if (CollectionUtils.isNotEmpty(userSet)) {
-					for (User agent : userSet) {
-						if (null == agent)
-							continue;
+			long agentCount = CollectionUtils.isNotEmpty(agents) ? agents
+					.size() : 0;
+			if (CollectionUtils.isNotEmpty(userSet)) {
+				for (User agent : userSet) {
+					if (null == agent)
+						continue;
 
-						Long nodeId = agent.getId();
+					Long nodeId = agent.getId();
 
-						if (nodeId == parentId) {
-							if (memberCountMap.containsKey(nodeId)) {
-								long total = memberCountMap.get(nodeId);
-								parentView.setName(parentView.getName() + "("
-										+ total + ")");
-								memberView.setName(memberView.getName() + "("
-										+ (total - agentCount) + ")");
-								if (total - agentCount > 0)
-									childList.add(memberView);
-							}
-
-							continue;
-						}
-
-						TreeView agentView = new TreeView(Constants.NODE_AGENT
-								+ nodeId, "[代]" + agent.getName());
+					if (nodeId == parentId) {
 						if (memberCountMap.containsKey(nodeId)) {
 							long total = memberCountMap.get(nodeId);
-							agentView.setName(agentView.getName() + "(" + total
-									+ ")");
+							parentView.setName(parentView.getName() + "("
+									+ total + ")");
+							memberView.setName(memberView.getName() + "("
+									+ (total - agentCount) + ")");
+							if (total - agentCount > 0)
+								childList.add(memberView);
 						}
-						childList.add(agentView);
-					}
-					parentView.setChildren(childList);
-				}
 
+						continue;
+					}
+
+					TreeView agentView = new TreeView(Constants.NODE_AGENT
+							+ nodeId, "[代]" + agent.getName());
+					if (memberCountMap.containsKey(nodeId)) {
+						long total = memberCountMap.get(nodeId);
+						agentView.setName(agentView.getName() + "(" + total
+								+ ")");
+					}
+					childList.add(agentView);
+				}
+				parentView.setChildren(childList);
 			}
 
 		}

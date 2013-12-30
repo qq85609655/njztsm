@@ -22,7 +22,7 @@ public interface SMSService {
 	public Page<SMS> getSMSPage(Application app, SMSStatus status,
 			User creator, Long belong, Pageable pageable);
 
-	public void removeSMS(User creator);
+	public void removeSMS(Long creator);
 
 	public SMS getSMS(Long id);
 }

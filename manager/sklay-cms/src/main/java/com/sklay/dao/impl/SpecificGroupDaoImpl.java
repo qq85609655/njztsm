@@ -64,9 +64,9 @@ public class SpecificGroupDaoImpl implements SpecificGroupDao {
 		Query query = em.createQuery(sb.toString());
 
 		if (null != belong) {
+			query.setParameter("belong", belong);
 			if (null != owner)
 				query.setParameter("owner", owner);
-			query.setParameter("belong", belong);
 		} else if (null != owner) {
 			query.setParameter("owner", owner);
 		}

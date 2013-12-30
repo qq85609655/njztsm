@@ -728,7 +728,7 @@ public class MemberController {
 
 		bindingService.updateBindingCreator(superUser, superUser.getId(),
 				member);
-		smsService.removeSMS(member);
+		// smsService.removeSMS(member.getId());
 		// appService.remove(member.getId());
 		userService.delete(member);
 

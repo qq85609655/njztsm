@@ -37,7 +37,7 @@ public class SMSServiceImpl implements SMSService {
 	}
 
 	@Override
-	public void removeSMS(User creator) {
+	public void removeSMS(Long creator) {
 		smsDao.removeSMS(creator);
 	}
 

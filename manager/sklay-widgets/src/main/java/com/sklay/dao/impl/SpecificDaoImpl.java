@@ -550,7 +550,7 @@ public class SpecificDaoImpl implements SpecificDao {
 
 		if (null != belong) {
 			if (null != creator) {
-				qlString.append(" and u.group.owner = :owner  ");
+				qlString.append(" and ( u.group.owner = :owner or u.belong = :belong )  ");
 			} else
 				qlString.append(" and u.belong = :belong  ");
 		} else if (null != creator)
@@ -565,10 +565,9 @@ public class SpecificDaoImpl implements SpecificDao {
 			query.setParameter("group", group);
 
 		if (null != belong) {
+			query.setParameter("belong", belong);
 			if (null != creator)
 				query.setParameter("owner", creator);
-			else
-				query.setParameter("belong", belong);
 		} else if (null != creator)
 			query.setParameter("owner", creator);
 
@@ -747,11 +746,9 @@ public class SpecificDaoImpl implements SpecificDao {
 			query.setParameter("app", app);
 
 		if (null != belong) {
-			if (null != creator) {
+			query.setParameter("belong", belong);
+			if (null != creator)
 				query.setParameter("creator", creator.getId());
-				query.setParameter("belong", belong);
-			} else
-				query.setParameter("belong", belong);
 		} else if (null != creator)
 			query.setParameter("creator", creator);
 

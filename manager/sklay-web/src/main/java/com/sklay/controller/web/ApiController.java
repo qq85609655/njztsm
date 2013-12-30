@@ -135,8 +135,8 @@ public class ApiController {
 
 		if (null == deviceBinding) {
 			if (null != operation) {
-				operation.setDesctiption(operation.getDesctiption()
-						+ " 采集数据转化异常!");
+				operation.setDesctiption(operation.getDesctiption() + " 设备号【"
+						+ gatherData.getSimNo() + "】还未绑定主帐号");
 				operationService.create(operation);
 			}
 			throw new SklayException(ErrorCode.SMS_GATHER_ERROR);
@@ -213,7 +213,7 @@ public class ApiController {
 				operationService.create(operation);
 			}
 			throw new SklayException(ErrorCode.AUTIT_ERROR, null, new Object[] {
-					"应用信息不存在或", "发送短信" });
+					"应用信息不存在或未完成审核", "发送短信" });
 		}
 		/** 全部发送 */
 		if (SwitchStatus.OPEN == switchStatus) {
@@ -246,7 +246,6 @@ public class ApiController {
 		}
 
 		return 0;
-
 	}
 
 	@RequestMapping("/asyncphysical")

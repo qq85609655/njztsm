@@ -23,6 +23,7 @@
 		<script type="text/javascript" src="${ctx}/static/thirdparty/bootstrap/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="${ctx}/static/js/jquery.scrollUp.min.js"></script>
 		<script type="text/javascript" src="${ctx}/static/js/base.js"></script>
+		<script type="text/javascript" src="${ctx}/static/js/common.js"></script>
 <style>
 .controls .span1{
 padding-left:0px;

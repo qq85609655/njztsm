@@ -20,6 +20,6 @@
 	<import resource="database.xml" />
 	<import resource="cache.xml" />
 	<import resource="service.xml" />
-	<!-- <import resource="task.xml" /> -->
+	<import resource="task.xml" />
 	<import resource="shiro.xml" />
 </beans>

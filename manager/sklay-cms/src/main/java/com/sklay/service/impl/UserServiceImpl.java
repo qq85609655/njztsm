@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import com.sklay.core.ex.SklayException;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.PwdUtils;
+import com.sklay.dao.SpecificGroupDao;
 import com.sklay.dao.UserDao;
 import com.sklay.model.User;
 import com.sklay.service.UserService;
@@ -42,6 +43,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserDao userDao;
+
+	@Autowired
+	private SpecificGroupDao specificGroupDao;
 
 	@Override
 	public void regist(User user) throws SklayException {
@@ -111,9 +115,10 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<User> getUserByPhone(Set<String> phones) throws SklayException {
-		if(CollectionUtils.isNotEmpty(phones))
-			return userDao.findByPhone(phones) ;
+		if (CollectionUtils.isNotEmpty(phones))
+			return userDao.findByPhone(phones);
 		return null;
 	}
 
+	
 }

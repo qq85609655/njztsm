@@ -302,6 +302,10 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 		if (strDate.length() == 10) {
 			return FORMATTIME_DATE.parse(strDate, pos);
 		}
+
+		if (strDate.length() == 16) {
+			return FORMATTIME_TIME.parse(strDate, pos);
+		}
 		return FORMATTIME_DATETIME.parse(strDate, pos);
 	}
 
@@ -429,8 +433,20 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 	 * 
 	 * @return
 	 */
-	public static String getMonth() {
-		return getMonth(getCurrentDate());
+	public static Integer getMonth() {
+		Calendar car = Calendar.getInstance();
+		return car.get(Calendar.MONTH) + 1;
+	}
+
+	/**
+	 * 取得当前时间的月份
+	 * 
+	 * @return
+	 */
+	public static Integer getNextMonth(Date date) {
+		Calendar car = Calendar.getInstance();
+		car.setTime(date);
+		return car.get(Calendar.MONTH) + 1;
 	}
 
 	public static String getDay(String datestr) {
@@ -442,8 +458,20 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 	 * 
 	 * @return
 	 */
-	public static String getDay() {
-		return getDay(getCurrentDate());
+	public static Integer getDay() {
+		Calendar car = Calendar.getInstance();
+		return car.get(Calendar.DAY_OF_MONTH);
+	}
+
+	/**
+	 * 取得当前时间的日
+	 * 
+	 * @return
+	 */
+	public static Integer getNextDay(Date date) {
+		Calendar car = Calendar.getInstance();
+		car.setTime(date);
+		return car.get(Calendar.DAY_OF_MONTH);
 	}
 
 	public static String getHour(String date) {
@@ -690,5 +718,45 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(getStringToDate(dateTime));
 		return cal;
+	}
+
+	/** 计算年龄 */
+	public static Integer getAge(Date birthDay) {
+		Calendar cal = Calendar.getInstance();
+
+		if (cal.before(birthDay)) {
+			throw new IllegalArgumentException(
+					"The birthDay is before Now.It's unbelievable!");
+		}
+
+		int yearNow = cal.get(Calendar.YEAR);
+		int monthNow = cal.get(Calendar.MONTH) + 1;
+		int dayOfMonthNow = cal.get(Calendar.DAY_OF_MONTH);
+
+		cal.setTime(birthDay);
+		int yearBirth = cal.get(Calendar.YEAR);
+		int monthBirth = cal.get(Calendar.MONTH);
+		int dayOfMonthBirth = cal.get(Calendar.DAY_OF_MONTH);
+
+		int age = yearNow - yearBirth;
+
+		if (monthNow <= monthBirth) {
+			if (monthNow == monthBirth) {
+				if (dayOfMonthNow < dayOfMonthBirth) {
+					age--;
+				}
+			} else {
+				age--;
+			}
+		}
+
+		return age;
+	}
+
+	public static void main(String[] args) {
+
+		System.out.println(getMonth());
+
+		System.out.println(getDay());
 	}
 }

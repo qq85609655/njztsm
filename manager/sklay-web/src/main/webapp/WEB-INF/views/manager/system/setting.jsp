@@ -138,8 +138,8 @@
 	        </div>
 	      </div>
 	      
-	      <div class="control-group hide">
-	        <label class="control-label">短信任务开关</label>
+	      <div class="control-group">
+	        <label class="control-label">生日提醒开关</label>
 	         <div class="controls">
 	         	<label class="radio inline span1" for="inputSendSMSJob2">
 				  <input type="radio" name="sendSMSJob" id="inputSendSMSJob2" value="<%=SwitchStatus.CLOSE %>" <c:if test="${setting.sendSMSJob.value eq 0}">checked</c:if> ><%=SwitchStatus.CLOSE.getLable() %>

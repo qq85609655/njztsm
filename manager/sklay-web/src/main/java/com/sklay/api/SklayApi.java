@@ -1,10 +1,13 @@
 package com.sklay.api;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
 import com.sklay.core.sdk.exceptions.JSONException;
@@ -27,8 +31,10 @@ import com.sklay.core.util.Constants;
 import com.sklay.enums.LogLevelType;
 import com.sklay.enums.SMSResult;
 import com.sklay.mobile.Update;
+import com.sklay.model.Blackword;
 import com.sklay.model.Operation;
 import com.sklay.model.SMS;
+import com.sklay.service.BlackwordService;
 
 /**
  * 
@@ -82,11 +88,17 @@ public class SklayApi {
 	@Value("${" + Constants.SMS_PWD_PAIRS + "}")
 	private String pwdPairs;
 
+	@Value("${" + Constants.SMS_BIRTHDAY_PAIRS + "}")
+	private String birthPairs;
+
 	@Value("${" + Constants.SMS_CHANGE_PWD + "}")
 	private String changePwd;
 
 	@Value("${" + Constants.SMS_BALANCE + "}")
 	private String balance;
+
+	@Value("${" + Constants.SMS_TEMPLATE_BIRTHDAY + "}")
+	private String birthday_tpl;
 
 	// 版本号
 	@Value("${" + Constants.ANDROID_VER_CODE + "}")
@@ -103,6 +115,9 @@ public class SklayApi {
 	// 更新描述信息
 	@Value("${" + Constants.ANDROID_UPDATE_LOG + "}")
 	private String updateLog;
+
+	@Resource
+	private BlackwordService blackwordService;
 
 	public Update getMobileAndroidVer() {
 		return new Update(versionCode, versionName, downloadUrl, updateLog);
@@ -194,23 +209,35 @@ public class SklayApi {
 		Set<SMS> smsResult = Sets.newHashSet();
 
 		if (CollectionUtils.isNotEmpty(smsList)) {
+
+			Set<String> blackwords = blackwordList();
+
 			for (SMS sms : smsList) {
 				Map<String, String> pairs = Maps.newHashMap();
+
+				String content = sms.getContent();
+
+				content = replaceBlackword(content, blackwords);
 
 				pairs.put("username", account);
 				pairs.put("scode", password);
 				pairs.put("signtag", sign_tpl);
 				pairs.put("mobile", sms.getMobile());
-				pairs.put("content", sms.getContent());
+				pairs.put("content", content);
 
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
 				sms.setResult(result);
 
+				sms.setContent(content);
 				SMSResult sRslt = SMSResult.findByLable(result);
 				if (null != sRslt)
 					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
 							+ "】");
+				if (SMSResult.SUCCESS != sRslt)
+					sms.setStatus(SMSStatus.FAIL);
+				else if (SMSResult.SUCCESS == sRslt)
+					sms.setStatus(SMSStatus.SUCCESS);
 				LOGGER.info("physical result {} " + result);
 				smsResult.add(sms);
 				try {
@@ -298,9 +325,15 @@ public class SklayApi {
 	public Set<SMS> sms(Set<SMS> smsList) {
 		Set<SMS> smsResult = Sets.newHashSet();
 		if (CollectionUtils.isNotEmpty(smsList)) {
+
+			Set<String> blackwords = blackwordList();
+
 			for (SMS sms : smsList) {
 				Map<String, String> pairs = Maps.newHashMap();
 
+				String content = sms.getContent();
+
+				content = replaceBlackword(content, blackwords);
 				pairs.put("username", account);
 				pairs.put("scode", password);
 				pairs.put("signtag", sign_tpl);
@@ -310,11 +343,15 @@ public class SklayApi {
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
 				sms.setResult(result);
-
+				sms.setContent(content);
 				SMSResult sRslt = SMSResult.findByLable(result);
 				if (null != sRslt)
 					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
 							+ "】");
+				if (SMSResult.SUCCESS != sRslt)
+					sms.setStatus(SMSStatus.FAIL);
+				else if (SMSResult.SUCCESS == sRslt)
+					sms.setStatus(SMSStatus.SUCCESS);
 				LOGGER.info("sms result {} " + result);
 				smsResult.add(sms);
 				try {
@@ -355,6 +392,54 @@ public class SklayApi {
 				if (null != sRslt)
 					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
 							+ "】");
+				if (SMSResult.SUCCESS != sRslt)
+					sms.setStatus(SMSStatus.FAIL);
+				else if (SMSResult.SUCCESS == sRslt)
+					sms.setStatus(SMSStatus.SUCCESS);
+				LOGGER.info("resetPwd result {} " + result);
+				smsResult.add(sms);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					throw new SklayException(e);
+				}
+			}
+		}
+
+		return smsResult;
+	}
+
+	/**
+	 * @param recivers
+	 * @param SMSContent
+	 * @return
+	 */
+	public Set<SMS> birthday(Set<SMS> smsList) {
+		Set<SMS> smsResult = Sets.newHashSet();
+		if (CollectionUtils.isNotEmpty(smsList)) {
+			for (SMS sms : smsList) {
+				Map<String, String> pairs = Maps.newHashMap();
+
+				pairs.put("username", account);
+				pairs.put("scode", password);
+				pairs.put("tempid", birthday_tpl);
+				pairs.put("signtag", sign_tpl);
+				pairs.put("mobile", sms.getMobile());
+				pairs.put("content", sms.getContent());
+
+				String result = ApiClient.http_post(sendUrl,
+						ApiClient.splitNameValuePair(pairs));
+				sms.setResult(result);
+				sms.setRemark(birthday_tpl);
+				SMSResult sRslt = SMSResult.findByLable(result);
+				if (null != sRslt)
+					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
+							+ "】");
+				if (SMSResult.SUCCESS != sRslt)
+					sms.setStatus(SMSStatus.FAIL);
+				else if (SMSResult.SUCCESS == sRslt)
+					sms.setStatus(SMSStatus.SUCCESS);
 				LOGGER.info("resetPwd result {} " + result);
 				smsResult.add(sms);
 				try {
@@ -372,24 +457,34 @@ public class SklayApi {
 	public Set<SMS> sos(Set<SMS> smsList) {
 		Set<SMS> smsResult = Sets.newHashSet();
 		if (CollectionUtils.isNotEmpty(smsList)) {
+			Set<String> blackwords = blackwordList();
 			for (SMS sms : smsList) {
 				Map<String, String> pairs = Maps.newHashMap();
+
+				String content = sms.getContent();
+				content = replaceBlackword(content, blackwords);
 
 				pairs.put("username", account);
 				pairs.put("scode", password);
 				pairs.put("tempid", sos_tpl);
 				pairs.put("signtag", sign_tpl);
 				pairs.put("mobile", sms.getMobile());
-				pairs.put("content", sms.getContent());
+				pairs.put("content", content);
 
 				String result = ApiClient.http_post(sendUrl,
 						ApiClient.splitNameValuePair(pairs));
 				sms.setResult(result);
 				sms.setRemark(sos_tpl);
+				sms.setContent(content);
+
 				SMSResult sRslt = SMSResult.findByLable(result);
 				if (null != sRslt)
 					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
 							+ "】");
+				if (SMSResult.SUCCESS != sRslt)
+					sms.setStatus(SMSStatus.FAIL);
+				else if (SMSResult.SUCCESS == sRslt)
+					sms.setStatus(SMSStatus.SUCCESS);
 				smsResult.add(sms);
 
 				LOGGER.info("sos result {} " + result);
@@ -448,13 +543,19 @@ public class SklayApi {
 		if (StringUtils.isNotBlank(smsSetting.getSosPairs()))
 			this.setSosPairs(smsSetting.getSosPairs().trim());
 
+		if (StringUtils.isNotBlank(smsSetting.getBirthdayTpl()))
+			this.setBirthday_tpl(smsSetting.getBirthdayTpl().trim());
+
+		if (StringUtils.isNotBlank(smsSetting.getBirthPairs()))
+			this.setBirthPairs(smsSetting.getBirthPairs().trim());
+
 		return bRslt;
 	}
 
 	public SMSSetting getSMSSetting() {
 		return new SMSSetting(pwd_tpl, account, password, sendUrl,
 				physical_tpl, sos_tpl, sign_tpl, sosPairs, pwdPairs, changePwd,
-				balance);
+				balance, birthday_tpl, birthPairs);
 	}
 
 	public String getPhysical_tpl() {
@@ -569,6 +670,22 @@ public class SklayApi {
 		this.sign_tpl = sign_tpl;
 	}
 
+	public String getBirthday_tpl() {
+		return birthday_tpl;
+	}
+
+	public void setBirthday_tpl(String birthday_tpl) {
+		this.birthday_tpl = birthday_tpl;
+	}
+
+	public String getBirthPairs() {
+		return birthPairs;
+	}
+
+	public void setBirthPairs(String birthPairs) {
+		this.birthPairs = birthPairs;
+	}
+
 	public String getChangePwd() {
 		return changePwd;
 	}
@@ -593,9 +710,52 @@ public class SklayApi {
 		this.pwdPairs = pwdPairs;
 	}
 
+	private Set<String> blackwordList() {
+
+		Set<String> wordList = Sets.newHashSet();
+		List<Blackword> list = blackwordService.blackwordList();
+
+		if (CollectionUtils.isNotEmpty(list)) {
+			for (Blackword word : list) {
+				if (StringUtils.isNotBlank(word.getBlackword()))
+					wordList.add(word.getBlackword().trim());
+			}
+		}
+
+		return wordList;
+	}
+
+	private String replaceBlackword(String content, Set<String> blackwords) {
+
+		if (StringUtils.isEmpty(content) || CollectionUtils.isEmpty(blackwords))
+			return content;
+
+		for (String blackword : blackwords) {
+			if (content.contains(blackword)) {
+				content = content.replaceAll(blackword, appendSpace(blackword));
+			}
+		}
+		return content;
+	}
+
+	public static String appendSpace(String para) {
+		int length = para.length();
+		char[] value = new char[length << 1];
+		for (int i = 0, j = 0; i < length; ++i, j = i << 1) {
+			value[j] = para.charAt(i);
+			value[1 + j] = ' ';
+		}
+		return (new String(value)).trim();
+	}
+
 	public static void main(String[] args) {
-		String str = "0#1230#";
-		System.out.println(str.replaceFirst("0#", ""));
+		// String str = "0#1230#";
+		// System.out.println(str.replaceFirst("0#", ""));
+		// String str = "12dfg中三z中ss三 级ss在12";
+		// String str2 = "三 级";
+		// System.out.println(str2.length());
+		System.out.println(appendSpace("三    级中三 级中三 级中"));
+
 	}
 
 }

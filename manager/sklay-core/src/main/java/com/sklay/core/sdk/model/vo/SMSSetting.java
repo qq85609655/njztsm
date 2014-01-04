@@ -23,9 +23,13 @@ public class SMSSetting implements Serializable {
 
 	private String signTpl;
 
+	private String birthdayTpl;
+
 	private String sosPairs;
 
 	private String pwdPairs;
+
+	private String birthPairs;
 
 	private String changePwd;
 
@@ -77,7 +81,8 @@ public class SMSSetting implements Serializable {
 
 	public SMSSetting(String pwdTpl, String account, String password,
 			String sendUrl, String physicalTpl, String sosTpl, String signTpl,
-			String sosPairs, String pwdPairs, String changePwd, String balance) {
+			String sosPairs, String pwdPairs, String changePwd, String balance,
+			String birthdayTpl, String birthPairs) {
 		super();
 		this.sosPairs = sosPairs;
 		this.pwdPairs = pwdPairs;
@@ -90,6 +95,8 @@ public class SMSSetting implements Serializable {
 		this.sosTpl = sosTpl;
 		this.changePwd = changePwd;
 		this.balance = balance;
+		this.birthdayTpl = birthdayTpl;
+		this.birthPairs = birthPairs;
 
 	}
 
@@ -139,5 +146,21 @@ public class SMSSetting implements Serializable {
 
 	public void setBalance(String balance) {
 		this.balance = balance;
+	}
+
+	public String getBirthdayTpl() {
+		return birthdayTpl;
+	}
+
+	public void setBirthdayTpl(String birthdayTpl) {
+		this.birthdayTpl = birthdayTpl;
+	}
+
+	public String getBirthPairs() {
+		return birthPairs;
+	}
+
+	public void setBirthPairs(String birthPairs) {
+		this.birthPairs = birthPairs;
 	}
 }

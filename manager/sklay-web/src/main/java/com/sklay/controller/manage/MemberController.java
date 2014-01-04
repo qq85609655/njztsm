@@ -166,10 +166,18 @@ public class MemberController {
 	@RequestMapping("/create")
 	@RequiresPermissions("member:create")
 	@ResponseBody
-	public DataView create(User user, Long groupId, ModelMap modelMap) {
+	public DataView create(User user, Long groupId, String birth,
+			ModelMap modelMap) {
 
 		if (null == user)
 			throw new SklayException(ErrorCode.MISS_PARAM, null, "用户信息");
+
+		if (StringUtils.isEmpty(birth))
+			throw new SklayException(ErrorCode.MISS_PARAM, null, "用户生日");
+		Date birthDay = DateTimeUtil.getStringToDate(birth);
+		if (DateTimeUtil.getCurrentDay().before(birthDay))
+			throw new SklayException(ErrorCode.ILLEGAL_PARAM, null, "用户生日");
+
 		if (null == groupId)
 			throw new SklayException(ErrorCode.MISS_PARAM, null, "用户所在分组");
 
@@ -183,7 +191,7 @@ public class MemberController {
 					"会员分组", "添加会员" });
 
 		user.setGroup(targetGroup);
-
+		user.setBirthday(birthDay);
 		targetGroup.setMemberCount(targetGroup.getMemberCount() + 1);
 
 		boolean checkGroup = true;
@@ -232,20 +240,29 @@ public class MemberController {
 		User session = LoginUserHelper.getLoginUser();
 
 		modelMap = getUserGroup(session, modelMap);
+
 		return "manager.member.initUpdate";
 	}
 
 	@RequestMapping("/update")
 	@RequiresPermissions("member:update")
 	@ResponseBody
-	public DataView update(User user, Long groupId, ModelMap modelMap) {
+	public DataView update(User user, String birth, Long groupId,
+			ModelMap modelMap) {
 
 		boolean checkGroup = false;
 		user = checkUser(user, checkGroup);
 
+		if (StringUtils.isEmpty(birth))
+			throw new SklayException(ErrorCode.MISS_PARAM, null, "用户生日");
+		Date birthDay = DateTimeUtil.getStringToDate(birth);
+		if (DateTimeUtil.getCurrentDay().before(birthDay))
+			throw new SklayException(ErrorCode.ILLEGAL_PARAM, null, "用户生日");
+
 		if (null == user.getId())
 			throw new SklayException(ErrorCode.MISS_PARAM, null, ":会员信息");
 
+		user.setBirthday(birthDay);
 		User orginal = userService.getUser(user.getId());
 		Set<Group> groups = null;
 		if (null == orginal)

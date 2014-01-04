@@ -86,6 +86,14 @@ public class PropertieUtils {
 				properties.setProperty(Constants.SMS_TEMPLATE_SIGN, smsSetting
 						.getSignTpl().trim());
 
+			if (StringUtils.isNotBlank(smsSetting.getBirthdayTpl()))
+				properties.setProperty(Constants.SMS_TEMPLATE_BIRTHDAY,
+						smsSetting.getBirthdayTpl().trim());
+
+			if (StringUtils.isNotBlank(smsSetting.getBirthPairs()))
+				properties.setProperty(Constants.SMS_BIRTHDAY_PAIRS, smsSetting
+						.getBirthPairs().trim());
+
 			FileOutputStream fos = new FileOutputStream(propertyPath);
 
 			properties.store(fos, "Copyright (c) sklay.net");

@@ -77,4 +77,5 @@ public class SpecificGroupDaoImpl implements SpecificGroupDao {
 
 		return query;
 	}
+
 }

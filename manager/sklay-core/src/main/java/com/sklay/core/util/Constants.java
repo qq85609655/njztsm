@@ -62,6 +62,8 @@ public class Constants {
 	public static final String SMS_TEMPLATE_PHYSICAL = "sms.physical.template";
 
 	public static final String SMS_TEMPLATE_SOS = "sms.sos.template";
+	
+	public static final String SMS_TEMPLATE_BIRTHDAY = "sms.birthday.template";
 
 	public static final String SMS_SOS_PAIRS = "sms.sos.pairs";
 
@@ -70,6 +72,8 @@ public class Constants {
 	public static final String SMS_TEMPLATE_PWD = "sms.pwd.template";
 
 	public static final String SMS_PWD_PAIRS = "sms.pwd.pairs";
+	
+	public static final String SMS_BIRTHDAY_PAIRS = "sms.birthday.pairs";
 
 	public static final String SMS_TEMPLATE_SIGN = "sms.sign.template";
 

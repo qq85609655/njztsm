@@ -30,9 +30,9 @@
 		        </div>
 		      </div>
 		      <div class="control-group">
-		        <label class="control-label" for="inputAccountId">短信帐号</label>
+		        <label class="control-label" for="inputAccount">短信帐号</label>
 		        <div class="controls">
-		          <input class="span5" type="text" name="accountId" id="inputAccountId" placeholder="短信帐号" value="${smsSetting.account }">
+		          <input class="span5" type="text" name="account" id="inputAccount" placeholder="短信帐号" value="${smsSetting.account }">
 		        </div>
 		      </div>
 		      <div class="control-group">
@@ -45,26 +45,39 @@
 		      <div class="control-group">
 		        <label class="control-label" for="inputSOS">定位短信模版</label>
 		        <div class="controls">
-		        	<input class="span5" name="sos" id="inputSOS" placeholder="定位短信模版" value="${smsSetting.sosTpl }"/>
+		        	<input class="span5" name="sosTpl" id="inputSOS" placeholder="定位短信模版" value="${smsSetting.sosTpl }"/>
 		        </div>
 		      </div>
 		      <div class="control-group">
 		        <label class="control-label" for="inputSosPairs">定位短信参数</label>
 		        <div class="controls">
-		        	<textarea rows="4" cols="4" class="span5" name="sosTpl" id="inputSosPairs" placeholder="定位短信参数">${smsSetting.sosPairs }</textarea>
+		        	<textarea rows="4" cols="4" class="span5" name="sosPairs" id="inputSosPairs" placeholder="定位短信参数">${smsSetting.sosPairs }</textarea>
 		        </div>
 		      </div>
 		      
 		      <div class="control-group">
-		        <label class="control-label" for="inputUserId">重置密码模版</label>
+		        <label class="control-label" for="inputPwd">重置密码模版</label>
 		        <div class="controls">
-		        	<input class="span5" name="sos" id="inputPwd" placeholder="定位短信模版" value="${smsSetting.pwdTpl }"/>
+		        	<input class="span5" name="pwdTpl" id="inputPwd" placeholder="定位短信模版" value="${smsSetting.pwdTpl }"/>
 		        </div>
 		      </div>
 		      <div class="control-group">
 		        <label class="control-label" for="inputPwdPairs">重置密码参数</label>
 		        <div class="controls">
-		        	<textarea rows="4" cols="4" class="span5" name="sosTpl" id="inputPwdPairs" placeholder="定位短信参数">${smsSetting.pwdPairs }</textarea>
+		        	<textarea rows="4" cols="4" class="span5" name="pwdPairs" id="inputPwdPairs" placeholder="定位短信参数">${smsSetting.pwdPairs }</textarea>
+		        </div>
+		      </div>
+		      
+		      <div class="control-group">
+		        <label class="control-label" for="inputBirthdayTpl">生日提醒模版</label>
+		        <div class="controls">
+		        	<input class="span5" name="birthdayTpl" id="inputBirthdayTpl" placeholder="生日提醒模版" value="${smsSetting.birthdayTpl }"/>
+		        </div>
+		      </div>
+		      <div class="control-group">
+		        <label class="control-label" for="inputBirthPairs">生日提醒参数</label>
+		        <div class="controls">
+		        	<textarea rows="4" cols="4" class="span5" name="birthPairs" id="inputBirthPairs" placeholder="生日提醒参数">${smsSetting.birthPairs }</textarea>
 		        </div>
 		      </div>
 		      

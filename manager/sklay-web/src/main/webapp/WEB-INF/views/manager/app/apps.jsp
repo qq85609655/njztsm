@@ -11,9 +11,9 @@
 			<thead>
 				<tr>
 					<th>编号</th>
-					<th class="span2">名称</th>
+					<th class="span">名称</th>
 					<th class="span2">资费标准(元)</th>
-					<th class="span2">说明</th>
+					<th class="span3">说明</th>
 					<th class="span2">操作</th>
 				</tr>
 			</thead>
@@ -27,7 +27,7 @@
 					<c:otherwise>
 						<c:forEach items="${models}" var="model">
 							<tr>
-								<td><label class="checkbox hiden" for="checkbox_${model.id}"><input id="checkbox_${model.id}" type="checkbox" name="checkbox" value="${model.id}">  ${model.id}</label></td>
+								<td><label class="checkbox" for="checkbox_${model.id}"><input class="hide" id="checkbox_${model.id}" type="checkbox" name="checkbox" value="${model.id}">${model.id}</label></td>
 								<td>${model.title} </td>
 								<td>${model.price}</td>
 								<td>${model.description}</td>

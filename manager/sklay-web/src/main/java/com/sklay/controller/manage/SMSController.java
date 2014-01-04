@@ -111,16 +111,19 @@ public class SMSController {
 		if (CollectionUtils.isNotEmpty(list)) {
 			for (SMS sms : list) {
 				Long rec = sms.getReceiver();
-				User rc;
-				if (userMap.containsKey(rec))
-					rc = userMap.get(rec);
-				else {
-					rc = userService.getUser(rec);
-					userMap.put(rec, rc);
+				User rc = null;
+				if (null != rec) {
+					if (userMap.containsKey(rec))
+						rc = userMap.get(rec);
+					else {
+						rc = userService.getUser(rec);
+						userMap.put(rec, rc);
+					}
 				}
 				SMSView temp = new SMSView();
 				BeanUtils.copyProperties(sms, temp);
-				temp.setReciverUser(rc.getName());
+				if (rc != null)
+					temp.setReciverUser(rc.getName());
 
 				result.add(temp);
 			}
@@ -258,32 +261,39 @@ public class SMSController {
 
 		SMSSetting newSetting = null;
 
-		if (!oldSetting.getPhysicalTpl().equals(smsSetting.getPhysicalTpl())) {
+		if (StringUtils.isNotBlank(smsSetting.getPhysicalTpl())
+				&& !oldSetting.getPhysicalTpl().equals(
+						smsSetting.getPhysicalTpl())) {
 			newSetting = new SMSSetting();
 			newSetting.setPhysicalTpl(smsSetting.getPhysicalTpl().trim());
 		}
 
-		if (!oldSetting.getSosTpl().equals(smsSetting.getSosTpl())) {
+		if (StringUtils.isNotBlank(smsSetting.getSosTpl())
+				&& !oldSetting.getSosTpl().equals(smsSetting.getSosTpl())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setSosTpl(smsSetting.getSosTpl().trim());
 		}
 
-		if (!oldSetting.getPwdTpl().equals(smsSetting.getPwdTpl())) {
+		if (StringUtils.isNotBlank(smsSetting.getPwdTpl())
+				&& !oldSetting.getPwdTpl().equals(smsSetting.getPwdTpl())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setPwdTpl(smsSetting.getPwdTpl().trim());
 		}
 
-		if (!oldSetting.getSignTpl().equals(smsSetting.getSignTpl())) {
+		if (StringUtils.isNotBlank(smsSetting.getSignTpl())
+				&& !oldSetting.getSignTpl().equals(smsSetting.getSignTpl())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setSign(smsSetting.getSignTpl().trim());
 		}
 
-		if (!oldSetting.getAccount().equals(smsSetting.getAccount())) {
+		if (StringUtils.isNotBlank(smsSetting.getAccount())
+				&& !oldSetting.getAccount().equals(smsSetting.getAccount())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setAccount(smsSetting.getAccount().trim());
 		}
 
-		if (!oldSetting.getPassword().equals(smsSetting.getPassword())) {
+		if (StringUtils.isNotBlank(smsSetting.getPassword())
+				&& !oldSetting.getPassword().equals(smsSetting.getPassword())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setPassword(smsSetting.getPassword().trim());
 
@@ -293,29 +303,48 @@ public class SMSController {
 				throw new SklayException("密码修改失败!");
 		}
 
-		if (!oldSetting.getSendUrl().equals(smsSetting.getSendUrl())) {
+		if (StringUtils.isNotBlank(smsSetting.getSendUrl())
+				&& !oldSetting.getSendUrl().equals(smsSetting.getSendUrl())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setSendUrl(smsSetting.getSendUrl().trim());
 		}
 
-		if (!oldSetting.getBalance().equals(smsSetting.getBalance())) {
+		if (StringUtils.isNotBlank(smsSetting.getBalance())
+				&& !oldSetting.getBalance().equals(smsSetting.getBalance())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setBalance(smsSetting.getBalance().trim());
 		}
 
-		if (!oldSetting.getChangePwd().equals(smsSetting.getChangePwd())) {
+		if (StringUtils.isNotBlank(smsSetting.getChangePwd())
+				&& !oldSetting.getChangePwd().equals(smsSetting.getChangePwd())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setChangePwd(smsSetting.getChangePwd().trim());
 		}
 
-		if (!oldSetting.getPwdPairs().equals(smsSetting.getPwdPairs())) {
+		if (StringUtils.isNotBlank(smsSetting.getPwdPairs())
+				&& !oldSetting.getPwdPairs().equals(smsSetting.getPwdPairs())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setPwdPairs(smsSetting.getPwdPairs().trim());
 		}
 
-		if (!oldSetting.getSosPairs().equals(smsSetting.getSosPairs())) {
+		if (StringUtils.isNotBlank(smsSetting.getSosPairs())
+				&& !oldSetting.getSosPairs().equals(smsSetting.getSosPairs())) {
 			newSetting = null == newSetting ? new SMSSetting() : newSetting;
 			newSetting.setSosPairs(smsSetting.getSosPairs().trim());
+		}
+
+		if (StringUtils.isNotBlank(smsSetting.getBirthdayTpl())
+				&& !oldSetting.getBirthdayTpl().equals(
+						smsSetting.getBirthdayTpl())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setBirthdayTpl(smsSetting.getBirthdayTpl().trim());
+		}
+
+		if (StringUtils.isNotBlank(smsSetting.getBirthPairs())
+				&& !oldSetting.getBirthPairs().equals(
+						smsSetting.getBirthPairs())) {
+			newSetting = null == newSetting ? new SMSSetting() : newSetting;
+			newSetting.setBirthPairs(smsSetting.getBirthPairs().trim());
 		}
 
 		if (null != newSetting) {
@@ -336,7 +365,19 @@ public class SMSController {
 		SMS sms = smsService.getSMS(id);
 		if (null == sms)
 			throw new SklayException(ErrorCode.FINF_NULL, null, "短信");
-		modelMap.addAttribute("model", sms);
+
+		SMSView view = new SMSView();
+		BeanUtils.copyProperties(sms, view);
+
+		Long rec = sms.getReceiver();
+		User rc = null;
+		if (null != rec) {
+			rc = userService.getUser(rec);
+		}
+		if (rc != null)
+			view.setReciverUser(rc.getName());
+
+		modelMap.addAttribute("model", view);
 
 		return "modal:sms.resend";
 	}

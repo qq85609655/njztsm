@@ -11,4 +11,5 @@ public interface SpecificGroupDao {
 
 	public Page<Group> page(String keyword, User owner, Long belong,
 			Pageable pageable) throws SklayException;
+
 }

@@ -7,13 +7,13 @@
 		  <div class="control-group">
 	        <label class="control-label">收信人姓名  </label>
 	        <div class="controls">
-	        	<label class="control-label"><strong>${model.receiver.name}</strong></label>
+	        	<label class="control-label"><strong>${model.reciverUser}</strong></label>
 	        </div>
 	      </div>
 	      <div class="control-group">
 	        <label class="control-label">收信人手机号</label>
 	        <div class="controls">
-	        	<label class="control-label"><strong>${model.receiver.phone}</strong></label>
+	        	<label class="control-label"><strong>${model.mobile}</strong></label>
 	        </div>
 	      </div>
 	      

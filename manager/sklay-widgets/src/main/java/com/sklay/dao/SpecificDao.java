@@ -92,4 +92,8 @@ public interface SpecificDao {
 
 	public List<DeviceBinding> getUserBindingByLevel(Set<Long> targetUser,
 			Level level, String sn) throws SklayException;
+
+	public List<User> queryBirthdayUser() throws SklayException;
+
+	public List<DeviceBinding> findTargetBinding(User targetUser, Level level);
 }

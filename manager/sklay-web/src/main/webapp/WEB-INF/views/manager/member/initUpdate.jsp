@@ -2,7 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ include file="../../include.jsp"%>
-
+<script type="text/javascript" src="${ctx}/static/thirdparty/datepicker/WdatePicker.js"></script>
 <div class="widget-box">
 
 	<div class="alert alert-info" style="font-size: 14px;text-align: center;">
@@ -52,12 +52,28 @@
 				</label>
 	        </div>
 	      </div>
+	      
+	      <div class="control-group">
+	        	<label class="control-label" for="inputBirthday"><span style="color: red;">*</span> 生日</label>
+	        	<div class=" controls">
+				    <input class="span3 Wdate" type="text" required="required" onfocus="WdatePicker({startDate:'1949-01-01',dateFmt:'yyyy-MM-dd' ,maxDate:'{%y-10}-%M-%d'})" id="inputBirthday" name="birth" value="<fmt:formatDate value='${member.birthday }' pattern='yyyy-MM-dd'/>" placeholder="生日">
+				</div>      
+	      </div>
+	      
 	      <div class="control-group">
 	        <label class="control-label" for="inputAge"><span style="color: red;">*</span> 年龄</label>
 	        <div class="controls">
 	          <input class="span3" type="number" min="1" required="required" name="age" id="inputAge" placeholder="未填写年龄" value="${member.age }">
 	        </div>
 	      </div>
+	      
+	      <div class="control-group">
+	        <label class="control-label" for="inputArea"><span style="color: red;">*</span> 地区</label>
+	        <div class="controls">
+	          <input class="span3" type="text" name="area" id="inputArea" placeholder="未填写地区" value="${member.area }">
+	        </div>
+	      </div>
+	      
 	      <div class="control-group">
 	        <label class="control-label" for="inputHeight">身高</label>
 	        <div class="controls">
@@ -76,12 +92,7 @@
 	        	<textarea class="span3" rows="4" cols="5"  name="medicalHistory" id="inputMedicalHistory" placeholder="未填写病史">${member.medicalHistory }</textarea>
 	        </div>
 	      </div>
-	      <div class="control-group">
-	        <label class="control-label" for="inputArea"><span style="color: red;">*</span> 地区</label>
-	        <div class="controls">
-	          <input class="span3" type="text" name="area" id="inputArea" placeholder="未填写地区" value="${member.area }">
-	        </div>
-	      </div>
+	      
 	      <div class="control-group">
 	        <label class="control-label" for="inputAddress">详细地址</label>
 	        <div class="controls">

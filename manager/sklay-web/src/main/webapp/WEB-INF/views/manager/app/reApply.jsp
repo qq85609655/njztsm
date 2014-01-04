@@ -30,7 +30,7 @@ border-color: #bce8f1;
 	        <label class="control-label" for="inputCost">费用</label>
 	        <div class="controls">
 	          <input type="hidden" name="product.id" id="product" value="${model.id }" >
-	          <input type="hidden" name="appType" id="appType" value="<%=AppType.SMS %>" >
+	          <input type="hidden" name="appType" id="appType" value="${model.appType }" >
 	          <input class="span3" type="text" name="cost" id="inputCost" placeholder="请输入金额" value="${model.cost }">
 	        </div>
 	      </div>

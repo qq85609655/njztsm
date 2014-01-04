@@ -178,4 +178,8 @@ public class BindingServiceImpl implements BindingService {
 				BindingMold.FREE, BindingMold.PAID, target, Level.FIRST);
 	}
 
+	@Override
+	public List<DeviceBinding> findTargetBinding(User targetUser, Level level) {
+		return specificDao.findTargetBinding(targetUser, level);
+	}
 }

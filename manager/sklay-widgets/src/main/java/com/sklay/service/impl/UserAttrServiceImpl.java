@@ -92,4 +92,9 @@ public class UserAttrServiceImpl implements UserAttrService {
 		return userAttrDao.findUserPaidAttrByKey(key, userIds);
 	}
 
+	@Override
+	public List<User> queryBirthdayUser() throws SklayException {
+		return specificDao.queryBirthdayUser();
+	}
+
 }

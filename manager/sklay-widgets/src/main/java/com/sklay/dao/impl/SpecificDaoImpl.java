@@ -1,5 +1,6 @@
 package com.sklay.dao.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +28,7 @@ import com.sklay.core.enums.SMSType;
 import com.sklay.core.enums.Sex;
 import com.sklay.core.enums.TipType;
 import com.sklay.core.ex.SklayException;
+import com.sklay.core.util.DateTimeUtil;
 import com.sklay.dao.SpecificDao;
 import com.sklay.enums.LogLevelType;
 import com.sklay.model.Application;
@@ -783,6 +785,32 @@ public class SpecificDaoImpl implements SpecificDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
+	public List<DeviceBinding> findTargetBinding(User targetUser, Level level) {
+
+		StringBuffer qlString = new StringBuffer(
+				" select b from DeviceBinding b where 1=1 ");
+
+		if (null != targetUser)
+			qlString.append(" and b.serialNumber = ( select bb.serialNumber from DeviceBinding bb where bb.targetUser.id = :userId)  ");
+
+		if (null != level)
+			qlString.append(" and b.level = :level  ");
+
+		qlString.append(" order by  b.updateTime desc ");
+
+		Query query = em.createQuery(qlString.toString());
+
+		if (null != targetUser)
+			query.setParameter("userId", targetUser.getId());
+
+		if (null != level)
+			query.setParameter("level", level);
+
+		return query.getResultList();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
 	public List<DeviceBinding> getUserBindingByLevel(Set<Long> targetUser,
 			Level level, String sn) throws SklayException {
 
@@ -807,4 +835,30 @@ public class SpecificDaoImpl implements SpecificDao {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<User> queryBirthdayUser() throws SklayException {
+		StringBuffer sb = null;
+		sb = new StringBuffer(
+				"select u from User u ,DeviceBinding d where u.id=d.targetUser.id ");
+		Date nextDay = DateTimeUtil.getNextDay();
+		Integer month = DateTimeUtil.getNextMonth(nextDay);
+		Integer day = DateTimeUtil.getNextDay(nextDay);
+
+		sb.append(" and MONTH(u.birthday) = :month ");
+		sb.append(" and DAY(u.birthday) = :day ");
+		sb.append(" and u.status = :userStatus ");
+		sb.append(" and d.level = :level ");
+		sb.append(" and d.status = :deviceStatus ");
+
+		Query query = em.createQuery(sb.toString());
+
+		query.setParameter("month", month);
+		query.setParameter("day", day);
+		query.setParameter("level", Level.FIRST);
+		query.setParameter("userStatus", AuditStatus.PASS);
+		query.setParameter("deviceStatus", AuditStatus.PASS);
+
+		return query.getResultList();
+	}
 }

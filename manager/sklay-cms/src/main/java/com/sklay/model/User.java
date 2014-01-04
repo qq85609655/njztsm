@@ -1,6 +1,7 @@
 package com.sklay.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -66,6 +67,8 @@ public class User implements Serializable {
 	private Group group;
 
 	private Long belong;
+
+	private Date birthday;
 
 	public User() {
 	}
@@ -196,6 +199,14 @@ public class User implements Serializable {
 
 	public void setBelong(Long belong) {
 		this.belong = belong;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
 	}
 
 	public String toString() {

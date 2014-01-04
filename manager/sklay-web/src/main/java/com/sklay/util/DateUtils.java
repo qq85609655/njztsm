@@ -78,4 +78,19 @@ public class DateUtils {
 
 		return timeStr;
 	}
+	
+	public static String getCurrentTime() {
+		SimpleDateFormat sdf = new SimpleDateFormat("",
+				Locale.SIMPLIFIED_CHINESE);
+
+		sdf.applyPattern("MM月dd日 HH时mm分");
+
+		String timeStr = sdf.format(new Date());
+
+		return timeStr;
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(getCurrentTime());
+	}
 }

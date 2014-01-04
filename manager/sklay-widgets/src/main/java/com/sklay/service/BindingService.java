@@ -68,4 +68,6 @@ public interface BindingService {
 	public void deleteBinding(String serialNumber);
 
 	public void updateBindingCreator(User creator, Long updator, User original);
+
+	public List<DeviceBinding> findTargetBinding(User targetUser, Level level);
 }

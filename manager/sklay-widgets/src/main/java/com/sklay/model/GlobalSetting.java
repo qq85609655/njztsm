@@ -39,7 +39,7 @@ public class GlobalSetting implements Serializable {
 	@Column(name = "send_physical", columnDefinition = "int default 0")
 	private SwitchStatus physicalSMS;
 
-	/** 求救短信开关 */
+	/** 定位短信开关 */
 	@Column(name = "send_sos", columnDefinition = "int default 0")
 	private SwitchStatus sosSMS;
 

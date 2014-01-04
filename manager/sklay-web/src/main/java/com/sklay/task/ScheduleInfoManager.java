@@ -42,29 +42,23 @@ public class ScheduleInfoManager {
 		CronTriggerBean trigger = (CronTriggerBean) scheduler.getTrigger(
 				"cronTrigger", Scheduler.DEFAULT_GROUP);
 		String originConExpression = trigger.getCronExpression();
-		String dbCronExpression = "0 30 0 * * ?";
-		String defaultCronExpression = "0 10 0 * * ?";
-		// 判断从DB中取得的任务时间(dbCronExpression)和现在的quartz线程中的任务时间(originConExpression)是否相等
-		// 如果相等，则表示用户并没有重新设定数据库中的任务时间，这种情况不需要重新rescheduleJob
-		// if (!originConExpression.equalsIgnoreCase(dbCronExpression)) {
+		// String dbCronExpression = "0 30 0 * * ?";
+		// String defaultCronExpression = "0 10 0 * * ?";
+		//
+		// if (originConExpression.equalsIgnoreCase("0/10 * * * * ?")) {
+		// trigger.setCronExpression(defaultCronExpression);
+		// scheduler.rescheduleJob("cronTrigger", Scheduler.DEFAULT_GROUP,
+		// trigger);
+		// } else if
+		// (originConExpression.equalsIgnoreCase(defaultCronExpression)) {
 		// trigger.setCronExpression(dbCronExpression);
 		// scheduler.rescheduleJob("cronTrigger", Scheduler.DEFAULT_GROUP,
 		// trigger);
+		// } else if (originConExpression.equalsIgnoreCase(dbCronExpression)) {
+		// trigger.setCronExpression(defaultCronExpression);
+		// scheduler.rescheduleJob("cronTrigger", Scheduler.DEFAULT_GROUP,
+		// trigger);
 		// }
-
-		if (originConExpression.equalsIgnoreCase("0/10 * * * * ?")) {
-			trigger.setCronExpression(defaultCronExpression);
-			scheduler.rescheduleJob("cronTrigger", Scheduler.DEFAULT_GROUP,
-					trigger);
-		} else if (originConExpression.equalsIgnoreCase(defaultCronExpression)) {
-			trigger.setCronExpression(dbCronExpression);
-			scheduler.rescheduleJob("cronTrigger", Scheduler.DEFAULT_GROUP,
-					trigger);
-		} else if (originConExpression.equalsIgnoreCase(dbCronExpression)) {
-			trigger.setCronExpression(defaultCronExpression);
-			scheduler.rescheduleJob("cronTrigger", Scheduler.DEFAULT_GROUP,
-					trigger);
-		}
 		taskManager.doDayJob();
 
 		LOGGER.error("do job");

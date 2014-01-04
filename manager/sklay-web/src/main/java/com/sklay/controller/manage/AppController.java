@@ -198,14 +198,22 @@ public class AppController {
 	@RequiresUser
 	public String initApply(@PathVariable Long appId, ModelMap modelMap) {
 
-		User session = LoginUserHelper.getLoginUser();
-		List<Application> list = appService.getByCreator(AppType.PUSH,
-				AuditStatus.PASS, session.getId());
-		if (CollectionUtils.isNotEmpty(list))
-			throw new SklayException(ErrorCode.EXIST, null, new Object[] {
-					AuditStatus.PASS.getLable() + "有效申请", "再次申请" });
+		if (null == appId) {
+			throw new SklayException(ErrorCode.MISS_PARAM, null,
+					new Object[] { "appId" });
+		}
 
 		Product product = productService.get(appId);
+		if (null == product) {
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { "商品信息" });
+		}
+		User session = LoginUserHelper.getLoginUser();
+		List<Application> list = appService.getByCreator(product.getAppType(),
+				null, session.getId());
+		if (CollectionUtils.isNotEmpty(list))
+			throw new SklayException(ErrorCode.EXIST, null, new Object[] {
+					product.getTitle() + "应用申请", "再次申请" });
 
 		modelMap.addAttribute("model", product);
 
@@ -317,7 +325,7 @@ public class AppController {
 		int used = sendCount * smsLength;
 		int c = app.getCount() - (used + app.getUsed());
 		if (c < Constants.ZERO)
-			throw new SklayException("短信數量不足,无法发送,短信剩余量 " + c);
+			throw new SklayException("短信数量不足,无法发送,短信剩余量 " + c);
 
 		Date date = new Date();
 		for (String reciver : phoneSet) {

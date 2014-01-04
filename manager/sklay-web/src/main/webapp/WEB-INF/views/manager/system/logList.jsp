@@ -25,10 +25,10 @@
 				<thead>
 					<tr>
 						<th >编号</th>
-						<th class="input-mini">名称</th>
-						<th >参数</th>
-						<th class="input-mini">类型</th>
-						<th class="input-mini">描述</th>
+						<th class="span2">名称</th>
+						<th class="span2">参数</th>
+						<th class="span2">类型</th>
+						<th class="span2">描述</th>
 						<th class="span3">时间</th>
 					</tr>
 				</thead>
@@ -44,7 +44,7 @@
 								<tr>
 									<td><label class="checkbox" for="checkbox_${model.id}"> ${model.id}</label></td>
 									<td>${model.name}</td>
-									<td>${model.content}</td>
+									<td data-ellipsis='40'>${model.content}</td>
 									<td>${model.type.lable} </td>
 									<td>${model.desctiption}</td>
 									<td>${model.createTime}</td>

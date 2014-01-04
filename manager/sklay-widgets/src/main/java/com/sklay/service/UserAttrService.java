@@ -51,4 +51,5 @@ public interface UserAttrService {
 	public Page<User> getUserPage(Long group, String keyword, User user,
 			Long belong, Pageable pageable) throws SklayException;
 
+	List<User> queryBirthdayUser() throws SklayException;
 }

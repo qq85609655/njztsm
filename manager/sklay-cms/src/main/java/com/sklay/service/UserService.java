@@ -48,7 +48,7 @@ public interface UserService {
 	boolean exist(String phone) throws SklayException;
 
 	User getUser(Long userId) throws SklayException;
-	
+
 	List<User> getUserByPhone(Set<String> phones) throws SklayException;
 
 	List<User> getUser(Set<Long> userId) throws SklayException;

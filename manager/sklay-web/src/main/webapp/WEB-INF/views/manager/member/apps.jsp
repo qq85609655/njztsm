@@ -14,7 +14,12 @@
 			  <span class="add-on">应用类型</span>
 			    <select class="span2" name="appType">
 				  <option value="" <c:if test="${empty app}"> selected="selected" </c:if>>所有</option>
-				  <option value="<%=AppType.SMS %>" <c:if test="${app.value eq 0}"> selected="selected" </c:if>><%=AppType.SMS.getLable() %></option>
+				  <option value="<%=AppType.PUSH %>" <c:if test="${app.value eq 0}"> selected="selected" </c:if>><%=AppType.PUSH.getLable() %></option>
+				  <option value="<%=AppType.PHYSICAL %>" <c:if test="${app.value eq 1}"> selected="selected" </c:if>><%=AppType.PHYSICAL.getLable() %></option>
+				  <option value="<%=AppType.SOS %>" <c:if test="${app.value eq 2}"> selected="selected" </c:if>><%=AppType.SOS.getLable() %></option>
+				  <option value="<%=AppType.PWD %>" <c:if test="${app.value eq 3}"> selected="selected" </c:if>><%=AppType.PWD.getLable() %></option>
+				  <option value="<%=AppType.WISH %>" <c:if test="${app.value eq 4}"> selected="selected" </c:if>><%=AppType.WISH.getLable() %></option>
+				  <option value="<%=AppType.TIP %>" <c:if test="${app.value eq 5}"> selected="selected" </c:if>><%=AppType.TIP.getLable() %></option>
 				</select>
 			</div>
 			
@@ -65,7 +70,7 @@
 									<td>${model.count}</td>
 									<td>${model.used}</td>
 									<td>${model.cost}</td>
-									<td>${model.status.lable}</td>
+									<td <c:if test="${model.status.value != 1 }">style="color:red;"</c:if>>${model.status.lable}</td>
 									<td>${model.remark}</td>
 									<td>
 									<c:choose>

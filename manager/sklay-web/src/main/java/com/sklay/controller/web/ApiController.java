@@ -235,7 +235,8 @@ public class ApiController {
 		else {
 			SMS log = new SMS(creator.getId(), content, reportDate,
 					targetUser.getId(), targetUser.getPhone(), SMSStatus.FAIL);
-			log.setBelong(targetUser.getBelong());
+			log.setBelong(belong);
+			log.setApp(app);
 			smsLogs.add(log);
 		}
 
@@ -274,14 +275,14 @@ public class ApiController {
 
 		if (null == gatherData) {
 			if (null != operation) {
-				operation.setDesctiption("定位数据采集为空") ;
+				operation.setDesctiption("定位数据采集为空");
 				operationService.create(operation);
 			}
 			throw new SklayException(ErrorCode.FINF_NULL, null, "定位的数据");
 		}
 		if (StringUtils.isBlank(gatherData.getSimNo())) {
 			if (null != operation) {
-				operation.setDesctiption("采集卡号不能为空!") ;
+				operation.setDesctiption("采集卡号不能为空!");
 				operationService.create(operation);
 			}
 			throw new SklayException(ErrorCode.SMS_GATHER_SIMNO_EMPTY);
@@ -293,7 +294,8 @@ public class ApiController {
 		if (null == deviceBinding
 				|| AuditStatus.PASS != deviceBinding.getStatus()) {
 			if (null != operation) {
-				operation.setDesctiption("设备:"+gatherData.getSimNo()+"还未绑定主用户") ;
+				operation.setDesctiption("设备:" + gatherData.getSimNo()
+						+ "还未绑定主用户");
 				operationService.create(operation);
 			}
 			throw new SklayException(ErrorCode.SMS_GATHER_NOBANDING, null,
@@ -312,7 +314,7 @@ public class ApiController {
 					"用户信息", "发送短信" });
 		}
 		User creator = deviceBinding.getCreator();
-		User bandingor = deviceBinding.getTargetUser() ;
+		User bandingor = deviceBinding.getTargetUser();
 		long belong = deviceBinding.getBelong();
 		long creatorId = creator.getId();
 		Date dataTime = new Date();
@@ -449,7 +451,7 @@ public class ApiController {
 			loaction = sklayApi.SearchLocation(latitude, longitude);
 
 			String SMSContent = NLS.getMsg(smsTemplate, new Object[] {
-					userName, DateUtils.getCurrentDate(), loaction });
+					userName, DateUtils.getCurrentTime(), loaction });
 			/** 保存采集到的原始数据 */
 			String originalData = JSONObject.toJSONString(gatherData);
 			/** 创建体检报告 */
@@ -488,7 +490,7 @@ public class ApiController {
 			throw new SklayException(ErrorCode.FINF_NULL, null, "系统配置");
 
 		if (SwitchStatus.CLOSE == setting.getSosSMS())
-			throw new SklayException(ErrorCode.CLOSED, null, "求救");
+			throw new SklayException(ErrorCode.CLOSED, null, "定位业务");
 
 		return setting.getApiLogSwitch();
 

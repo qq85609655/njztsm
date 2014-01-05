@@ -428,19 +428,19 @@ public class SklayApi {
 				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
-				String result = ApiClient.http_post(sendUrl,
-						ApiClient.splitNameValuePair(pairs));
-				sms.setResult(result);
+//				String result = ApiClient.http_post(sendUrl,
+//						ApiClient.splitNameValuePair(pairs));
+//				sms.setResult(result);
 				sms.setRemark(birthday_tpl);
-				SMSResult sRslt = SMSResult.findByLable(result);
-				if (null != sRslt)
-					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
-							+ "】");
-				if (SMSResult.SUCCESS != sRslt)
-					sms.setStatus(SMSStatus.FAIL);
-				else if (SMSResult.SUCCESS == sRslt)
-					sms.setStatus(SMSStatus.SUCCESS);
-				LOGGER.info("resetPwd result {} " + result);
+//				SMSResult sRslt = SMSResult.findByLable(result);
+//				if (null != sRslt)
+//					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
+//							+ "】");
+//				if (SMSResult.SUCCESS != sRslt)
+//					sms.setStatus(SMSStatus.FAIL);
+//				else if (SMSResult.SUCCESS == sRslt)
+//					sms.setStatus(SMSStatus.SUCCESS);
+//				LOGGER.info("resetPwd result {} " + result);
 				smsResult.add(sms);
 				try {
 					Thread.sleep(500);

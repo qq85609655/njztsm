@@ -9,6 +9,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
@@ -66,6 +67,7 @@ public class TaskManagerImpl implements TaskManager {
 	private SMSService smsService;
 
 	@Override
+	@Async
 	public void doDayJob() {
 
 		GlobalSetting setting = globalService.getGlobalConfig();
@@ -152,7 +154,7 @@ public class TaskManagerImpl implements TaskManager {
 					jobs.add(sms);
 				}
 
-				jobs = sklayApi.birthday(jobs);
+				// jobs = sklayApi.birthday(jobs);
 				smsService.create(jobs);
 
 			}

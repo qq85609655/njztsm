@@ -44,7 +44,7 @@
 								<tr>
 									<td><label class="checkbox" for="checkbox_${model.id}"> ${model.id}</label></td>
 									<td>${model.name}</td>
-									<td data-ellipsis='40'>${model.content}</td>
+									<td data-ellipsis='100'>${model.content}</td>
 									<td>${model.type.lable} </td>
 									<td>${model.desctiption}</td>
 									<td>${model.createTime}</td>

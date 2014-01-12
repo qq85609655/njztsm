@@ -428,15 +428,15 @@ public class SpecificDaoImpl implements SpecificDao {
 			if (null != creator)
 				sb.append(" and ( d.creator = :creator or  d.belong = :belong )");
 			else
-				sb.append(" and d.belong = :belong  ");
+				sb.append(" and d.belong = :belong ");
 		} else if (null != creator)
-			sb.append(" and d.creator = :creator )");
+			sb.append(" and d.creator = :creator");
 
 		if (null != group)
 			sb.append(" and d.targetUser.group.id = :group ");
 
 		if (StringUtils.isNotBlank(keyword))
-			sb.append(" and ( d.targetUser.name like :keyword or d.serialNumber like :keyword ) ");
+			sb.append(" and ( d.targetUser.name like :keyword or d.serialNumber like :keyword or  d.targetUser.phone like :keyword ) ");
 
 		Query query = em.createQuery(sb.toString());
 
@@ -537,7 +537,7 @@ public class SpecificDaoImpl implements SpecificDao {
 		return new PageImpl(resultList, pageable, total);
 	}
 
-	private Query initFindMemberPage(Long group, String keyword, User creator,
+	private Query initFindMemberPage(Long group, String keyword, User owner,
 			Long belong, boolean isCount) {
 		StringBuffer qlString = new StringBuffer(" select ");
 		if (isCount)
@@ -551,12 +551,12 @@ public class SpecificDaoImpl implements SpecificDao {
 			qlString.append(" and u.group.id = :group ");
 
 		if (null != belong) {
-			if (null != creator) {
+			if (null != owner) {
 				qlString.append(" and ( u.group.owner = :owner or u.belong = :belong )  ");
 			} else
 				qlString.append(" and u.belong = :belong  ");
-		} else if (null != creator)
-			qlString.append(" and u.creator = :creator )");
+		} else if (null != owner)
+			qlString.append(" and u.group.owner = :owner ");
 
 		if (StringUtils.isNotBlank(keyword))
 			qlString.append(" and ( u.phone like :keyword or u.name like :keyword or u.area like :keyword  or u.address like :keyword  or u.description like :keyword  ) ");
@@ -568,10 +568,10 @@ public class SpecificDaoImpl implements SpecificDao {
 
 		if (null != belong) {
 			query.setParameter("belong", belong);
-			if (null != creator)
-				query.setParameter("owner", creator);
-		} else if (null != creator)
-			query.setParameter("owner", creator);
+			if (null != owner)
+				query.setParameter("owner", owner);
+		} else if (null != owner)
+			query.setParameter("owner", owner);
 
 		if (StringUtils.isNotBlank(keyword))
 			query.setParameter("keyword",
@@ -752,7 +752,7 @@ public class SpecificDaoImpl implements SpecificDao {
 			if (null != creator)
 				query.setParameter("creator", creator.getId());
 		} else if (null != creator)
-			query.setParameter("creator", creator);
+			query.setParameter("creator", creator.getId());
 
 		return query;
 	}

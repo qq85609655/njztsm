@@ -15,17 +15,20 @@ import com.sklay.core.enums.ReadType;
 import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.enums.SMSType;
 import com.sklay.core.enums.Sex;
+import com.sklay.core.enums.SwitchStatus;
 import com.sklay.core.enums.TipType;
 import com.sklay.core.ex.SklayException;
 import com.sklay.enums.LogLevelType;
 import com.sklay.model.Application;
 import com.sklay.model.DeviceBinding;
+import com.sklay.model.Festival;
 import com.sklay.model.GlobalSetting;
 import com.sklay.model.Group;
 import com.sklay.model.MataData;
 import com.sklay.model.MedicalReport;
 import com.sklay.model.Operation;
 import com.sklay.model.SMS;
+import com.sklay.model.SMSTemplate;
 import com.sklay.model.User;
 
 public interface SpecificDao {
@@ -96,4 +99,12 @@ public interface SpecificDao {
 	public List<User> queryBirthdayUser() throws SklayException;
 
 	public List<DeviceBinding> findTargetBinding(User targetUser, Level level);
+
+	public Page<Festival> getFestivalPage(String jobTime,
+			SwitchStatus switchStatus, String keyword, Pageable pageable)
+			throws SklayException;
+
+	public Page<SMSTemplate> getSMSTemplatePage(AuditStatus status,
+			Festival festival, String keyword, Pageable pageable)
+			throws SklayException;
 }

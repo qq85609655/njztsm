@@ -127,7 +127,7 @@ public class MatadateController {
 
 		BeanUtils.copyProperties(mataData, orginal, new String[] { "id" });
 
-		matadataService.update(mataData);
+		matadataService.update(orginal);
 
 		return new DataView(0, "操作成功.");
 	}

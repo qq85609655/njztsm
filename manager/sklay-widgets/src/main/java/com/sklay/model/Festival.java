@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.sklay.core.enums.SwitchStatus;
+
 @Entity
 @Table(name = "sklay_festival")
 public class Festival implements Serializable {
@@ -26,6 +28,12 @@ public class Festival implements Serializable {
 	@Column(nullable = false, name = "name")
 	private String name;
 
+	@Column(name = "switch_status", columnDefinition = "int define 0")
+	private SwitchStatus switchStatus;
+
+	@Column(name = "job_time")
+	private String jobTime;
+
 	public Long getId() {
 		return id;
 	}
@@ -40,5 +48,62 @@ public class Festival implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public SwitchStatus getSwitchStatus() {
+		return switchStatus;
+	}
+
+	public void setSwitchStatus(SwitchStatus switchStatus) {
+		this.switchStatus = switchStatus;
+	}
+
+	public String getJobTime() {
+		return jobTime;
+	}
+
+	public void setJobTime(String jobTime) {
+		this.jobTime = jobTime;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((jobTime == null) ? 0 : jobTime.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((switchStatus == null) ? 0 : switchStatus.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Festival other = (Festival) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (jobTime == null) {
+			if (other.jobTime != null)
+				return false;
+		} else if (!jobTime.equals(other.jobTime))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (switchStatus != other.switchStatus)
+			return false;
+		return true;
 	}
 }

@@ -26,6 +26,7 @@ import com.sklay.core.enums.ReadType;
 import com.sklay.core.enums.SMSStatus;
 import com.sklay.core.enums.SMSType;
 import com.sklay.core.enums.Sex;
+import com.sklay.core.enums.SwitchStatus;
 import com.sklay.core.enums.TipType;
 import com.sklay.core.ex.SklayException;
 import com.sklay.core.util.DateTimeUtil;
@@ -33,12 +34,14 @@ import com.sklay.dao.SpecificDao;
 import com.sklay.enums.LogLevelType;
 import com.sklay.model.Application;
 import com.sklay.model.DeviceBinding;
+import com.sklay.model.Festival;
 import com.sklay.model.GlobalSetting;
 import com.sklay.model.Group;
 import com.sklay.model.MataData;
 import com.sklay.model.MedicalReport;
 import com.sklay.model.Operation;
 import com.sklay.model.SMS;
+import com.sklay.model.SMSTemplate;
 import com.sklay.model.User;
 
 @Repository
@@ -860,5 +863,121 @@ public class SpecificDaoImpl implements SpecificDao {
 		query.setParameter("deviceStatus", AuditStatus.PASS);
 
 		return query.getResultList();
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public Page<Festival> getFestivalPage(String jobTime,
+			SwitchStatus switchStatus, String keyword, Pageable pageable)
+			throws SklayException {
+
+		Query queryCount = initFestivalPage(jobTime, switchStatus, keyword,
+				true);
+		Query queryData = initFestivalPage(jobTime, switchStatus, keyword,
+				false);
+
+		Long total = (Long) queryCount.getSingleResult();
+		if (!(total > 0))
+			return null;
+		queryData.setFirstResult(pageable.getOffset());
+		queryData.setMaxResults(pageable.getPageSize());
+
+		List<Festival> resultList = queryData.getResultList();
+
+		return new PageImpl(resultList, pageable, total);
+	}
+
+	private Query initFestivalPage(String jobTime, SwitchStatus switchStatus,
+			String keyword, boolean isCount) {
+
+		StringBuffer qlString = new StringBuffer(" select ");
+		if (isCount)
+			qlString.append(" count(f) ");
+		else
+			qlString.append(" f ");
+
+		qlString.append(" from Festival f where 1=1 ");
+
+		if (StringUtils.isNotBlank(jobTime))
+			qlString.append(" and f.jobTime = :jobTime  ");
+
+		if (null != switchStatus)
+			qlString.append(" and f.switchStatus = :switchStatus  ");
+
+		if (StringUtils.isNotBlank(keyword))
+			qlString.append(" and f.name = :keyword ");
+
+		qlString.append(" order by  f.id desc ");
+
+		Query query = em.createQuery(qlString.toString());
+
+		if (StringUtils.isNotBlank(jobTime))
+			query.setParameter("jobTime", jobTime);
+
+		if (null != switchStatus)
+			query.setParameter("switchStatus", switchStatus);
+
+		if (StringUtils.isNotBlank(keyword))
+			query.setParameter("keyword", "%"
+					+ keyword.replaceAll("%", "").trim() + "%");
+
+		return query;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public Page<SMSTemplate> getSMSTemplatePage(AuditStatus status,
+			Festival festival, String keyword, Pageable pageable)
+			throws SklayException {
+
+		Query queryCount = initSMSTemplatePage(status, festival, keyword, true);
+		Query queryData = initSMSTemplatePage(status, festival, keyword, false);
+
+		Long total = (Long) queryCount.getSingleResult();
+		if (!(total > 0))
+			return null;
+		queryData.setFirstResult(pageable.getOffset());
+		queryData.setMaxResults(pageable.getPageSize());
+
+		List<SMSTemplate> resultList = queryData.getResultList();
+
+		return new PageImpl(resultList, pageable, total);
+	}
+
+	private Query initSMSTemplatePage(AuditStatus status, Festival festival,
+			String keyword, boolean isCount) {
+
+		StringBuffer qlString = new StringBuffer(" select ");
+		if (isCount)
+			qlString.append(" count(m) ");
+		else
+			qlString.append(" m ");
+
+		qlString.append(" from SMSTemplate m where 1=1 ");
+
+		if (null != status)
+			qlString.append(" and m.status = :status  ");
+
+		if (null != festival)
+			qlString.append(" and m.festival = :festival  ");
+
+		if (StringUtils.isNotBlank(keyword))
+			qlString.append(" and ( m.festival.name like :keyword or  m.tpl like :keyword or m.content like :keyword )");
+
+		qlString.append(" order by  m.id desc ");
+
+		Query query = em.createQuery(qlString.toString());
+
+		if (null != status)
+			query.setParameter("status", status);
+
+		if (null != festival)
+			query.setParameter("festival", festival);
+
+		if (StringUtils.isNotBlank(keyword))
+			query.setParameter("keyword", "%"
+					+ keyword.replaceAll("%", "").trim() + "%");
+
+		return query;
 	}
 }

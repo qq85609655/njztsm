@@ -56,15 +56,13 @@ public class FestivalServiceImpl implements FestivalService {
 	}
 
 	@Override
-	public List<Festival> list(Set<Long> festival)
-			throws SklayException {
-		return festivalDao.list(festival) ;
+	public List<Festival> list(Set<Long> festival) throws SklayException {
+		return festivalDao.list(festival);
 	}
 
 	@Override
 	public void offOn(Set<Long> festival, SwitchStatus switchStatus)
 			throws SklayException {
-		// TODO Auto-generated method stub
-		
+		festivalDao.offOn(switchStatus, festival);
 	}
 }

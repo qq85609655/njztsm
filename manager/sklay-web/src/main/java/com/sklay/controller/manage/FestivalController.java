@@ -57,8 +57,10 @@ public class FestivalController {
 		String pageQuery = initQuery(jobTime, switchStatus, keyword);
 
 		modelMap.addAttribute("pageModel", page);
-		modelMap.addAttribute("pageQuery", pageQuery);
+		modelMap.addAttribute("jobTime", jobTime);
+		modelMap.addAttribute("checkedId", switchStatus);
 		modelMap.addAttribute("keyword", keyword);
+		modelMap.addAttribute("pageQuery", pageQuery);
 
 		return "manager.festival.list";
 	}
@@ -78,6 +80,20 @@ public class FestivalController {
 	@ResponseBody
 	public DataView create(Festival festival, ModelMap modelMap) {
 
+		if (null == festival)
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { "参数" });
+
+		if (StringUtils.isBlank(festival.getName()))
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { "节日名称参数" });
+
+		if (StringUtils.isBlank(festival.getJobTime()))
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { "节日时间参数" });
+
+		if (null == festival.getSwitchStatus())
+			festival.setSwitchStatus(SwitchStatus.CLOSE);
 		festivalService.create(festival);
 
 		return new DataView(0, "操作成功.");
@@ -101,6 +117,22 @@ public class FestivalController {
 	@ResponseBody
 	public DataView update(Festival festival, ModelMap modelMap) {
 
+		if (null == festival)
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { "参数" });
+
+		if (StringUtils.isBlank(festival.getName()))
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { "节日名称参数" });
+
+		if (StringUtils.isBlank(festival.getJobTime()))
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { "节日时间参数" });
+
+		if (null == festival.getId())
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { "节日Id参数" });
+
 		Festival orginal = festivalService.get(festival.getId());
 
 		if (null == orginal)
@@ -116,32 +148,35 @@ public class FestivalController {
 		return new DataView(0, "操作成功.");
 	}
 
-	@RequestMapping("/off")
+	@RequestMapping("/off/{id}")
 	@RequiresPermissions("festival:off")
 	@ResponseBody
 	@Widget(name = ":off", description = "停用", level = WidgetLevel.THIRD)
-	public DataView off(Long[] ids, ModelMap modelMap) {
+	public DataView off(@PathVariable Long id, ModelMap modelMap) {
 
-		if (null != ids && ids.length > 0) {
-			Set<Long> idSet = Sets.newHashSet();
-			for (Long id : ids)
-				idSet.add(id);
-
-			festivalService.offOn(idSet, SwitchStatus.CLOSE);
+		if (null != id) {
+			Festival festival = festivalService.get(id);
+			if (null != festival
+					&& SwitchStatus.OPEN == festival.getSwitchStatus()) {
+				festival.setSwitchStatus(SwitchStatus.CLOSE);
+				festivalService.update(festival);
+			}
 		}
 		return new DataView(0, "操作成功.");
 	}
 
-	@RequestMapping("/on")
+	@RequestMapping("/on/{id}")
 	@RequiresPermissions("festival:on")
 	@Widget(name = ":on", description = "启用", level = WidgetLevel.THIRD)
 	@ResponseBody
-	public DataView on(@PathVariable Long[] ids) {
-		if (null != ids && ids.length > 0) {
-			Set<Long> idSet = Sets.newHashSet();
-			for (Long id : ids)
-				idSet.add(id);
-			festivalService.offOn(idSet, SwitchStatus.OPEN);
+	public DataView on(@PathVariable Long id) {
+		if (null != id) {
+			Festival festival = festivalService.get(id);
+			if (null != festival
+					&& SwitchStatus.CLOSE == festival.getSwitchStatus()) {
+				festival.setSwitchStatus(SwitchStatus.OPEN);
+				festivalService.update(festival);
+			}
 		}
 		return new DataView(0, "操作成功.");
 	}

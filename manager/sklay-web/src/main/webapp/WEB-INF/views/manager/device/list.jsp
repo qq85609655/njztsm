@@ -80,7 +80,7 @@
 			
 			<div class="input-prepend">
 			  	<span class="add-on" data-name="tooltip" data-toggle="tooltip" data-original-title="【姓名、手机号、地址、区域、备注】">关键字:</span>
-			    <input type="text" name="keyword" class="span3" value='${keyword }'>
+			    <input type="text" name="keyword" class="span2" value='${keyword }'>
 			    <button type="submit" class="btn" id="searchBtn">搜索</button>
 			</div>
 		</form>

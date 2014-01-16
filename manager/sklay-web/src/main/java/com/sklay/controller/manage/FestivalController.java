@@ -1,9 +1,10 @@
 package com.sklay.controller.manage;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.BeanUtils;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.common.collect.Sets;
 import com.sklay.core.annotation.Widget;
 import com.sklay.core.annotation.Widgets;
 import com.sklay.core.enums.SwitchStatus;
@@ -92,6 +92,16 @@ public class FestivalController {
 			throw new SklayException(ErrorCode.FINF_NULL, null,
 					new Object[] { "节日时间参数" });
 
+		String jobTime = festival.getJobTime().trim();
+		festival.setJobTime(jobTime);
+
+		List<Festival> list = festivalService.list(jobTime);
+
+		if (CollectionUtils.isNotEmpty(list)) {
+			throw new SklayException(ErrorCode.EXIST, null, new Object[] {
+					"同一节日时间", "添加" });
+		}
+
 		if (null == festival.getSwitchStatus())
 			festival.setSwitchStatus(SwitchStatus.CLOSE);
 		festivalService.create(festival);
@@ -133,11 +143,21 @@ public class FestivalController {
 			throw new SklayException(ErrorCode.FINF_NULL, null,
 					new Object[] { "节日Id参数" });
 
+		String jobTime = festival.getJobTime().trim();
+		festival.setJobTime(jobTime);
+
 		Festival orginal = festivalService.get(festival.getId());
 
 		if (null == orginal)
 			throw new SklayException(ErrorCode.MISS_PARAM, null, "节日对象");
 
+		if (!orginal.getJobTime().equals(jobTime)) {
+			List<Festival> list = festivalService.list(jobTime);
+			if (CollectionUtils.isNotEmpty(list)) {
+				throw new SklayException(ErrorCode.EXIST, null, new Object[] {
+						"同一节日时间", "添加" });
+			}
+		}
 		if (orginal.equals(festival))
 			return new DataView(0, "操作成功.");
 

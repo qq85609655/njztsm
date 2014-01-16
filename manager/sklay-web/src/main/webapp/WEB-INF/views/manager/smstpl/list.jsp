@@ -10,36 +10,34 @@
 
 	<div class="widget-content tab-content">
 	
-		<form action="${ctx }/admin/festival/list" method="post">
-		
+		<form action="${ctx }/admin/smstpl/${fid }/list" method="post">
+			<input type="hidden" name="fid" value='${fid }'>
 			<div class="input-prepend">
-			  	<span class="add-on">启用状态:</span>
-			    <select class="span2" name="switchStatus">
-				  <option value="" <c:if test="${empty checked}"> selected="selected" </c:if>>所有</option>
-				  <option value="<%=SwitchStatus.CLOSE %>" <c:if test="${0 eq checked.value}"> selected="selected" </c:if>><%=SwitchStatus.CLOSE.getLable() %></option>
-				  <option value="<%=SwitchStatus.OPEN %>" <c:if test="${1 eq checked.value}"> selected="selected" </c:if>><%=SwitchStatus.OPEN.getLable() %></option>
+			  <span class="add-on">绑定状态</span>
+			    <select class="span2" name="status">
+				  <option value="" <c:if test="${empty checkedStatus}"> selected="selected" </c:if>>所有状态</option>
+					<option value="<%=AuditStatus.WAIT %>" <c:if test="${ checkedStatus.value eq 0}"> selected="selected" </c:if>><%=AuditStatus.WAIT.getLable() %></option>
+					<option value="<%=AuditStatus.PASS %>" <c:if test="${ checkedStatus.value eq 1}"> selected="selected" </c:if>><%=AuditStatus.PASS.getLable() %></option>
+					<option value="<%=AuditStatus.NOT %>" <c:if test="${ checkedStatus.value eq 2}"> selected="selected" </c:if>><%=AuditStatus.NOT.getLable() %></option>
 				</select>
 			</div>
 			
-      		<div class="input-prepend">
-	        	<span class="add-on">节日时间</span>
-	          	<input class="Wdate" type="text" required="required" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" id="inputJobTime" name="jobTime" placeholder="节日日期">
-	        </div>
-	      
 		    <div class=" input-prepend">
 			  	<span class="add-on" data-name="tooltip" data-toggle="tooltip" data-original-title="【姓名、手机号、地址、区域、备注】">关键字:</span>
 			    <input type="text" name="keyword" class="span3" value='${keyword }'>
 			    <button type="submit" class="btn">搜索</button>
 		    </div>
 		</form>
-		<div class="widget-content tab-content hide">sss</div>
+		<div class="widget-content tab-content">
+			<a class="modal-link btn btn-info" data-target="#modalTemplate" data-title="创建短信" href="${ctx}/admin/smstpl/initCreate/${fid }" data-href="${ctx}/admin/smstpl/list" data-content="创建成功." data-original-title="消息...">创建</a>
+		</div>
 		<div class="tab-pane active">
 			<table class="table table-striped table-bordered table-hover">
 				<thead>
 					<tr>
 						<th>编号</th>
-						<th>节日名称</th>
-						<th>节日时间</th>
+						<th>模版名称</th>
+						<th>短信内容</th>
 						<th>状态</th>
 						<th>操作</th>
 					</tr>
@@ -55,18 +53,21 @@
 							<c:forEach items="${pageModel.content}" var="model">
 								<tr>
 									<td>${model.id}</td>
-									<td>${model.name}</td>
-									<td>${model.jobTime}</td>
-									<td>${model.switchStatus.lable}</td>
+									<td>${model.tpl}</td>
+									<td>${model.content}</td>
+									<td>${model.status.lable}</td>
 									<td>
-									<a class="modal-link" data-target="#modalTemplate" data-title="编辑节日" href="${ctx}/admin/festival/initUpdate/${model.id}" data-href="${ctx}/admin/festival/list" data-content="编辑成功." data-original-title="消息...">编辑</a> |
-									<c:if test="${model.switchStatus.value eq 1 }">
-										<a class="modal-link-a" data-target="#modalTemplate" data-title="停用节日" href="javascript:void(0);" data-href="${ctx}/admin/festival/off/${model.id}">停用</a> |
+									<a class="modal-link" data-target="#modalTemplate" data-title="编辑短信" href="${ctx}/admin/smstpl/initUpdate/${model.id}" data-href="${ctx}/admin/smstpl/list" data-content="编辑成功." data-original-title="消息...">编辑</a> |
+									<c:if test="${model.status.value eq 2 }">
+										<a class="modal-link-a" data-target="#modalTemplate" data-title="启用短信" href="javascript:void(0);" data-href="${ctx}/admin/smstpl/on/${model.id}">通过</a>
 									</c:if>
-									<c:if test="${model.switchStatus.value eq 0 }">
-										<a class="modal-link-a" data-target="#modalTemplate" data-title="启用节日" href="javascript:void(0);" data-href="${ctx}/admin/festival/on/${model.id}">启用</a> |
+									<c:if test="${model.status.value eq 1 }">
+										<a class="modal-link-a" data-target="#modalTemplate" data-title="停用短信" href="javascript:void(0);" data-href="${ctx}/admin/smstpl/off/${model.id}">不通过</a>
 									</c:if>
-									<a href="${ctx}/admin/smstpl/${model.id}/list">推送短信</a>
+									<c:if test="${model.status.value eq 0 }">
+										<a class="modal-link-a" data-target="#modalTemplate" data-title="启用短信" href="javascript:void(0);" data-href="${ctx}/admin/smstpl/on/${model.id}">通过</a> |
+										<a class="modal-link-a" data-target="#modalTemplate" data-title="停用短信" href="javascript:void(0);" data-href="${ctx}/admin/smstpl/off/${model.id}">不通过</a>
+									</c:if>
 									</td>
 								</tr>
 							</c:forEach>

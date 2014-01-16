@@ -959,7 +959,7 @@ public class SpecificDaoImpl implements SpecificDao {
 			qlString.append(" and m.status = :status  ");
 
 		if (null != festival)
-			qlString.append(" and m.festival = :festival  ");
+			qlString.append(" and m.festival.id = :festival  ");
 
 		if (StringUtils.isNotBlank(keyword))
 			qlString.append(" and ( m.festival.name like :keyword or  m.tpl like :keyword or m.content like :keyword )");
@@ -972,7 +972,7 @@ public class SpecificDaoImpl implements SpecificDao {
 			query.setParameter("status", status);
 
 		if (null != festival)
-			query.setParameter("festival", festival);
+			query.setParameter("festival", festival.getId());
 
 		if (StringUtils.isNotBlank(keyword))
 			query.setParameter("keyword", "%"

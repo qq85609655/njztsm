@@ -20,4 +20,7 @@ public interface FestivalDao extends JpaRepository<Festival, Long> {
 	@Query(" update  Festival f set f.switchStatus = ?1 where f.id in ( ?2 ) ")
 	public void offOn(SwitchStatus switchStatus, Set<Long> festival)
 			throws SklayException;
+	
+	@Query(" select f from Festival f where f.jobTime = ?1  ")
+	public List<Festival> list(String jobTime) throws SklayException ;
 }

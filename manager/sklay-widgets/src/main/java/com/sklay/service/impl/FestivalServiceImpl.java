@@ -65,4 +65,9 @@ public class FestivalServiceImpl implements FestivalService {
 			throws SklayException {
 		festivalDao.offOn(switchStatus, festival);
 	}
+
+	@Override
+	public List<Festival> list(String jobTime) throws SklayException {
+		return festivalDao.list(jobTime);
+	}
 }

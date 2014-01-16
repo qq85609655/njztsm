@@ -19,9 +19,12 @@ public interface FestivalService {
 	public Festival get(Long festival) throws SklayException;
 
 	public List<Festival> list(Set<Long> festival) throws SklayException;
-	
-	public void offOn(Set<Long> festival,SwitchStatus switchStatus) throws SklayException;
-	
+
+	public List<Festival> list(String jobTime) throws SklayException;
+
+	public void offOn(Set<Long> festival, SwitchStatus switchStatus)
+			throws SklayException;
+
 	public Page<Festival> getFestivalPage(String jobTime,
 			SwitchStatus switchStatus, String keyword, Pageable pageable)
 			throws SklayException;

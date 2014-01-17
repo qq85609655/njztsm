@@ -105,7 +105,7 @@ public class ApiController {
 		if (SwitchStatus.OPEN == filterPhysicalSetting(setting)) {
 
 			operation = new Operation();
-			operation.setContent(gatherData.toString());
+			operation.setContent(JSONObject.toJSONString(gatherData));
 			operation.setName("体检短信");
 			operation.setType(LogLevelType.API);
 			operation.setDesctiption(LogLevelType.API.getLable());
@@ -266,7 +266,7 @@ public class ApiController {
 		if (SwitchStatus.OPEN == filterSOSSetting(setting)) {
 
 			operation = new Operation();
-			operation.setContent(gatherData.toString());
+			operation.setContent(JSONObject.toJSONString(gatherData));
 			operation.setName("定位短信");
 			operation.setType(LogLevelType.API);
 			operation.setDesctiption(LogLevelType.API.getLable());

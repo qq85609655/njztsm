@@ -36,9 +36,8 @@ public class SMSTemplateController {
 
 	@ModelAttribute
 	public void populateModel(Model model) {
-		model.addAttribute("nav", "festival:model");
-		model.addAttribute("subnav", "festival:list");
-		model.addAttribute("subHref", "/admin/festival/list");
+		model.addAttribute("nav", "festival:list");
+		model.addAttribute("href", "/admin/festival/list");
 	}
 
 	@RequestMapping("/{fid}/list")

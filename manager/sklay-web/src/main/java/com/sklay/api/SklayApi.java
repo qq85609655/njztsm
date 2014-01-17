@@ -429,9 +429,11 @@ public class SklayApi {
 				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
-				 String result = ApiClient.http_post(sendUrl,
-				 ApiClient.splitNameValuePair(pairs));
-				 sms.setResult(result);
+				// TODO
+				// String result = ApiClient.http_post(sendUrl,
+				// ApiClient.splitNameValuePair(pairs));
+				String result = "";
+				sms.setResult(result);
 				sms.setRemark(birthday_tpl);
 				SMSResult sRslt = SMSResult.findByLable(result);
 				if (null != sRslt)
@@ -473,9 +475,10 @@ public class SklayApi {
 				pairs.put("mobile", sms.getMobile());
 				pairs.put("sendtime",
 						DateTimeUtil.getDateTimeWithoutChar(sms.getSendTime()));
-
-				String result = ApiClient.http_post(sendUrl,
-						ApiClient.splitNameValuePair(pairs));
+				// TODO
+				// String result = ApiClient.http_post(sendUrl,
+				// ApiClient.splitNameValuePair(pairs));
+				String result = "";
 				sms.setResult(result);
 				SMSResult sRslt = SMSResult.findByLable(result);
 				if (null != sRslt)

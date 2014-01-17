@@ -39,9 +39,7 @@ public class FestivalController {
 
 	@ModelAttribute
 	public void populateModel(Model model) {
-		model.addAttribute("nav", "festival:model");
-		model.addAttribute("subnav", "festival:list");
-		model.addAttribute("subHref", "/admin/festival/list");
+		model.addAttribute("nav", "festival:list");
 	}
 
 	@RequestMapping("/list")
@@ -67,12 +65,12 @@ public class FestivalController {
 
 	@RequestMapping("/initCreate")
 	@RequiresPermissions("festival:create")
-	@Widget(name = ":create", description = "创建节日")
+	@Widget(name = ":create", description = "创建节日", level = WidgetLevel.THIRD)
 	public String initCreate(ModelMap modelMap) {
 		modelMap.addAttribute("subnav", "festival:create");
 		modelMap.addAttribute("thirdbreadcrumb", "创建节日");
 
-		return "manager.festival.initCreate";
+		return "modal:festival.initCreate";
 	}
 
 	@RequestMapping("/create")
@@ -92,7 +90,12 @@ public class FestivalController {
 			throw new SklayException(ErrorCode.FINF_NULL, null,
 					new Object[] { "节日时间参数" });
 
+		if (null == festival.getSendTime())
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { "短信时间参数" });
+
 		String jobTime = festival.getJobTime().trim();
+
 		festival.setJobTime(jobTime);
 
 		List<Festival> list = festivalService.list(jobTime);
@@ -111,7 +114,7 @@ public class FestivalController {
 
 	@RequestMapping("/initUpdate/{id}")
 	@RequiresPermissions("festival:update")
-	@Widget(name = ":update", description = "修改元节日", level = WidgetLevel.THIRD)
+	@Widget(name = ":update", description = "修改节日", level = WidgetLevel.THIRD)
 	public String initUpdate(@PathVariable Long id, ModelMap modelMap) {
 		modelMap.addAttribute("thirdbreadcrumb", "修改节日");
 		Festival festival = null;
@@ -142,6 +145,10 @@ public class FestivalController {
 		if (null == festival.getId())
 			throw new SklayException(ErrorCode.FINF_NULL, null,
 					new Object[] { "节日Id参数" });
+
+		if (null == festival.getSendTime())
+			throw new SklayException(ErrorCode.FINF_NULL, null,
+					new Object[] { "短信时间参数" });
 
 		String jobTime = festival.getJobTime().trim();
 		festival.setJobTime(jobTime);

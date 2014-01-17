@@ -27,7 +27,7 @@
 						<th >编号</th>
 						<th class="span2">名称</th>
 						<th class="span2">参数</th>
-						<th class="span2">类型</th>
+						<!-- <th class="span2">类型</th> -->
 						<th class="span2">描述</th>
 						<th class="span3">时间</th>
 					</tr>
@@ -45,9 +45,9 @@
 									<td><label class="checkbox" for="checkbox_${model.id}"> ${model.id}</label></td>
 									<td>${model.name}</td>
 									<td data-ellipsis='100'>${model.content}</td>
-									<td>${model.type.lable} </td>
+									<%-- <td>${model.type.lable} </td> --%>
 									<td>${model.desctiption}</td>
-									<td>${model.createTime}</td>
+									<td><fmt:formatDate value="${model.createTime}" type="both" dateStyle="default" timeStyle="default"/></td>
 								</tr>
 							</c:forEach>
 						</c:otherwise>

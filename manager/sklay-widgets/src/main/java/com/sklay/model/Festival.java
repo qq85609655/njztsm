@@ -10,6 +10,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.sklay.core.enums.SwitchStatus;
 
 @Entity
@@ -36,6 +38,7 @@ public class Festival implements Serializable {
 	private String jobTime;
 
 	@Column(name = "send_time")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date sendTime;
 
 	public Long getId() {
@@ -78,6 +81,8 @@ public class Festival implements Serializable {
 		result = prime * result + ((jobTime == null) ? 0 : jobTime.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result
+				+ ((sendTime == null) ? 0 : sendTime.hashCode());
+		result = prime * result
 				+ ((switchStatus == null) ? 0 : switchStatus.hashCode());
 		return result;
 	}
@@ -105,6 +110,11 @@ public class Festival implements Serializable {
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
+			return false;
+		if (sendTime == null) {
+			if (other.sendTime != null)
+				return false;
+		} else if (!sendTime.equals(other.sendTime))
 			return false;
 		if (switchStatus != other.switchStatus)
 			return false;

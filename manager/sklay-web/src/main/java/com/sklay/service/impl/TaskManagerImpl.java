@@ -1,5 +1,6 @@
 package com.sklay.service.impl;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -93,9 +94,10 @@ public class TaskManagerImpl implements TaskManager {
 
 		AppType appType = AppType.TIP;
 
+		Date date = new Date();
 		Operation operation = new Operation();
 		operation.setName("【" + appType.getLable() + "】任务错误日志");
-		operation.setCreateTime(new Date());
+		operation.setCreateTime(date);
 		operation.setType(LogLevelType.ADMIN);
 
 		if (null == setting) {
@@ -119,11 +121,22 @@ public class TaskManagerImpl implements TaskManager {
 		Map<Long, Application> mapApps = Maps.newHashMap();
 		if (CollectionUtils.isNotEmpty(list)) {
 			Set<SMS> jobs = Sets.newHashSet();
+
+			Calendar cal = DateTimeUtil.parseDateTime(setting.getSendSMSTime());
+
+			int hour = cal.get(Calendar.HOUR_OF_DAY);
+			int min = cal.get(Calendar.MINUTE);
+			int second = cal.get(Calendar.SECOND);
+
+			Date sendTime = DateTimeUtil.getDate(date, hour, min, second);
+
 			for (User targetUser : list) {
 				Long belong = targetUser.getBelong();
 				if (null == belong) {
-					operation.setContent(JSONObject.toJSONString(targetUser)
-							+ "的belong" + appType.getLable() + "提醒不存在");
+					operation.setContent(JSONObject.toJSONString(targetUser));
+					operation.setDesctiption("【" + targetUser.getId() + "】【"
+							+ targetUser.getName() + "】的belong"
+							+ appType.getLable() + "提醒不存在");
 					operationService.create(operation);
 					continue;
 				}
@@ -137,12 +150,14 @@ public class TaskManagerImpl implements TaskManager {
 				if (null == app) {
 					operation.setContent("属于【" + belong + "】app"
 							+ appType.getLable() + "任务不存在");
+					operation.setDesctiption(operation.getContent());
 					operationService.create(operation);
 					continue;
 				}
 
 				if (AuditStatus.PASS != app.getStatus()) {
-					operation.setContent("属于【" + belong + "】app"
+					operation.setContent(JSONObject.toJSONString(app));
+					operation.setDesctiption("属于【" + belong + "】app"
 							+ appType.getLable() + "业务审核未完成，无法发送短信");
 					operationService.create(operation);
 					continue;
@@ -151,8 +166,10 @@ public class TaskManagerImpl implements TaskManager {
 						.findTargetBinding(targetUser, Level.SECOND);
 
 				if (CollectionUtils.isEmpty(bandList)) {
-					operation.setContent(JSONObject.toJSONString(targetUser)
-							+ "暂时没有附属帐号接收" + appType.getLable() + "短信");
+					operation.setContent(JSONObject.toJSONString(targetUser));
+					operation.setDesctiption("【" + targetUser.getId() + "】【"
+							+ targetUser.getName() + "】暂时没有附属帐号接收"
+							+ appType.getLable() + "短信");
 					operationService.create(operation);
 					continue;
 				}
@@ -173,7 +190,7 @@ public class TaskManagerImpl implements TaskManager {
 
 					sms.setApp(app);
 					sms.setBelong(belong);
-					sms.setSendTime(setting.getSendSMSTime());
+					sms.setSendTime(sendTime);
 					jobs.add(sms);
 				}
 
@@ -209,6 +226,7 @@ public class TaskManagerImpl implements TaskManager {
 
 		if (CollectionUtils.isEmpty(apps)) {
 			operation.setContent("【" + appType.getLable() + "】app应用不存在");
+			operation.setDesctiption(operation.getContent());
 			operationService.create(operation);
 			return;
 		}
@@ -216,7 +234,8 @@ public class TaskManagerImpl implements TaskManager {
 		Application app = apps.get(Constants.ZERO);
 
 		if (AuditStatus.PASS != app.getStatus()) {
-			operation.setContent("【" + appType.getLable() + "】app审核未完成");
+			operation.setContent(JSONObject.toJSONString(app));
+			operation.setDesctiption("【" + appType.getLable() + "】app审核未完成");
 			operationService.create(operation);
 			return;
 		}
@@ -227,7 +246,9 @@ public class TaskManagerImpl implements TaskManager {
 		List<SMSTemplate> templates = smsTemplateService.list(status, festival);
 		if (CollectionUtils.isEmpty(templates)) {
 			operation.setContent("【" + appType.getLable() + "】"
-					+ JSONObject.toJSONString(festival) + "app短信模版不存在");
+					+ festival.getId() + "  " + festival.getName() + "  "
+					+ festival.getJobTime() + "app短信模版不存在");
+			operation.setDesctiption(operation.getContent());
 			operationService.create(operation);
 			return;
 		}
@@ -238,7 +259,10 @@ public class TaskManagerImpl implements TaskManager {
 
 		if (CollectionUtils.isEmpty(users)) {
 			operation.setContent("【" + appType.getLable() + "】"
-					+ JSONObject.toJSONString(festival) + "app审核通过的会员不存在");
+					+ festival.getId() + "  " + festival.getName() + "  "
+					+ festival.getJobTime() + "app审核通过的会员不存在");
+
+			operation.setDesctiption(operation.getContent());
 			operationService.create(operation);
 			return;
 		}
@@ -256,7 +280,7 @@ public class TaskManagerImpl implements TaskManager {
 			SMS sms = new SMS(creator, content, sendTime, receiver, mobile,
 					SMSStatus.FAIL);
 			sms.setRemark(remark);
-
+			sms.setApp(app);
 			jobs.add(sms);
 		}
 

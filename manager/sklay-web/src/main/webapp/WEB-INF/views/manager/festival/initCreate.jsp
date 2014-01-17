@@ -5,8 +5,7 @@
 <script type="text/javascript" src="${ctx}/static/thirdparty/datepicker/WdatePicker.js"></script>
 <%@ include file="../../include.jsp"%>
 
-<div class="widget-box">	
-	<div class="widget-content tab-content" id="createForm">
+	<div id="createForm">
 		<form class="form-horizontal" action="${ctx }/admin/festival/create" method="post">
 	      <div class="control-group">
 	      	<label class="control-label" for="inputName"><span style="color: red;">*</span> 节日名称</label>
@@ -18,7 +17,14 @@
 	      <div class="control-group">
 	      	<label class="control-label" for="inputJobTime"><span style="color: red;">*</span> 节日时间</label>
 	        <div class="controls">
-	          <input class="span3 Wdate" type="text" required="required" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" id="inputJobTime" name="jobTime" placeholder="节日日期">
+	          <input class="span3 Wdate" type="text" required="required" onfocus="WdatePicker({isShowClear:false,dateFmt:'yyyy-MM-dd',readOnly:true})" id="inputJobTime" name="jobTime" placeholder="节日时间">
+	        </div>
+	      </div>
+	      
+	      <div class="control-group">
+	      	<label class="control-label" for="inputSendTime"><span style="color: red;">*</span> 短信时间</label>
+	        <div class="controls">
+	          <input class="span3 Wdate" type="text" required="required" onfocus="WdatePicker({isShowClear:false,dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" id="inputSendTime" name="sendTime" placeholder="短信时间">
 	        </div>
 	      </div>
 	      
@@ -34,11 +40,5 @@
 	        </div>
 	      </div>
 	      
-	      <div class="control-group">
-	        <div class="controls">
-	          <button type="button" class="btn btn-primary"  title="" data-delay="5" data-html="true" data-href="${ctx}/admin/festival/list" data-content="添加成功." data-original-title="消息...">提交</button>
-	        </div>
-	      </div>
 	    </form>
    	</div>
-</div>

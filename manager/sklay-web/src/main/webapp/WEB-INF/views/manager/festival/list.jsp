@@ -23,7 +23,7 @@
 			
       		<div class="input-prepend">
 	        	<span class="add-on">节日时间</span>
-	          	<input class="Wdate" type="text" required="required" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" id="inputJobTime" name="jobTime" placeholder="节日日期">
+	          	<input class="Wdate" type="text" required="required" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true})" id="inputJobTime" name="jobTime" placeholder="节日日期">
 	        </div>
 	      
 		    <div class=" input-prepend">
@@ -32,7 +32,9 @@
 			    <button type="submit" class="btn">搜索</button>
 		    </div>
 		</form>
-		<div class="widget-content tab-content hide">sss</div>
+		<div class="widget-content tab-content">
+			<a class="modal-link btn btn-info" data-target="#modalTemplate" data-title="创建节日" href="${ctx}/admin/festival/initCreate" data-href="${ctx}/admin/festival/list" data-content="创建成功." data-original-title="消息...">创建</a>
+		</div>
 		<div class="tab-pane active">
 			<table class="table table-striped table-bordered table-hover">
 				<thead>
@@ -40,6 +42,7 @@
 						<th>编号</th>
 						<th>节日名称</th>
 						<th>节日时间</th>
+						<th>短信时间</th>
 						<th>状态</th>
 						<th>操作</th>
 					</tr>
@@ -57,6 +60,7 @@
 									<td>${model.id}</td>
 									<td>${model.name}</td>
 									<td>${model.jobTime}</td>
+									<td><fmt:formatDate value="${model.sendTime}" type="both" dateStyle="default" timeStyle="default"/></td>
 									<td>${model.switchStatus.lable}</td>
 									<td>
 									<a class="modal-link" data-target="#modalTemplate" data-title="编辑节日" href="${ctx}/admin/festival/initUpdate/${model.id}" data-href="${ctx}/admin/festival/list" data-content="编辑成功." data-original-title="消息...">编辑</a> |

@@ -211,6 +211,37 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 	 * 取得yyyy-MM-dd日期
 	 * 
 	 * @param day
+	 * @return yyyy-MM-dd 格式
+	 */
+	public static Date getDate(String day) {
+
+		ParsePosition pos = new ParsePosition(0);
+
+		return FORMATTIME_DATE.parse(day, pos);
+	}
+
+	/**
+	 * 取得yyyy-MM-dd日期
+	 * 
+	 * @param day
+	 * @return yyyy-MM-dd 格式
+	 */
+	public static Date getDate(Date day, int hour, int min, int second) {
+
+		ParsePosition pos = new ParsePosition(0);
+
+		Date date = FORMATTIME_DATE.parse(FORMATTIME_DATE.format(day), pos);
+
+		Long time = date.getTime() + hour * 60 * 60 * 1000 + min * 60 * 1000
+				+ second * 1000;
+
+		return new Date(time);
+	}
+
+	/**
+	 * 取得yyyy-MM-dd日期
+	 * 
+	 * @param day
 	 *            (+时间增加day -时间后退day)
 	 * @return yyyy-MM-dd 格式
 	 */
@@ -720,6 +751,14 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 	public static Calendar parseDateTime(String dateTime) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(getStringToDate(dateTime));
+
+		return cal;
+	}
+
+	public static Calendar parseDateTime(Date dateTime) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dateTime);
+
 		return cal;
 	}
 
@@ -765,8 +804,13 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 
 	public static void main(String[] args) {
 
-		System.out.println(getDateTimeWithoutChar(new Date()));
+		System.out.println(parseDateTime("2014-01-17 23:12:22").get(
+				Calendar.HOUR_OF_DAY));
+		System.out.println(parseDateTime("2014-01-17 23:12:22").get(
+				Calendar.MINUTE));
+		System.out.println(parseDateTime("2014-01-17 23:12:22").get(
+				Calendar.SECOND));
 
-		System.out.println(getDay());
+		System.out.println(getDate(new Date(), 23, 12, 22));
 	}
 }

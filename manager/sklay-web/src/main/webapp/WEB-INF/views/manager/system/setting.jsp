@@ -154,7 +154,7 @@
 	        <label class="control-label" for="inputSendSMSTime">生日提醒短信时间</label>
 	         <div class="controls">
 	         	<label class=" inline span1" for="inputSendSMSTime">
-				  <input class="Wdate" name="sendSMSTime" id="inputSendSMSTime" type="text" required="required" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" placeholder="生日提醒短信时间" value="${setting.sendSMSTime }">
+				  <input class="Wdate" name="sendSMSTime" id="inputSendSMSTime" type="text" required="required" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" placeholder="生日提醒短信时间" value="<fmt:formatDate value="${setting.sendSMSTime }" type="both" dateStyle="default" timeStyle="default"/>">
 				</label>
 	        </div>
 	      </div>

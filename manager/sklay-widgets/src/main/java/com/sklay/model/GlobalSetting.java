@@ -11,6 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.SwitchStatus;
 
@@ -70,6 +72,7 @@ public class GlobalSetting implements Serializable {
 
 	/** 定时短信时间 */
 	@Column(name = "send_job_time")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date sendSMSTime;
 
 	/** 默认设备允许绑定个数 */

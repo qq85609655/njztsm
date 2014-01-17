@@ -18,7 +18,14 @@
 	      <div class="control-group">
 	      	<label class="control-label" for="inputJobTime"><span style="color: red;">*</span> 节日时间</label>
 	        <div class="controls">
-	          <input class="span3 Wdate" value="${ festival.jobTime}" type="text" required="required" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" id="inputJobTime" name="jobTime" placeholder="节日日期">
+	          <input class="span3 Wdate" value="${ festival.jobTime}" type="text" required="required" onfocus="WdatePicker({isShowClear:false,dateFmt:'yyyy-MM-dd',readOnly:true})" id="inputJobTime" name="jobTime" placeholder="节日日期">
+	        </div>
+	      </div>
+	      
+	      <div class="control-group">
+	      	<label class="control-label" for="inputSendTime"><span style="color: red;">*</span> 短信时间</label>
+	        <div class="controls">
+	          <input class="span3 Wdate" value="<fmt:formatDate value="${festival.sendTime}" type="both" dateStyle="default" timeStyle="default"/>" type="text" required="required" onfocus="WdatePicker({isShowClear:false,dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" id="inputSendTime" name="sendTime" placeholder="短信时间">
 	        </div>
 	      </div>
 	      

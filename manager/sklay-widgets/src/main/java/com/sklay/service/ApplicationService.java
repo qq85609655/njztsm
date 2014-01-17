@@ -28,6 +28,9 @@ public interface ApplicationService {
 	public List<Application> getByCreator(AppType appType, AuditStatus status,
 			Long owner) throws SklayException;
 
+	public List<Application> getByAppType(AppType appType)
+			throws SklayException;
+
 	public Application get(Long id) throws SklayException;
 
 	public Application getByCreator(AppType appType, Long owner)

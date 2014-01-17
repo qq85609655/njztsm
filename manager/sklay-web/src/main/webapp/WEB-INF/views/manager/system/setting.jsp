@@ -8,6 +8,7 @@
 <%@ include file="../../include.jsp"%>
 <link rel="stylesheet" type="text/css" href="${ctx}/static/thirdparty/bootstrap-timepicker/css/bootstrap-timepicker.min.css">
 <script type="text/javascript" src="${ctx}/static/thirdparty/bootstrap-timepicker/js/bootstrap-timepicker.js"></script>
+<script type="text/javascript" src="${ctx}/static/thirdparty/datepicker/WdatePicker.js"></script>
 
 	<ul class="nav nav-tabs">
 	    <li <c:if test="${('server' eq active) || (empty active)}"> class="active" </c:if>><a href="#widget-server" data-toggle="tab">服务器配置</a></li>
@@ -149,12 +150,12 @@
 				</label>
 	        </div>
 	      </div>
-	      <div class="control-group hide">
-	        <label class="control-label" for="inputSendSMSTime">短信任务时间</label>
+	      <div class="control-group">
+	        <label class="control-label" for="inputSendSMSTime">生日提醒短信时间</label>
 	         <div class="controls">
 	         	<label class=" inline span1" for="inputSendSMSTime">
-				  <input type="datetime" name="sendSMSTime" id="inputSendSMSTime" value="${setting.sendSMSTime }" >
-				  </label>
+				  <input class="Wdate" name="sendSMSTime" id="inputSendSMSTime" type="text" required="required" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" placeholder="生日提醒短信时间" value="${setting.sendSMSTime }">
+				</label>
 	        </div>
 	      </div>
 	      

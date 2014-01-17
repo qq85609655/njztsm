@@ -1,6 +1,7 @@
 package com.sklay.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -69,13 +70,13 @@ public class GlobalSetting implements Serializable {
 
 	/** 定时短信时间 */
 	@Column(name = "send_job_time")
-	private Long sendSMSTime;
+	private Date sendSMSTime;
 
 	/** 默认设备允许绑定个数 */
 	@Column(name = "binding_count", columnDefinition = "int default 2")
 	private Integer bindingCount;
 
-	/** 开启api日志跟踪 0025100001586307*/
+	/** 开启api日志跟踪 0025100001586307 */
 	@Column(name = "api_log_switch", columnDefinition = "int default 0")
 	private SwitchStatus apiLogSwitch;
 
@@ -144,11 +145,11 @@ public class GlobalSetting implements Serializable {
 		this.visitCount = visitCount;
 	}
 
-	public Long getSendSMSTime() {
+	public Date getSendSMSTime() {
 		return sendSMSTime;
 	}
 
-	public void setSendSMSTime(Long sendSMSTime) {
+	public void setSendSMSTime(Date sendSMSTime) {
 		this.sendSMSTime = sendSMSTime;
 	}
 

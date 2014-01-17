@@ -1,6 +1,7 @@
 package com.sklay.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,6 +34,9 @@ public class Festival implements Serializable {
 
 	@Column(name = "job_time")
 	private String jobTime;
+
+	@Column(name = "send_time")
+	private Date sendTime;
 
 	public Long getId() {
 		return id;
@@ -105,5 +109,13 @@ public class Festival implements Serializable {
 		if (switchStatus != other.switchStatus)
 			return false;
 		return true;
+	}
+
+	public Date getSendTime() {
+		return sendTime;
+	}
+
+	public void setSendTime(Date sendTime) {
+		this.sendTime = sendTime;
 	}
 }

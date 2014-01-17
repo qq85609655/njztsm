@@ -22,6 +22,9 @@ public interface FestivalService {
 
 	public List<Festival> list(String jobTime) throws SklayException;
 
+	public List<Festival> list(String jobTime, SwitchStatus switchStatus)
+			throws SklayException;
+
 	public void offOn(Set<Long> festival, SwitchStatus switchStatus)
 			throws SklayException;
 

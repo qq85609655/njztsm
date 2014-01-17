@@ -72,6 +72,12 @@ public class ApplicationServiceImpl implements ApplicationService {
 	}
 
 	@Override
+	public List<Application> getByAppType(AppType appType)
+			throws SklayException {
+		return appDao.getByAppType(appType);
+	}
+
+	@Override
 	public List<Application> cerate(List<Application> application)
 			throws SklayException {
 		return appDao.save(application);

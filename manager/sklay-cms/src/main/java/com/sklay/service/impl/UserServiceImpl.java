@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
+import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.ex.SklayException;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.PwdUtils;
@@ -96,6 +97,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public List<User> getUser(AuditStatus status) throws SklayException {
+		return userDao.findByStatus(status);
+	}
+
+	@Override
 	@CacheEvict(value = Constants.SHIRO_AUTHOR_ACAHE, allEntries = true)
 	public void update(User user) throws SklayException {
 		if (null != user)
@@ -120,5 +126,4 @@ public class UserServiceImpl implements UserService {
 		return null;
 	}
 
-	
 }

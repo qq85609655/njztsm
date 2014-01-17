@@ -20,7 +20,10 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 
 	private static SimpleDateFormat FORMATTIME_ONLY_TIME;
 
+	private static SimpleDateFormat FORMATTIME;
+
 	static {
+		FORMATTIME = new SimpleDateFormat("yyyyMMddHHmmss");
 		FORMATTIME_DATE = new SimpleDateFormat("yyyy-MM-dd");
 		FORMATTIME_TIME = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		FORMATTIME_DATE_TIME = new SimpleDateFormat("yyyy/MM/dd");
@@ -753,9 +756,16 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 		return age;
 	}
 
+	public static String getDateTimeWithoutChar(Date sourceDate) {
+		if (sourceDate == null) {
+			return "";
+		}
+		return FORMATTIME.format(sourceDate);
+	}
+
 	public static void main(String[] args) {
 
-		System.out.println(getMonth());
+		System.out.println(getDateTimeWithoutChar(new Date()));
 
 		System.out.println(getDay());
 	}

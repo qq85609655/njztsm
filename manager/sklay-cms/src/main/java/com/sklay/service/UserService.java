@@ -18,6 +18,7 @@ package com.sklay.service;
 import java.util.List;
 import java.util.Set;
 
+import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.ex.SklayException;
 import com.sklay.model.User;
 
@@ -52,5 +53,7 @@ public interface UserService {
 	List<User> getUserByPhone(Set<String> phones) throws SklayException;
 
 	List<User> getUser(Set<Long> userId) throws SklayException;
+
+	List<User> getUser(AuditStatus status) throws SklayException;
 
 }

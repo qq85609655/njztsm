@@ -28,6 +28,7 @@ import com.sklay.core.sdk.model.Verb;
 import com.sklay.core.sdk.model.vo.LocationDetail;
 import com.sklay.core.sdk.model.vo.SMSSetting;
 import com.sklay.core.util.Constants;
+import com.sklay.core.util.DateTimeUtil;
 import com.sklay.enums.LogLevelType;
 import com.sklay.enums.SMSResult;
 import com.sklay.mobile.Update;
@@ -428,19 +429,63 @@ public class SklayApi {
 				pairs.put("mobile", sms.getMobile());
 				pairs.put("content", sms.getContent());
 
-//				String result = ApiClient.http_post(sendUrl,
-//						ApiClient.splitNameValuePair(pairs));
-//				sms.setResult(result);
+				 String result = ApiClient.http_post(sendUrl,
+				 ApiClient.splitNameValuePair(pairs));
+				 sms.setResult(result);
 				sms.setRemark(birthday_tpl);
-//				SMSResult sRslt = SMSResult.findByLable(result);
-//				if (null != sRslt)
-//					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
-//							+ "】");
-//				if (SMSResult.SUCCESS != sRslt)
-//					sms.setStatus(SMSStatus.FAIL);
-//				else if (SMSResult.SUCCESS == sRslt)
-//					sms.setStatus(SMSStatus.SUCCESS);
-//				LOGGER.info("resetPwd result {} " + result);
+				SMSResult sRslt = SMSResult.findByLable(result);
+				if (null != sRslt)
+					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
+							+ "】");
+				if (SMSResult.SUCCESS != sRslt)
+					sms.setStatus(SMSStatus.FAIL);
+				else if (SMSResult.SUCCESS == sRslt)
+					sms.setStatus(SMSStatus.SUCCESS);
+				LOGGER.info("resetPwd result {} " + result);
+				smsResult.add(sms);
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					throw new SklayException(e);
+				}
+			}
+		}
+
+		return smsResult;
+	}
+
+	/**
+	 * @param recivers
+	 * @param SMSContent
+	 * @return
+	 */
+	public Set<SMS> festival(Set<SMS> jobs) {
+		Set<SMS> smsResult = Sets.newHashSet();
+		if (CollectionUtils.isNotEmpty(jobs)) {
+			for (SMS sms : jobs) {
+				Map<String, String> pairs = Maps.newHashMap();
+
+				pairs.put("username", account);
+				pairs.put("scode", password);
+				pairs.put("tempid", sms.getRemark());
+				pairs.put("signtag", sign_tpl);
+				pairs.put("mobile", sms.getMobile());
+				pairs.put("sendtime",
+						DateTimeUtil.getDateTimeWithoutChar(sms.getSendTime()));
+
+				String result = ApiClient.http_post(sendUrl,
+						ApiClient.splitNameValuePair(pairs));
+				sms.setResult(result);
+				SMSResult sRslt = SMSResult.findByLable(result);
+				if (null != sRslt)
+					sms.setResult(sms.getResult() + "【" + sRslt.getLable()
+							+ "】");
+				if (SMSResult.SUCCESS != sRslt)
+					sms.setStatus(SMSStatus.FAIL);
+				else if (SMSResult.SUCCESS == sRslt)
+					sms.setStatus(SMSStatus.SUCCESS);
+				LOGGER.info("resetPwd result {} " + result);
 				smsResult.add(sms);
 				try {
 					Thread.sleep(500);

@@ -70,4 +70,10 @@ public class FestivalServiceImpl implements FestivalService {
 	public List<Festival> list(String jobTime) throws SklayException {
 		return festivalDao.list(jobTime);
 	}
+
+	@Override
+	public List<Festival> list(String jobTime, SwitchStatus switchStatus)
+			throws SklayException {
+		return festivalDao.list(jobTime, switchStatus);
+	}
 }

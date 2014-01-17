@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sklay.api.SklayApi;
+import com.sklay.core.enums.AppType;
 import com.sklay.core.enums.AuditStatus;
 import com.sklay.core.enums.BindingMold;
 import com.sklay.core.enums.Level;
@@ -24,20 +27,27 @@ import com.sklay.core.enums.SwitchStatus;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
 import com.sklay.core.message.NLS;
+import com.sklay.core.util.Constants;
+import com.sklay.core.util.DateTimeUtil;
 import com.sklay.enums.LogLevelType;
 import com.sklay.model.Application;
 import com.sklay.model.DeviceBinding;
+import com.sklay.model.Festival;
 import com.sklay.model.GlobalSetting;
 import com.sklay.model.Operation;
 import com.sklay.model.SMS;
+import com.sklay.model.SMSTemplate;
 import com.sklay.model.User;
 import com.sklay.service.ApplicationService;
 import com.sklay.service.BindingService;
+import com.sklay.service.FestivalService;
 import com.sklay.service.GlobalService;
 import com.sklay.service.OperationService;
 import com.sklay.service.SMSService;
+import com.sklay.service.SMSTemplateService;
 import com.sklay.service.TaskManager;
 import com.sklay.service.UserAttrService;
+import com.sklay.service.UserService;
 
 @Service
 public class TaskManagerImpl implements TaskManager {
@@ -66,14 +76,25 @@ public class TaskManagerImpl implements TaskManager {
 	@Autowired
 	private SMSService smsService;
 
+	@Resource
+	private FestivalService festivalService;
+
+	@Resource
+	private SMSTemplateService smsTemplateService;
+
+	@Resource
+	private UserService userService;
+
 	@Override
 	@Async
 	public void doDayJob() {
 
 		GlobalSetting setting = globalService.getGlobalConfig();
 
+		AppType appType = AppType.TIP;
+
 		Operation operation = new Operation();
-		operation.setName("定时任务错误日志");
+		operation.setName("【" + appType.getLable() + "】任务错误日志");
 		operation.setCreateTime(new Date());
 		operation.setType(LogLevelType.ADMIN);
 
@@ -86,11 +107,11 @@ public class TaskManagerImpl implements TaskManager {
 		}
 		if (SwitchStatus.OPEN != setting.getSendSMSJob()) {
 
-			operation.setContent("全局站点生日提醒业务配置功能已关闭");
+			operation.setContent("全局站点" + appType.getLable() + "业务配置功能已关闭");
 			operationService.create(operation);
 
 			throw new SklayException(ErrorCode.CLOSED, null,
-					new Object[] { "生日提醒任务" });
+					new Object[] { appType.getLable() + "任务" });
 		}
 
 		List<User> list = userAttrService.queryBirthdayUser();
@@ -102,7 +123,7 @@ public class TaskManagerImpl implements TaskManager {
 				Long belong = targetUser.getBelong();
 				if (null == belong) {
 					operation.setContent(JSONObject.toJSONString(targetUser)
-							+ "的belong生日短信提醒不存在");
+							+ "的belong" + appType.getLable() + "提醒不存在");
 					operationService.create(operation);
 					continue;
 				}
@@ -114,14 +135,15 @@ public class TaskManagerImpl implements TaskManager {
 					mapApps.put(belong, app);
 				}
 				if (null == app) {
-					operation.setContent("属于【" + belong + "】app生日提醒任务不存在");
+					operation.setContent("属于【" + belong + "】app"
+							+ appType.getLable() + "任务不存在");
 					operationService.create(operation);
 					continue;
 				}
 
 				if (AuditStatus.PASS != app.getStatus()) {
-					operation.setContent("属于【" + belong
-							+ "】app生日提醒业务审核未完成，无法发送短信");
+					operation.setContent("属于【" + belong + "】app"
+							+ appType.getLable() + "业务审核未完成，无法发送短信");
 					operationService.create(operation);
 					continue;
 				}
@@ -130,7 +152,7 @@ public class TaskManagerImpl implements TaskManager {
 
 				if (CollectionUtils.isEmpty(bandList)) {
 					operation.setContent(JSONObject.toJSONString(targetUser)
-							+ "暂时没有附属帐号接收生日提醒短信");
+							+ "暂时没有附属帐号接收" + appType.getLable() + "短信");
 					operationService.create(operation);
 					continue;
 				}
@@ -151,10 +173,11 @@ public class TaskManagerImpl implements TaskManager {
 
 					sms.setApp(app);
 					sms.setBelong(belong);
+					sms.setSendTime(setting.getSendSMSTime());
 					jobs.add(sms);
 				}
 
-				// jobs = sklayApi.birthday(jobs);
+				jobs = sklayApi.birthday(jobs);
 				smsService.create(jobs);
 
 			}
@@ -163,4 +186,83 @@ public class TaskManagerImpl implements TaskManager {
 		LOGGER.info(" birthday list is {}", list);
 	}
 
+	@Override
+	@Async
+	public void doFestivalJob() {
+		String jobTime = DateTimeUtil.getCurrentDate();
+		SwitchStatus switchStatus = SwitchStatus.OPEN;
+
+		List<Festival> festivals = festivalService.list(jobTime, switchStatus);
+
+		if (CollectionUtils.isEmpty(festivals)) {
+			return;
+		}
+
+		AppType appType = AppType.WISH;
+
+		Operation operation = new Operation();
+		operation.setName("【" + appType.getLable() + "】任务错误日志");
+		operation.setCreateTime(new Date());
+		operation.setType(LogLevelType.ADMIN);
+
+		List<Application> apps = appService.getByAppType(appType);
+
+		if (CollectionUtils.isEmpty(apps)) {
+			operation.setContent("【" + appType.getLable() + "】app应用不存在");
+			operationService.create(operation);
+			return;
+		}
+
+		Application app = apps.get(Constants.ZERO);
+
+		if (AuditStatus.PASS != app.getStatus()) {
+			operation.setContent("【" + appType.getLable() + "】app审核未完成");
+			operationService.create(operation);
+			return;
+		}
+
+		Festival festival = festivals.get(Constants.ZERO);
+
+		AuditStatus status = AuditStatus.PASS;
+		List<SMSTemplate> templates = smsTemplateService.list(status, festival);
+		if (CollectionUtils.isEmpty(templates)) {
+			operation.setContent("【" + appType.getLable() + "】"
+					+ JSONObject.toJSONString(festival) + "app短信模版不存在");
+			operationService.create(operation);
+			return;
+		}
+
+		int szie = templates.size();
+
+		List<User> users = userService.getUser(status);
+
+		if (CollectionUtils.isEmpty(users)) {
+			operation.setContent("【" + appType.getLable() + "】"
+					+ JSONObject.toJSONString(festival) + "app审核通过的会员不存在");
+			operationService.create(operation);
+			return;
+		}
+		Long creator = app.getOwner();
+		Date sendTime = festival.getSendTime();
+
+		Set<SMS> jobs = Sets.newHashSet();
+		for (User user : users) {
+
+			int index = (int) (Math.random() * szie);
+			String remark = templates.get(index).getTpl();
+			String content = templates.get(index).getContent();
+			Long receiver = user.getId();
+			String mobile = user.getPhone();
+			SMS sms = new SMS(creator, content, sendTime, receiver, mobile,
+					SMSStatus.FAIL);
+			sms.setRemark(remark);
+
+			jobs.add(sms);
+		}
+
+		jobs = sklayApi.festival(jobs);
+
+		if (CollectionUtils.isNotEmpty(jobs))
+			smsService.create(jobs);
+	}
 }

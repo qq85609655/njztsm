@@ -56,7 +56,7 @@ a:hover {
 .navbar .brand,
 .navbar .nav > li > a {
   color: #ffffff;
-  font-size: 13px;
+ /* font-size: 13px;*/
   text-shadow: none;
   padding: 15px 30px;
   background: url(img/navigation-divider.png) no-repeat right 50%;
@@ -98,6 +98,7 @@ a:hover {
 .navbar .nav li.open > a {
   background: none;
 }
+/*
 .dropdown-menu {
   margin-top: -1px;
   -webkit-border-radius: 0;
@@ -485,3 +486,4 @@ footer hr {
     margin-right: -20px;
   }
 }
+*/

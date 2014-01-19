@@ -79,9 +79,9 @@ SKLAY.modal = function(args) {
 				if (args.onSubmit) {
 					args.onSubmit();
 				} else {
-					$(this).attr('disabled',"disabled");
+					$(this).attr('disabled', "disabled");
 					modal.find("form").submit();
-				//	$(this).button('reset');
+					// $(this).button('reset');
 				}
 			});
 		}
@@ -91,8 +91,36 @@ SKLAY.modal = function(args) {
 		if (args.onHidden) {
 			modal.on('hidden', args.onHidden);
 		}
-		
+
 	});
 	modal.appendTo("body");
 	return modal;
 };
+
+$(".modal-link-dialog").click(
+				function(event) {
+					event.preventDefault();
+					$target = $(this).attr('data-target');
+					$header = $(this).attr('data-title');
+					$nofooter = $(this).attr('data-nofooter');
+					$delete = $(this).attr('data-delete');
+
+					if ($nofooter) {
+						$($target)
+								.find(".modal-header")
+								.html(
+										"<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>×</button><h3>"
+												+ $header + "</h3>");
+						$($target).find(".modal-footer").hide();
+					} else {
+						$($target).find(".modal-header").html(
+								"<h3>" + $header + "</h3>");
+						$($target).find(".modal-footer").show();
+					}
+
+					$($target).removeData("modal");
+					$($target).modal({
+						remote : $(this).attr("href")
+					});
+					$($target).modal("show");
+				});

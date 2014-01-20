@@ -77,7 +77,14 @@
 		</div>	
 	</div>
 	<!-- navbar end -->
-
+<div class="page-content-wrapper">
+    <div class="hero-unit">
+        <div class="container">
+            <h1>Website content planning made simple.</h1>
+            <h2>We help web teams plan, structure and collaborate on content.</h2>
+        </div>
+    </div>
+</div>
 <div id="wrap" class="container">
 	<div id="content" class="row">
 		<tiles:insertAttribute name="content" />

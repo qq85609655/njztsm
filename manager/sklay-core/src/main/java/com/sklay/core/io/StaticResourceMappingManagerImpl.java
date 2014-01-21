@@ -33,11 +33,9 @@ public class StaticResourceMappingManagerImpl implements
 
 	private ApplicationContext applicationContext;
 
-	private static final String DEFAULT_UPLOAD_PATH = "/WEB-INF/upload";
-
 	private int cacheSeconds = 31556926;
 
-	private String uploadPath = DEFAULT_UPLOAD_PATH;
+	private String uploadPath;
 
 	private ResourceLoader resourceLoader = new DefaultResourceLoader();
 

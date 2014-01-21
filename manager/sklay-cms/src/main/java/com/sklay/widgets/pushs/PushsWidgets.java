@@ -79,6 +79,7 @@ public class PushsWidgets {
 		VIEW_TEMPLATE_MAP.put("paginationBigimg", "pagination-bigimg.tpl");
 		VIEW_TEMPLATE_MAP.put("paginationLeftimg", "pagination-leftimg.tpl");
 		VIEW_TEMPLATE_MAP.put("paginationImgs", "pagination-imgs.tpl");
+		VIEW_TEMPLATE_MAP.put("paginationTopimg", "pagination-topimg.tpl") ;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -121,9 +122,9 @@ public class PushsWidgets {
 					@NameAndValue(name = "图片TAB页(仅显示分类下拥有图片的文章)", value = "tabImages"),
 					@NameAndValue(name = "普通TAB页", value = "tabNormal"), }),
 			@Setting(key = "options", name = "轮播JS初始化选项", value = "{controlNav:false}", inputType = InputType.TEXTAREA),
-			@Setting(key = "themes", name = "轮播主题(bar,dark,default,light)", value = "default", inputType = InputType.INPUT),
+			@Setting(key = "themes", name = "轮播主题", optionsLoader = "findThemeTypes", value = "default", inputType = InputType.SELECT),
 			@Setting(key = "commentSize", name = "评论数", value = "10", inputType = InputType.INPUT) })
-	public Object list(com.sklay.model.Widget widget, ModelMap modelMap)
+	public String list(com.sklay.model.Widget widget, ModelMap modelMap)
 			throws IOException {
 
 		Map<String, String> settings = widget.getSettings();
@@ -210,6 +211,29 @@ public class PushsWidgets {
 		return tpl == null ? "list-normal.tpl" : tpl;
 	}
 
+	public Option[] findThemeTypes(){
+		
+			List<Option> opts = new ArrayList<Option>();
+				Option opt_default = new Option();
+				opt_default.setName("黑色");
+				opt_default.setValue("default");
+				opts.add(opt_default);
+				Option opt_bar = new Option();
+				opt_bar.setName("横条");
+				opt_bar.setValue("bar");
+				opts.add(opt_bar);
+				Option opt_dark = new Option();
+				opt_dark.setName("深色");
+				opt_dark.setValue("dark");
+				opts.add(opt_dark);
+				Option opt_light = new Option();
+				opt_light.setName("光良");
+				opt_light.setValue("light");
+				opts.add(opt_light);
+				
+			return opts.toArray(new Option[opts.size()]);
+	}
+	
 	private List<Comment> getCommentsByLogic(int logic, List<String> types,
 			boolean onlyImg, Date start, Date end, int offset, int limit) {
 		List<Comment> comments = null;
@@ -288,7 +312,8 @@ public class PushsWidgets {
 					@NameAndValue(name = "TABLE分页列表", value = "paginationTable"),
 					@NameAndValue(name = "大图加概述", value = "paginationBigimg"),
 					@NameAndValue(name = "左小图加概述", value = "paginationLeftimg"),
-					@NameAndValue(name = "图片列表", value = "paginationImgs") }) })
+					@NameAndValue(name = "图片列表", value = "paginationImgs") ,
+					@NameAndValue(name = "上小图下标题文列表", value = "paginationTopimg")}) })
 	public String pagination(com.sklay.model.Widget widget, Integer page,
 			ModelMap modelMap) {
 		Map<String, String> settings = widget.getSettings();

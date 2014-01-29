@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +116,21 @@ public class TaskManagerImpl implements TaskManager {
 			throw new SklayException(ErrorCode.CLOSED, null,
 					new Object[] { appType.getLable() + "任务" });
 		}
+		String jobTime = setting.getSendSMSTime();
+
+		if (StringUtils.isBlank(jobTime)) {
+			operation.setContent("全局站点生日提醒时间配置错误");
+			operationService.create(operation);
+
+			throw new SklayException("全局站点生日提醒时间配置错误");
+		}
+
+		if (!jobTime.contains(":") || 2 != jobTime.split(":").length) {
+			operation.setContent("全局站点生日提醒时间【" + jobTime + "】配置错误");
+			operationService.create(operation);
+
+			throw new SklayException("全局站点生日提醒时间【" + jobTime + "】配置错误");
+		}
 
 		List<User> list = userAttrService.queryBirthdayUser();
 
@@ -122,11 +138,12 @@ public class TaskManagerImpl implements TaskManager {
 		if (CollectionUtils.isNotEmpty(list)) {
 			Set<SMS> jobs = Sets.newHashSet();
 
-			Calendar cal = DateTimeUtil.parseDateTime(setting.getSendSMSTime());
+			// Calendar cal =
+			// DateTimeUtil.parseDateTime(setting.getSendSMSTime());
 
-			int hour = cal.get(Calendar.HOUR_OF_DAY);
-			int min = cal.get(Calendar.MINUTE);
-			int second = cal.get(Calendar.SECOND);
+			int hour = Integer.valueOf(jobTime.split(":")[0]);
+			int min = Integer.valueOf(jobTime.split(":")[1]);
+			int second = 0;
 
 			Date sendTime = DateTimeUtil.getDate(date, hour, min, second);
 
@@ -206,7 +223,7 @@ public class TaskManagerImpl implements TaskManager {
 	@Override
 	@Async
 	public void doFestivalJob() {
-		String jobTime = DateTimeUtil.getCurrentDate();
+		String jobTime = DateTimeUtil.getStringDateNextNum(1);
 		SwitchStatus switchStatus = SwitchStatus.OPEN;
 
 		List<Festival> festivals = festivalService.list(jobTime, switchStatus);
@@ -288,5 +305,10 @@ public class TaskManagerImpl implements TaskManager {
 
 		if (CollectionUtils.isNotEmpty(jobs))
 			smsService.create(jobs);
+
+		festival.setSwitchStatus(SwitchStatus.CLOSE);
+
+		festivalService.update(festival);
 	}
+
 }

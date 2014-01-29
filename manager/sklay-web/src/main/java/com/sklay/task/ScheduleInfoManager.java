@@ -60,8 +60,8 @@ public class ScheduleInfoManager {
 		// trigger);
 		// }
 		taskManager.doDayJob();
-		taskManager.doFestivalJob() ;
-		LOGGER.error("do job");
+		taskManager.doFestivalJob();
+		LOGGER.debug("do job");
 		// 下面是具体的job内容，可自行设置
 		// executeJobDetail();
 	}

@@ -268,6 +268,11 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 		return new Date(System.currentTimeMillis() + 1000 * 3600 * 24 * n);
 	}
 
+	public static String getStringDateNextNum(int n) {
+		return FORMATTIME_DATE.format(new Date(System.currentTimeMillis()
+				+ 1000 * 3600 * 24 * n));
+	}
+
 	/**
 	 * 取当前一天日期
 	 * 
@@ -812,5 +817,7 @@ public class DateTimeUtil extends org.apache.commons.lang.time.DateUtils {
 				Calendar.SECOND));
 
 		System.out.println(getDate(new Date(), 23, 12, 22));
+
+		System.out.println(getStringDateNextNum(1));
 	}
 }

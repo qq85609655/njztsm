@@ -8,7 +8,6 @@
 <%@ include file="../../include.jsp"%>
 <link rel="stylesheet" type="text/css" href="${ctx}/static/thirdparty/bootstrap-timepicker/css/bootstrap-timepicker.min.css">
 <script type="text/javascript" src="${ctx}/static/thirdparty/bootstrap-timepicker/js/bootstrap-timepicker.js"></script>
-<script type="text/javascript" src="${ctx}/static/thirdparty/datepicker/WdatePicker.js"></script>
 
 	<ul class="nav nav-tabs">
 	    <li <c:if test="${('server' eq active) || (empty active)}"> class="active" </c:if>><a href="#widget-server" data-toggle="tab">服务器配置</a></li>
@@ -152,10 +151,18 @@
 	      </div>
 	      <div class="control-group">
 	        <label class="control-label" for="inputSendSMSTime">生日提醒短信时间</label>
-	         <div class="controls">
+	        <%--  <div class="controls">
 	         	<label class=" inline span1" for="inputSendSMSTime">
 				  <input class="Wdate" name="sendSMSTime" id="inputSendSMSTime" type="text" required="required" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" placeholder="生日提醒短信时间" value="<fmt:formatDate value="${setting.sendSMSTime }" type="both" dateStyle="default" timeStyle="default"/>">
 				</label>
+	        </div> --%>
+	        <div class="controls">
+		        <div class="input-append bootstrap-timepicker ">
+		            <input type="text" class="input-small" name="sendSMSTime" id="inputSendSMSTime" placeholder="生日提醒短信时间" value="${setting.sendSMSTime }">
+		            <span class="add-on">
+		                <i class="icon-time"></i>
+		            </span>
+		        </div>
 	        </div>
 	      </div>
 	      
@@ -290,4 +297,10 @@
     	 showInputs:false
      });
      
-</script>
+     $('#inputSendSMSTime').timepicker({
+         minuteStep: 1,
+         showSeconds: false,
+         showMeridian: false,
+         defaultTime: false
+     });
+ </script>

@@ -24,7 +24,7 @@
 	     </bean>
 	     
 	 	 <bean class="com.sklay.core.io.StaticResourceMappingManagerImpl">
-	 		<property name="uploadPath" value="file:///D:/upload"/>
+	 		<property name="uploadPath" value="file:///D:/resource/upload"/>
 	 	 </bean>
 	</beans>
 	

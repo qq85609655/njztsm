@@ -59,8 +59,8 @@ public class ScheduleInfoManager {
 		// scheduler.rescheduleJob("cronTrigger", Scheduler.DEFAULT_GROUP,
 		// trigger);
 		// }
-		taskManager.doDayJob();
-		taskManager.doFestivalJob();
+//		taskManager.doDayJob();
+//		taskManager.doFestivalJob();
 		LOGGER.debug("do job");
 		// 下面是具体的job内容，可自行设置
 		// executeJobDetail();

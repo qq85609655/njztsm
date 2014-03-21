@@ -160,11 +160,11 @@ $(function(){
     		var chartData = data.data ;
             chartData = eval("("+chartData+")") ;
             
-    		reports = chartData.reports ;
-            chartLabels = chartData.labels ;
-            sysTolic = chartData.systolic ;
-            diasTolic = chartData.diastolic ;
-            health = chartData.health ;
+    		reports = eval("("+chartData.reports+")") ;
+            chartLabels = eval("("+chartData.labels+")") ;
+            sysTolic = eval("("+chartData.systolic+")") ;
+            diasTolic = eval("("+chartData.diastolic+")") ;
+            health = eval("("+chartData.health+")") ;
             userMember = chartData.member.name ;
             chartVertical = chartData.vertical ;
             first_label = chartData.first_label ;
@@ -190,11 +190,11 @@ $(function(){
             var chartData = data.data ;
             chartData = eval(chartData) ;
             
-            reports = chartData.reports ;
-            chartLabels = chartData.labels ;
-            sysTolic = chartData.systolic ;
-            diasTolic = chartData.diastolic ;
-            health = chartData.health ;
+            reports = eval("("+chartData.reports+")") ;
+            chartLabels = eval("("+chartData.labels+")") ;
+            sysTolic = eval("("+chartData.systolic+")") ;
+            diasTolic = eval("("+chartData.diastolic+")") ;
+            health = eval("("+chartData.health+")") ;
             userMember = chartData.member.name ;
             chartVertical = chartData.vertical ;
             first_label = chartData.first_label ;

@@ -10,7 +10,6 @@ width: 900px;
 margin: auto 0 0 -450px;
 }
 </style>
-<script type="text/javascript" src="${ctx}/static/thirdparty/jquery/jquery-1.8.3.min.js"></script>
 <script type="text/javascript" src="${ctx}/static/thirdparty/ichart/ichart.1.2.min.js"></script>
 <script type="text/javascript">
 $(function(){

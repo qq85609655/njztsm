@@ -78,9 +78,10 @@ public class MedicalReportServiceImpl implements MedicalReportService
         
         Long timeStart = startDate.getTime();
         Long timeEnd = endDate.getTime();
-        
-        return reportDao.getDayReport(userId, timeStart, timeEnd, SMSType.PHYSICAL);
-        
+        if (day < 0)
+            return reportDao.getDayReport(userId, timeStart, timeEnd, SMSType.PHYSICAL);
+        else
+            return reportDao.getDayReport(userId, timeEnd, timeStart, SMSType.PHYSICAL);
     }
     
     @Override

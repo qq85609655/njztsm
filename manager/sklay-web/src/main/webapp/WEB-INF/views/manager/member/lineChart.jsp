@@ -179,7 +179,7 @@ $(function(){
     	
     } ;
           
-    netview = function(){
+    nextview = function(){
   	  var url = '${ctx}/admin/member/lineChart/${userId}/+/'+last_label ;
         $.post(url,function(data){
         	if(!data.data){
@@ -187,7 +187,7 @@ $(function(){
         		return  ;
         	}
             var chartData = data.data ;
-            chartData = eval(chartData) ;
+            chartData = eval("("+chartData+")") ;
             
             reports = eval("("+chartData.reports+")") ;
             chartLabels = eval("("+chartData.labels+")") ;
@@ -213,6 +213,6 @@ $(function(){
 </script>
 			<div>
 			<button onclick="preview()">上一周</button>
-			<button onclick="netview()">下一周</button>
+			<button onclick="nextview()">下一周</button>
 			</div>
 			<div id='canvasDiv'></div>

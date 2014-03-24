@@ -22,6 +22,10 @@ public class LineChart extends Entity implements Serializable {
 
 	private String member;
 
+	private String firstTime;
+
+	private String lastTime;
+
 	public List<String> getLabels() {
 		return labels;
 	}
@@ -72,6 +76,22 @@ public class LineChart extends Entity implements Serializable {
 
 	public LineChart() {
 		super();
+	}
+
+	public String getFirstTime() {
+		return firstTime;
+	}
+
+	public void setFirstTime(String firstTime) {
+		this.firstTime = firstTime;
+	}
+
+	public String getLastTime() {
+		return lastTime;
+	}
+
+	public void setLastTime(String lastTime) {
+		this.lastTime = lastTime;
 	}
 
 	public LineChart(List<String> labels, List<Line> data,

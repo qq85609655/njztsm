@@ -12,28 +12,32 @@ public class Coordinates implements Serializable {
 	/**
 	 * 经度
 	 */
-	private String lon;
+	private String x;
 
 	/**
 	 * 纬度
 	 */
-	private String lat;
+	private String y;
 
-	public String getLon() {
-		return lon;
+	public String getX() {
+		return x;
 	}
 
-	public void setLon(String lon) {
-		this.lon = lon;
+	public void setX(String x) {
+		this.x = x;
 	}
 
-	public String getLat() {
-		return lat;
+	public String getY() {
+		return y;
 	}
 
-	public void setLat(String lat) {
-		this.lat = lat;
+	public void setY(String y) {
+		this.y = y;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return "Coordinates [x=" + x + ", y=" + y + "]";
+	}
+
 }

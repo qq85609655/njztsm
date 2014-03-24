@@ -25,6 +25,7 @@ import com.sklay.core.sdk.exceptions.JSONException;
 import com.sklay.core.sdk.model.Request;
 import com.sklay.core.sdk.model.Response;
 import com.sklay.core.sdk.model.Verb;
+import com.sklay.core.sdk.model.vo.Coordinates;
 import com.sklay.core.sdk.model.vo.LocationDetail;
 import com.sklay.core.sdk.model.vo.SMSSetting;
 import com.sklay.core.util.Constants;
@@ -32,6 +33,7 @@ import com.sklay.core.util.DateTimeUtil;
 import com.sklay.enums.LogLevelType;
 import com.sklay.enums.SMSResult;
 import com.sklay.mobile.Update;
+import com.sklay.model.ApiDataEntity;
 import com.sklay.model.Blackword;
 import com.sklay.model.Operation;
 import com.sklay.model.SMS;
@@ -57,10 +59,16 @@ public class SklayApi {
 	private String searchURL;
 
 	/**
+	 * 坐标转化
+	 */
+	@Value("${geoconv.url}")
+	private String geoconvURL;
+
+	/**
 	 * key
 	 */
-	@Value("${search.key}")
-	private String searchKey;
+	@Value("${ak.key}")
+	private String akKey;
 
 	@Value("${" + Constants.SMS_ACCOUNT + "}")
 	private String account;
@@ -117,6 +125,8 @@ public class SklayApi {
 	@Value("${" + Constants.ANDROID_UPDATE_LOG + "}")
 	private String updateLog;
 
+	private final static int SUCCESS = 0;
+
 	@Resource
 	private BlackwordService blackwordService;
 
@@ -159,46 +169,58 @@ public class SklayApi {
 	 * @return
 	 * @throws JSONException
 	 */
-	public String SearchLocation(String latitude, String longitude) {
-		Request request = new Request(Verb.GET, searchURL);
+	public String searchLocation(String latitude, String longitude) {
+		Request request = new Request(Verb.POST, searchURL);
 
 		request.addQuerystringParameter("location", latitude.trim() + ","
 				+ longitude.trim());
 		request.addQuerystringParameter("output", "json");
-		request.addQuerystringParameter("key", searchKey);
+		request.addQuerystringParameter("ak", akKey);
 		Response response = request.send();
-		// new
-		// { "status":"OK", "result":{ "location":{"lng":116.322987,
-		// "lat":39.983424},
-		// "formatted_address":"北京市海淀区中关村大街27号1101-08室","business":"人民大学,中关村,苏州街","addressComponent":{"city":"北京市","district":"海淀区",
-		// "province":"北京市","street":"中关村大街","street_number":"27号1101-08室"},"cityCode":131}}
 
 		if (StringUtils.isBlank(response.getBody()))
 			throw new SklayException(ErrorCode.API_CALL_ERROE);
 
-		JSONObject jsonObject = JSONObject.parseObject(response.getBody());
+		ApiDataEntity dataEntity = JSONObject.parseObject(response.getBody(),
+				ApiDataEntity.class);
 
-		if (!jsonObject.containsKey("status"))
-			throw new SklayException(ErrorCode.API_CALL_ERROE);
+		if (SUCCESS != dataEntity.getStatus())
+			throw new SklayException(dataEntity.getResult());
 
-		String status = jsonObject.getString("status");
+		LocationDetail location = JSONObject.parseObject(
+				dataEntity.getResult(), LocationDetail.class);
 
-		if ("INVILID_KEY".equals(status))
-			throw new SklayException(ErrorCode.API_ILLEGAL_KEY);
-		if ("INVALID_PARAMETERS".equals(status))
-			throw new SklayException(ErrorCode.API_ILLEGAL_PARAMETERS);
-		if ("OK".equalsIgnoreCase(status)) {
+		return location.getFormatted_address();
+	}
 
-			String result = jsonObject.getString("result");
-			if (StringUtils.isBlank(result))
-				throw new SklayException(ErrorCode.API_RESULT_ERROR);
+	public Coordinates geoconv(String latitude, String longitude) {
+		// String searchURL = "http://api.map.baidu.com/geoconv/v1/";
+		// String searchURL = "http://api.map.baidu.com/geocoder/v2/";
+		// String searchKey = "L511uLxYb6R8xm2B5Bnh9ijc";
+		Request request = new Request(Verb.POST, geoconvURL);
+		//
+		request.addQuerystringParameter("coords", longitude + "," + latitude);
+		request.addQuerystringParameter("from", "1");
+		request.addQuerystringParameter("to", "5");
 
-			LocationDetail location = JSONObject.parseObject(result,
-					LocationDetail.class);
+		request.addQuerystringParameter("output", "json");
+		request.addQuerystringParameter("ak", akKey);
+		Response response = request.send();
 
-			return location.getFormatted_address();
+		ApiDataEntity dataEntity = JSONObject.parseObject(response.getBody(),
+				ApiDataEntity.class);
+
+		if (SUCCESS != dataEntity.getStatus())
+			throw new SklayException(dataEntity.getResult());
+
+		List<Coordinates> location = JSONObject.parseArray(
+				dataEntity.getResult(), Coordinates.class);
+
+		if (CollectionUtils.isEmpty(location)) {
+			return null;
 		}
-		throw new SklayException(ErrorCode.API_CALL_ERROE);
+		// [Coordinates [x=117.11621763215, y=36.690725404979]]
+		return location.get(Constants.ZERO);
 	}
 
 	/**
@@ -672,14 +694,6 @@ public class SklayApi {
 		this.searchURL = searchURL;
 	}
 
-	public String getSearchKey() {
-		return searchKey;
-	}
-
-	public void setSearchKey(String searchKey) {
-		this.searchKey = searchKey;
-	}
-
 	public String getAccount() {
 		return account;
 	}
@@ -804,8 +818,38 @@ public class SklayApi {
 		// String str = "12dfg中三z中ss三 级ss在12";
 		// String str2 = "三 级";
 		// System.out.println(str2.length());
-		System.out.println(appendSpace("三    级中三 级中三 级中"));
+		// System.out.println(appendSpace("三    级中三 级中三 级中"));
+		String searchURL = "http://api.map.baidu.com/geoconv/v1/";
+		// String searchURL = "http://api.map.baidu.com/geocoder/v2/";
+		String searchKey = "L511uLxYb6R8xm2B5Bnh9ijc";
+		Request request = new Request(Verb.POST, searchURL);
+		//
+		request.addQuerystringParameter("coords", "117.103687,36.6839680");
+		request.addQuerystringParameter("from", "1");
+		request.addQuerystringParameter("to", "5");
+
+		// request.addQuerystringParameter("location",
+		// "36.690727800543,117.11621276292");
+
+		request.addQuerystringParameter("output", "json");
+		request.addQuerystringParameter("ak", searchKey);
+		Response response = request.send();
+		// new
+		// { "status":"OK", "result":{ "location":{"lng":116.322987,
+		// "lat":39.983424},
+		// "formatted_address":"北京市海淀区中关村大街27号1101-08室","business":"人民大学,中关村,苏州街","addressComponent":{"city":"北京市","district":"海淀区",
+		// "province":"北京市","street":"中关村大街","street_number":"27号1101-08室"},"cityCode":131}}
+
+		ApiDataEntity dataEntity = JSONObject.parseObject(response.getBody(),
+				ApiDataEntity.class);
+
+		if (SUCCESS != dataEntity.getStatus())
+			throw new SklayException(dataEntity.getResult());
+
+		List<Coordinates> location = JSONObject.parseArray(
+				dataEntity.getResult(), Coordinates.class);
+
+		System.out.println(location.toString());
 
 	}
-
 }

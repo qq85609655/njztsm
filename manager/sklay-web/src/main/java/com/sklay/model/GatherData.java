@@ -2,6 +2,8 @@ package com.sklay.model;
 
 import java.io.Serializable;
 
+import com.sklay.core.sdk.model.vo.Coordinates;
+
 public class GatherData implements Serializable {
 
 	/**
@@ -27,6 +29,11 @@ public class GatherData implements Serializable {
 	private String latitude = "";
 
 	private int indexHealth = 0;
+
+	/**
+	 * 转化后坐标
+	 */
+	private Coordinates coordinates;
 
 	public String getSimNo() {
 		return simNo;
@@ -113,6 +120,14 @@ public class GatherData implements Serializable {
 
 	public void setHighpressure(String highpressure) {
 		this.highPressure = highpressure;
+	}
+
+	public Coordinates getCoordinates() {
+		return coordinates;
+	}
+
+	public void setCoordinates(Coordinates coordinates) {
+		this.coordinates = coordinates;
 	}
 
 }

@@ -32,6 +32,7 @@ import com.sklay.core.enums.TipType;
 import com.sklay.core.ex.ErrorCode;
 import com.sklay.core.ex.SklayException;
 import com.sklay.core.message.NLS;
+import com.sklay.core.sdk.model.vo.Coordinates;
 import com.sklay.core.util.Constants;
 import com.sklay.core.util.DateTimeUtil;
 import com.sklay.enums.LogLevelType;
@@ -448,8 +449,17 @@ public class ApiController {
 			String latitude = gatherData.getLatitude().trim();
 			String longitude = gatherData.getLongitude().trim();
 			String loaction = "";
-			loaction = sklayApi.SearchLocation(latitude, longitude);
 
+			Coordinates coordinates = sklayApi.geoconv(latitude, longitude);
+
+			if (null == coordinates)
+				loaction = sklayApi.searchLocation(latitude, longitude);
+			else {
+				loaction = sklayApi.searchLocation(coordinates.getY(),
+						coordinates.getX());
+
+				gatherData.setCoordinates(coordinates);
+			}
 			String SMSContent = NLS.getMsg(smsTemplate, new Object[] {
 					userName, DateUtils.getCurrentTime(), loaction });
 			/** 保存采集到的原始数据 */

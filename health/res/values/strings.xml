@@ -77,6 +77,9 @@
     <string name="img_from_album">手机相册</string>
     <string name="ui_insert_image">插入图片</string>  
     
+    <string name="btn_chart_prview">上一周</string>  
+    <string name="btn_chart_next">下一周</string> 
+    
     <string name="setting_head_title">系统设置</string>
     
     <string name="alert_title">系统提示</string>

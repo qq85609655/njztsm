@@ -61,18 +61,16 @@
         android:paddingRight="2dip" >
 
         <Button
-            android:id="@+id/main_prview"
+            android:id="@+id/main_chart_prview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="left|center"
-            android:text="上一页" />
+            android:layout_gravity="left|center"/>
 
         <Button
-            android:id="@+id/main_next"
+            android:id="@+id/main_chart_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|center"
-            android:text="下一页" />
+            android:layout_gravity="right|center"/>
     </FrameLayout>
     
 </LinearLayout>

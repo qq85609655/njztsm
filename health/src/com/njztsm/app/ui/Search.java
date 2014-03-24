@@ -69,8 +69,11 @@ public class Search extends BaseActivity {
 		webViewHandler = new Handler();
 
 		search = (Button) findViewById(R.id.main_search);
-		btn_prview = (Button) findViewById(R.id.main_prview);
-		btn_next = (Button) findViewById(R.id.main_next);
+		btn_prview = (Button) findViewById(R.id.main_chart_prview);
+		btn_next = (Button) findViewById(R.id.main_chart_next);
+
+		btn_next.setText(R.string.btn_chart_next);
+		btn_prview.setText(R.string.btn_chart_prview);
 
 		progress = (ProgressBar) findViewById(R.id.main_head_progress);
 		editText = (EditText) findViewById(R.id.search_phone);
@@ -187,6 +190,8 @@ public class Search extends BaseActivity {
 	/**
 	 * 设置WebView对象支持javascript
 	 */
+	@SuppressWarnings("deprecation")
+	@SuppressLint("SetJavaScriptEnabled")
 	private void setSupportJavaScript() {
 		WebSettings settings = webView.getSettings();
 		settings.setJavaScriptEnabled(true);
@@ -281,6 +286,8 @@ public class Search extends BaseActivity {
 
 	private View.OnClickListener nextClickListener = new View.OnClickListener() {
 		public void onClick(View v) {
+			System.out.println("nextClickListener");
+
 			editText.clearFocus();
 			String phone = editText.getText().toString();
 			initWebView(day, phone, "+", lastTime);
@@ -289,6 +296,8 @@ public class Search extends BaseActivity {
 
 	private View.OnClickListener prviewClickListener = new View.OnClickListener() {
 		public void onClick(View v) {
+
+			System.out.println("prviewClickListener");
 			editText.clearFocus();
 			String phone = editText.getText().toString();
 			initWebView(day, phone, "-", firstTime);

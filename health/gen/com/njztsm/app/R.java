@@ -584,6 +584,8 @@ public final class R {
         public static final int login_user_table=0x7f0d0023;
         public static final int logindialog_space=0x7f0d0020;
         public static final int logindialog_view_switcher=0x7f0d0022;
+        public static final int main_chart_next=0x7f0d0051;
+        public static final int main_chart_prview=0x7f0d0050;
         public static final int main_footbar_chart=0x7f0d002e;
         public static final int main_footbar_home=0x7f0d0053;
         public static final int main_footbar_news=0x7f0d002d;
@@ -595,8 +597,6 @@ public final class R {
         public static final int main_menu_exit=0x7f0d0067;
         public static final int main_menu_setting=0x7f0d0066;
         public static final int main_menu_user=0x7f0d0064;
-        public static final int main_next=0x7f0d0051;
-        public static final int main_prview=0x7f0d0050;
         public static final int main_relativelayout_header=0x7f0d0030;
         public static final int main_scrolllayout=0x7f0d002b;
         public static final int main_search=0x7f0d004e;
@@ -701,7 +701,7 @@ public final class R {
         public static final int Weibo_Share_Error=0x7f0a0036;
         public static final int Weibo_Share_Repeat=0x7f0a0037;
         public static final int Weibo_Share_Success=0x7f0a0035;
-        public static final int alert_title=0x7f0a0076;
+        public static final int alert_title=0x7f0a0078;
         public static final int app_error=0x7f0a000a;
         public static final int app_error_message=0x7f0a000b;
         public static final int app_menu_surelogout=0x7f0a0007;
@@ -709,6 +709,8 @@ public final class R {
         public static final int app_product_name=0x7f0a0039;
         public static final int app_run_code_error=0x7f0a0006;
         public static final int blog_detail_head_title=0x7f0a0064;
+        public static final int btn_chart_next=0x7f0a0076;
+        public static final int btn_chart_prview=0x7f0a0075;
         public static final int cancle=0x7f0a0009;
         public static final int choose_image=0x7f0a0019;
         public static final int clearwords=0x7f0a001e;
@@ -800,7 +802,7 @@ public final class R {
         public static final int question_pub_head_title=0x7f0a0063;
         public static final int republish_tweet=0x7f0a001d;
         public static final int select=0x7f0a0015;
-        public static final int setting_head_title=0x7f0a0075;
+        public static final int setting_head_title=0x7f0a0077;
         public static final int share=0x7f0a0016;
         public static final int sharing=0x7f0a0017;
         /**  LoginSina 

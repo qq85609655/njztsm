@@ -137,6 +137,8 @@ public class Main extends BaseActivity {
 	private WebView webView;
 	private String url = "file:///android_asset/chart.html";
 	private Button search;
+	private Button btn_prview;
+	private Button btn_next;
 	private EditText editText;
 	private Handler webViewHandler;
 	private boolean isWebViewShow = false;
@@ -146,6 +148,8 @@ public class Main extends BaseActivity {
 	private int height;
 	private InputMethodManager imm;
 	private int day = 7;
+	private String firstTime;
+	private String lastTime;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -189,13 +193,21 @@ public class Main extends BaseActivity {
 		webView = (WebView) findViewById(R.id.webViewChart);
 		progress = (ProgressBar) findViewById(R.id.main_head_progress);
 		imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+		btn_prview = (Button) findViewById(R.id.main_chart_prview);
+		btn_next = (Button) findViewById(R.id.main_chart_next);
 
 		appContext = (AppContext) getApplication();
 		// 网络连接判断
 		if (!appContext.isNetworkConnected())
 			UIHelper.ToastMessage(this, R.string.network_not_connected);
 
+		btn_next.setText(R.string.btn_chart_next);
+		btn_prview.setText(R.string.btn_chart_prview);
+
 		search.setOnClickListener(searchClickListener);
+		btn_prview.setOnClickListener(prviewClickListener);
+		btn_next.setOnClickListener(nextClickListener);
+
 		width = getW();
 		height = getH();
 
@@ -217,7 +229,7 @@ public class Main extends BaseActivity {
 						v.setTag(1);
 						editText.clearFocus();
 						String phone = editText.getText().toString();
-						initWebView(day, phone);
+						initWebView(day, phone, "-", null);
 					} else {
 						v.setTag(null);
 					}
@@ -873,25 +885,22 @@ public class Main extends BaseActivity {
 		return flag;
 	}
 
-	private void initWebView(int day, final String phone) {
+	private void initWebView(int day, final String phone, final String type,
+			final String time) {
 
-		if (StringUtils.isEmpty(phone)) {
+		if (StringUtils.isEmpty(phone) || !StringUtils.isPhone(phone)) {
 			UIHelper.ToastMessage(appContext, "亲，您得输入手机号码才能检索哦！");
-			return;
-		}
-
-		if (!StringUtils.isPhone(phone)) {
-			UIHelper.ToastMessage(appContext, "亲，您要输入正确的手机号码才行哦！");
 			return;
 		}
 
 		progress.setVisibility(View.VISIBLE);
 		search.setEnabled(false);
+		btn_prview.setEnabled(false);
+		btn_next.setEnabled(false);
+
 		webViewHandler.post(new Runnable() {
 			public void run() {
 				int day = 7;
-				String type = "-";
-				String time = null;
 				try {
 					lineChart = appContext.getLineChartList(day, phone, type,
 							time);
@@ -902,11 +911,15 @@ public class Main extends BaseActivity {
 				if (null == lineChart) {
 					progress.setVisibility(View.GONE);
 					search.setEnabled(true);
+					btn_prview.setEnabled(true);
+					btn_next.setEnabled(true);
 					UIHelper.ToastMessage(appContext, msg);
 
 					return;
 				}
 				UIHelper.ToastMessage(appContext, "正在加载数据，请稍候！");
+				firstTime = lineChart.getFirstTime();
+				lastTime = lineChart.getLastTime();
 				if (isWebViewShow) {
 					webViewCallJS();
 					return;
@@ -927,6 +940,8 @@ public class Main extends BaseActivity {
 				+ height + ")");
 		progress.setVisibility(View.GONE);
 		search.setEnabled(true);
+		btn_prview.setEnabled(true);
+		btn_next.setEnabled(true);
 		// getString(R.string.new_data_toast_complete, newdata)
 		NewDataToast.makeText(webView.getContext(),
 				getString(R.string.new_data_toast_complete),
@@ -1024,7 +1039,27 @@ public class Main extends BaseActivity {
 		public void onClick(View v) {
 			editText.clearFocus();
 			String phone = editText.getText().toString();
-			initWebView(day, phone);
+			initWebView(day, phone, "-", null);
+		}
+	};
+
+	private View.OnClickListener nextClickListener = new View.OnClickListener() {
+		public void onClick(View v) {
+			System.out.println("nextClickListener");
+
+			editText.clearFocus();
+			String phone = editText.getText().toString();
+			initWebView(day, phone, "+", lastTime);
+		}
+	};
+
+	private View.OnClickListener prviewClickListener = new View.OnClickListener() {
+		public void onClick(View v) {
+
+			System.out.println("prviewClickListener");
+			editText.clearFocus();
+			String phone = editText.getText().toString();
+			initWebView(day, phone, "-", firstTime);
 		}
 	};
 

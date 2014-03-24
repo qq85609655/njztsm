@@ -232,7 +232,11 @@ public class AppContext extends Application {
 	public LineChart getLineChartList(int day, String phone, String type,
 			String time) throws AppException {
 		LineChart list = null;
-		String key = "lineChartReport_" + loginUid + "_" + phone + "_" + day;
+		String key = "lineChartReport_" + loginUid + "_" + phone + "_" + day
+				+ "_" + type;
+
+		if (!StringUtils.isEmpty(time))
+			key += "_" + time;
 
 		System.out.println(key);
 		if (isNetworkConnected() && (!isReadDataCache(key))) {

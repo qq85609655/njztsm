@@ -97,17 +97,20 @@ public class MedicalReportServiceImpl implements MedicalReportService
     }
     
     @Override
-    public List<MedicalReport> getMemberReports(MedicalReport lastReport, Long userId, int day)
+    public List<MedicalReport> getMemberReports(Long lastReportDate, Long userId, int day)
     {
         
-        Long date = lastReport.getReportTime();
+        Long date = lastReportDate;
         Date endDate = DateTimeUtil.getDate(date, 1);
         Date startDate = DateTimeUtil.getDate(date, day);
         
         Long timeStart = startDate.getTime();
         Long timeEnd = endDate.getTime();
         
-        return reportDao.getDayReport(userId, timeStart, timeEnd, SMSType.PHYSICAL);
+        if (day > 0)
+            return reportDao.getDayReport(userId, timeEnd, timeStart, SMSType.PHYSICAL);
+        else
+            return reportDao.getDayReport(userId, timeStart, timeEnd, SMSType.PHYSICAL);
         
     }
     

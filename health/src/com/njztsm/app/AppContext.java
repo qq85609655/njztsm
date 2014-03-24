@@ -13,17 +13,6 @@ import java.util.Hashtable;
 import java.util.Properties;
 import java.util.UUID;
 
-import com.njztsm.app.api.ApiClient;
-import com.njztsm.app.bean.LineChart;
-import com.njztsm.app.bean.News;
-import com.njztsm.app.bean.NewsList;
-import com.njztsm.app.bean.Notice;
-import com.njztsm.app.common.ImageUtils;
-import com.njztsm.app.common.MethodsCompat;
-import com.njztsm.app.common.StringUtils;
-import com.njztsm.app.common.UIHelper;
-
-import com.njztsm.app.R;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -36,6 +25,16 @@ import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
 import android.webkit.CacheManager;
+
+import com.njztsm.app.api.ApiClient;
+import com.njztsm.app.bean.LineChart;
+import com.njztsm.app.bean.News;
+import com.njztsm.app.bean.NewsList;
+import com.njztsm.app.bean.Notice;
+import com.njztsm.app.common.ImageUtils;
+import com.njztsm.app.common.MethodsCompat;
+import com.njztsm.app.common.StringUtils;
+import com.njztsm.app.common.UIHelper;
 
 /**
  * 全局应用程序类：用于保存和调用全局应用配置及访问网络数据
@@ -230,14 +229,16 @@ public class AppContext extends Application {
 	 * @return
 	 * @throws AppException
 	 */
-	public LineChart getLineChartList(int day, String phone)
-			throws AppException {
+	public LineChart getLineChartList(int day, String phone, String type,
+			String time) throws AppException {
 		LineChart list = null;
 		String key = "lineChartReport_" + loginUid + "_" + phone + "_" + day;
+
+		System.out.println(key);
 		if (isNetworkConnected() && (!isReadDataCache(key))) {
 			// if (isNetworkConnected()) {
 			try {
-				list = ApiClient.getLineChartList(this, day, phone);
+				list = ApiClient.getLineChartList(this, day, phone, type, time);
 				if (list != null) {
 					Notice notice = list.getNotice();
 					list.setNotice(null);

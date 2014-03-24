@@ -52,4 +52,27 @@
         android:layout_weight="1"
         android:scrollbars="none" />
 
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="40dip"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="2dip"
+        android:paddingRight="2dip" >
+
+        <Button
+            android:id="@+id/main_prview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center"
+            android:text="上一页" />
+
+        <Button
+            android:id="@+id/main_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center"
+            android:text="下一页" />
+    </FrameLayout>
+    
 </LinearLayout>

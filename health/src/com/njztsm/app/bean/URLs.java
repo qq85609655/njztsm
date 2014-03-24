@@ -21,12 +21,12 @@ public class URLs implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public final static String BASE_HOST = "open.njztsm.net";
+	public final static String BASE_HOST = "10.0.2.2";
 
-	public final static String BASE_CHART_HOST = "www.njztsm.net";
+	public final static String BASE_CHART_HOST = "10.0.2.2";
 
-	public final static String HOST = "www.oschina.net";// 192.168.1.213
-														// www.oschina.net
+	public final static String HOST = "10.0.2.2";// 192.168.1.213
+													// www.oschina.net
 	public final static String HTTP = "http://";
 	public final static String HTTPS = "https://";
 
@@ -49,7 +49,7 @@ public class URLs implements Serializable {
 			+ "android/version";
 
 	public final static String URL_LINE_CHART = BASE_CHART_API_HOST
-			+ "android/chart/";
+			+ "android/chartData";
 
 	private final static String URL_HOST = "oschina.net";
 	private final static String URL_WWW_HOST = "www." + URL_HOST;

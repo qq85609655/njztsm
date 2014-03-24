@@ -31,7 +31,7 @@ public interface MedicalReportService
     
     public List<MedicalReport> getLastReports(Long userId, Date dateTime, int day);
     
-    public List<MedicalReport> getMemberReports(MedicalReport lastReport, Long userId, int day);
+    public List<MedicalReport> getMemberReports(Long lastReportDate, Long userId, int day);
     
     public void deleteMedicalReport(Long userId);
     

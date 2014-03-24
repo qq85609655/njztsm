@@ -174,7 +174,7 @@ public class Main extends BaseActivity {
 		this.initQuickActionGrid();
 		this.initFrameListView();
 		this.initImswitcher();
-		this.initSearch() ;
+		this.initSearch();
 		// 启动轮询通知信息
 		// this.foreachUserNotice();
 
@@ -890,8 +890,11 @@ public class Main extends BaseActivity {
 		webViewHandler.post(new Runnable() {
 			public void run() {
 				int day = 7;
+				String type = "-";
+				String time = null;
 				try {
-					lineChart = appContext.getLineChartList(day, phone);
+					lineChart = appContext.getLineChartList(day, phone, type,
+							time);
 				} catch (AppException e) {
 					e.printStackTrace();
 				}

@@ -30,8 +30,11 @@ public class JSinterface {
 		handler.post(new Runnable() {
 			public void run() {
 				int day = 7;
+				String type = "-";
+				String time = null;
 				try {
-					lineChart = appContext.getLineChartList(day, phone);
+					lineChart = appContext.getLineChartList(day, phone, type,
+							time);
 				} catch (AppException e) {
 					e.printStackTrace();
 				}

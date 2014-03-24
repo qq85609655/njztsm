@@ -569,14 +569,23 @@ public class ApiClient {
 	 * @return
 	 * @throws AppException
 	 */
+	@SuppressWarnings("serial")
 	public static LineChart getLineChartList(AppContext appContext,
-			final int day, final String phone) throws AppException {
-		String newUrl = URLs.URL_LINE_CHART + phone.trim();
-		// TODO
-		// String newUrl = "http://test.njztsm.net/android/chart/" +
-		// phone.trim();
+			final int day, final String phone, final String type,
+			final String time) throws AppException {
+		String url = URLs.URL_LINE_CHART;
+		NameValuePair[] pairs = splitNameValuePair(new HashMap<String, String>() {
+			{
+				put("phone", phone.trim());
+				put("type", type.trim());
+				put("time", time);
+			}
+		});
+		System.out.println(url);
 		try {
-			DataView dataView = method_get(appContext, newUrl);
+			DataView dataView = http_post(appContext, url, pairs);
+
+			System.out.println(dataView);
 
 			if (Constants.SUCCESS != dataView.getCode()) {
 				return null;

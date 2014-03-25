@@ -347,7 +347,7 @@ public class AndroidColtroller
             reporTime = dateTime.getTime();
         }
         
-        int timeLength = "+".equals(type) ? 7 : -7;
+        int timeLength = "+".equals(type) ? 8 : -8;
         
         List<MedicalReport> lastReports = reportService.getMemberReports(reporTime, userId, timeLength);
         
@@ -357,12 +357,11 @@ public class AndroidColtroller
         long lastDate = lastReports.get(Constants.ZERO).getReportTime();
         
         Map<String, HealthReport> result4health = Maps.newHashMap();
-        String yeah = DateTimeUtil.getYear(lastDate);
-        
+        String lastYeah = DateTimeUtil.getYear(lastDate);
         for (MedicalReport mReoprt : lastReports)
         {
             String x_time = DateTimeUtil.getDate(mReoprt.getReportTime());
-            x_time = x_time.replaceFirst(yeah + "-", "");
+            x_time = x_time.replaceFirst(lastYeah + "-", "");
             
             String text = mReoprt.getOriginalData();
             ChartData gatherData = JSONObject.parseObject(text, ChartData.class);
@@ -377,6 +376,19 @@ public class AndroidColtroller
             result4health.put(x_time, healthReport);
         }
         
+        long firstDate = reporTime - 1000 * 3600 * 24 * 1;
+        if (timeLength > Constants.ZERO)
+        {
+            firstDate = firstDate + 1000 * 3600 * 24 * 8;
+        }
+        
+        if (StringUtils.isBlank(time))
+        {
+            firstDate = reporTime;
+        }
+        List<String> years = Lists.newArrayList();
+        boolean hasData = false;
+        
         for (int i = 0; i < 7; i++)
         {
             Integer systolic_val = 0;
@@ -384,13 +396,18 @@ public class AndroidColtroller
             Integer health_val = 0;
             String reports_val = "";
             
-            long cutDate = lastDate - 1000 * 3600 * 24 * i;
+            long cutDate = firstDate - 1000 * 3600 * 24 * i;
             String x_time = DateTimeUtil.getDate(cutDate);
-            x_time = x_time.replaceFirst(yeah + "-", "");
+            x_time = x_time.replaceFirst(lastYeah + "-", "");
             
-            labels.add(x_time);
+            String currentYear = DateTimeUtil.getYear(cutDate);
+            if (!years.contains(currentYear))
+                years.add(currentYear);
+            String lable_time = x_time.replace(currentYear + "-", "");
+            labels.add(lable_time);
             if (result4health.containsKey(x_time))
             {
+                hasData = true;
                 HealthReport healthReport = result4health.get(x_time);
                 
                 systolic_val = healthReport.getSystolic();
@@ -404,6 +421,10 @@ public class AndroidColtroller
             health.add(health_val);
             reports.add(reports_val);
         }
+        
+        if (!hasData)
+            throw new SklayException("暂无体检报告");
+        
         Collections.reverse(labels);
         Collections.reverse(systolic);
         Collections.reverse(diastolic);
@@ -419,11 +440,11 @@ public class AndroidColtroller
         Line line_health = new Line("健康指数", health, getRandColorCode(), line_width);
         
         List<Line> data = Lists.newArrayList(line_systolic, line_diastolic, line_health);
+        Collections.reverse(years);
+        LineChart chart = new LineChart(labels, data, reports, years.toString(), 6, member.getName());
         
-        LineChart chart = new LineChart(labels, data, reports, yeah, 6, member.getName());
-        
-        chart.setLastTime(DateTimeUtil.getDate(lastDate));
-        chart.setFirstTime(DateTimeUtil.getDate(lastDate - 1000 * 3600 * 24 * 6));
+        chart.setLastTime(DateTimeUtil.getDate(firstDate));
+        chart.setFirstTime(DateTimeUtil.getDate(firstDate - 1000 * 3600 * 24 * 6));
         DataView dataView = new DataView(1, "成功", JSON.toJSONString(chart));
         
         return dataView;

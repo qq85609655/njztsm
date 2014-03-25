@@ -35,3 +35,4 @@
 /android-server/android-web/target
 /android-server/android-web/*.classpath
 /android-server/android-web/*.project
+/health/.settings

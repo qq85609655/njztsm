@@ -131,8 +131,8 @@ function execute(chartData, w, h) {
 									.fillText('血压(mmHg)', x - 20, y - 10,
 											false, '#339999').textBaseline(
 											'top').fillText(
-											'时间(' + chartData.yeah + ')',
-											x + w - 40, y + h + 20, false,
+											'时间' + chartData.yeah,
+											x + w - 80, y + h + 20, false,
 											'#339999');
 						}
 					}));

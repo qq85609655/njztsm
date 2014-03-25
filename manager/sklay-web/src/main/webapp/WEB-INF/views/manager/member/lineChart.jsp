@@ -152,7 +152,7 @@ $(function(){
     	$.post(url,function(data){
     		
     		if(!data.data){
-                alert(last_label+" 以后暂无数据!") ;
+    			alert("好啦，别点了 亲 已经没有数据啦！") ;
                 return  ;
             }
     		
@@ -183,7 +183,7 @@ $(function(){
   	  var url = '${ctx}/admin/member/lineChart/${userId}/+/'+last_label ;
         $.post(url,function(data){
         	if(!data.data){
-        		alert(last_label+" 以后暂无数据!") ;
+        		alert("好啦，别点了 亲 已经到头了！") ;
         		return  ;
         	}
             var chartData = data.data ;
@@ -212,7 +212,7 @@ $(function(){
 	
 </script>
 			<div>
-			<button onclick="preview()">上一周</button>
-			<button onclick="nextview()">下一周</button>
+				<button onclick="preview()">上一周</button>
+				<button onclick="nextview()">下一周</button>
 			</div>
 			<div id='canvasDiv'></div>

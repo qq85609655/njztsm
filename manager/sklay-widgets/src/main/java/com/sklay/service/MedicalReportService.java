@@ -1,6 +1,5 @@
 package com.sklay.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +28,7 @@ public interface MedicalReportService
     
     public List<MedicalReport> getLastReports(Long userId, int day);
     
-    public List<MedicalReport> getLastReports(Long userId, Date dateTime, int day);
+    public List<MedicalReport> getLastReports(Long userId, long startTime, long endTime);
     
     public List<MedicalReport> getMemberReports(Long lastReportDate, Long userId, int day);
     

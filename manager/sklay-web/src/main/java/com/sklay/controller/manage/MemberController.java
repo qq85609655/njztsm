@@ -702,17 +702,27 @@ public class MemberController
         List<Integer> diastolic = Lists.newArrayList();
         List<Integer> health = Lists.newArrayList();
         List<String> reports = Lists.newArrayList();
-        Integer day = "-".equals(type) ? -7 : 7;
+        Integer day = "-".equals(type) ? -8 : 8;
         User member = userService.getUser(userId);
         if (null == member)
             throw new SklayException(ErrorCode.FINF_NULL, null, new Object[] {"需绑定的会员信息"});
         
-        List<MedicalReport> lastReports = reportService.getLastReports(userId, dateTime, day);
+        Long date = dateTime.getTime();
+        Date endDate = day > Constants.ZERO ? DateTimeUtil.getDate(date, -1) : DateTimeUtil.getDate(date, 1);
+        Date startDate = DateTimeUtil.getDate(date, day);
+        
+        Long timeStart = startDate.getTime();
+        Long timeEnd = endDate.getTime();
+        
+        List<MedicalReport> lastReports = null;
+        
+        if (day < 0)
+            lastReports = reportService.getLastReports(userId, timeStart, timeEnd);
+        else
+            lastReports = reportService.getLastReports(userId, timeEnd, timeStart);
         
         if (CollectionUtils.isEmpty(lastReports))
             throw new SklayException("暂无体检数据");
-        
-        long firstDate = lastReports.get(Constants.ZERO).getReportTime();
         
         Map<String, HealthReport> result4health = Maps.newHashMap();
         
@@ -731,7 +741,12 @@ public class MemberController
             
             result4health.put(x_time, healthReport);
         }
-        
+        long firstDate = dateTime.getTime() - 1000 * 3600 * 24 * 1;
+        if (day > Constants.ZERO)
+        {
+            firstDate = firstDate + 1000 * 3600 * 24 * 8;
+        }
+        boolean hasData = false;
         for (int i = 0; i < 7; i++)
         {
             Integer systolic_val = 0;
@@ -745,7 +760,7 @@ public class MemberController
             
             if (result4health.containsKey(x_time))
             {
-                
+                hasData = true;
                 HealthReport healthReport = result4health.get(x_time);
                 
                 systolic_val = healthReport.getSystolic();
@@ -759,6 +774,9 @@ public class MemberController
             health.add(health_val);
             reports.add(reports_val);
         }
+        
+        if (!hasData)
+            throw new SklayException("暂无体检数据");
         Collections.reverse(labels);
         Collections.reverse(systolic);
         Collections.reverse(diastolic);

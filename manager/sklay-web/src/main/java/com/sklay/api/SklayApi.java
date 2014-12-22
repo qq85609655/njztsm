@@ -170,12 +170,14 @@ public class SklayApi {
 	 * @throws JSONException
 	 */
 	public String searchLocation(String latitude, String longitude) {
-		Request request = new Request(Verb.POST, searchURL);
+		Request request = new Request(Verb.GET, searchURL);
 
 		request.addQuerystringParameter("location", latitude.trim() + ","
 				+ longitude.trim());
 		request.addQuerystringParameter("output", "json");
 		request.addQuerystringParameter("ak", akKey);
+//		request.addQuerystringParameter("callback", "renderReverse");
+		request.addQuerystringParameter("pois", "0");
 		Response response = request.send();
 
 		if (StringUtils.isBlank(response.getBody()))
@@ -197,7 +199,7 @@ public class SklayApi {
 		// String searchURL = "http://api.map.baidu.com/geoconv/v1/";
 		// String searchURL = "http://api.map.baidu.com/geocoder/v2/";
 		// String searchKey = "L511uLxYb6R8xm2B5Bnh9ijc";
-		Request request = new Request(Verb.POST, geoconvURL);
+		Request request = new Request(Verb.GET, geoconvURL);
 		//
 		request.addQuerystringParameter("coords", longitude + "," + latitude);
 		request.addQuerystringParameter("from", "1");
@@ -822,7 +824,7 @@ public class SklayApi {
 		String searchURL = "http://api.map.baidu.com/geoconv/v1/";
 		// String searchURL = "http://api.map.baidu.com/geocoder/v2/";
 		String searchKey = "L511uLxYb6R8xm2B5Bnh9ijc";
-		Request request = new Request(Verb.POST, searchURL);
+		Request request = new Request(Verb.GET, searchURL);
 		//
 		request.addQuerystringParameter("coords", "117.103687,36.6839680");
 		request.addQuerystringParameter("from", "1");
@@ -849,7 +851,7 @@ public class SklayApi {
 		List<Coordinates> location = JSONObject.parseArray(
 				dataEntity.getResult(), Coordinates.class);
 
-		System.out.println(location.toString());
+		System.out.println(""+ location.toString());
 
 	}
 }
